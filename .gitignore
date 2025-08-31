@@ -1,0 +1,120 @@
+# Build directories
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+Makefile2
+Makefile.cmake
+
+# Object files and libraries
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# Executables
+fauxdb
+network_client
+network_server
+
+# Compiler generated files
+*.d
+*.gch
+*.pch
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# CMake generated files
+CMakeScripts/
+Testing/
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Package manager files
+vcpkg_installed/
+
+# Regression test outputs
+regression/results/
+regression/logs/
+*.out
+*.diff
+regression.diffs
+regression.out
+
+# Extension build artifacts
+extension/bson/src/*.o
+extension/bson/results/
+extension/bson/regression.diffs
+extension/bson/regression.out
+
+# Module test artifacts
+module_test/CMakeFiles/
+module_test/CMakeCache.txt
+module_test/cmake_install.cmake
+module_test/Makefile
+module_test/Makefile2
+module_test/Makefile.cmake
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Coverage files
+*.gcov
+*.gcda
+*.gcno
+coverage/
+
+# Profiling files
+*.prof
+gmon.out
+
+# Documentation build
+doc/build/
+doc/_build/
+
+# Local configuration files
+config/local.conf
+*.local.conf
+*.log
+c.sh

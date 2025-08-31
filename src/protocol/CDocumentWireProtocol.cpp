@@ -17,6 +17,22 @@ using namespace std;
 using namespace FauxDB;
 // FauxDB namespace removed for direct symbol usage
 
+/* Utility: CRC-32C (Castagnoli) computation */
+static uint32_t crc32c_compute(const uint8_t* data, size_t length)
+{
+    uint32_t crc = 0xFFFFFFFFu;
+    for (size_t i = 0; i < length; ++i)
+    {
+        crc ^= data[i];
+        for (int k = 0; k < 8; ++k)
+        {
+            uint32_t mask = -(crc & 1u);
+            crc = (crc >> 1) ^ (0x82F63B78u & mask);
+        }
+    }
+    return ~crc;
+}
+
 /*-------------------------------------------------------------------------
  * CDocumentMessageHeader implementation
  *-------------------------------------------------------------------------*/
@@ -116,19 +132,23 @@ std::vector<uint8_t> CDocumentMsgSection1::serialize() const
 	std::vector<uint8_t> result;
 	result.push_back(kind);
 
-	/* Add identifier as cstring */
+	// Reserve space for section size (int32) immediately after kind
+	size_t sizePos = result.size();
+	result.resize(result.size() + 4, 0);
+
+	// identifier cstring
 	result.insert(result.end(), identifier.begin(), identifier.end());
-	result.push_back(0x00); /* Null terminator */
+	result.push_back(0x00);
 
-	/* Add size */
-	result.resize(result.size() + 4);
-	std::memcpy(result.data() + result.size() - 4, &size, sizeof(int32_t));
-
-	/* Add documents */
+	// documents
 	for (const auto& doc : documents)
 	{
 		result.insert(result.end(), doc.begin(), doc.end());
 	}
+
+	// Compute and write size: includes the int32 itself + identifier cstring + docs
+	int32_t computedSize = static_cast<int32_t>(result.size() - sizePos);
+	std::memcpy(result.data() + sizePos, &computedSize, sizeof(int32_t));
 
 	return result;
 }
@@ -147,41 +167,35 @@ bool CDocumentMsgSection1::deserialize(const std::vector<uint8_t>& data,
 		return false;
 	}
 
-	/* Read identifier as cstring */
+	// Read size (immediately after kind)
+	if (offset + 4 > data.size())
+	{
+		return false;
+	}
+	std::memcpy(&size, data.data() + offset, sizeof(int32_t));
+	size_t sectionStartAfterSize = offset + 4; // mark start of content
+	offset += 4;
+
+	// Read identifier as cstring
 	size_t start = offset;
 	while (offset < data.size() && data[offset] != 0x00)
 	{
 		offset++;
 	}
-
 	if (offset >= data.size())
 	{
 		return false;
 	}
-
 	identifier = std::string(data.begin() + start, data.begin() + offset);
 	offset++; /* Skip null terminator */
 
-	/* Read size */
-	if (offset + 4 > data.size())
-	{
-		return false;
-	}
-
-	std::memcpy(&size, data.data() + offset, sizeof(int32_t));
-	offset += 4;
-
 	/* Read documents */
-	size_t endOffset = offset + size - 4; /* size includes the int32 itself */
+	size_t endOffset = sectionStartAfterSize + (size >= 4 ? static_cast<size_t>(size - 4) : 0);
+
 	documents.clear();
 
-	while (offset < endOffset && offset < data.size())
+	while (offset < endOffset && offset + 4 <= data.size())
 	{
-		if (offset + 4 > data.size())
-		{
-			break;
-		}
-
 		int32_t docSize;
 		std::memcpy(&docSize, data.data() + offset, sizeof(int32_t));
 
@@ -443,13 +457,15 @@ void CDocumentMsgBody::setChecksumPresent(bool present)
 
 void CDocumentMsgBody::computeChecksum()
 {
-	/* TODO: Implement CRC32C computation */
-	checksum = 0;
+	// Compute CRC32C over serialized body (flagBits + sections, excluding
+	// trailing checksum field which is not yet appended here)
+	auto serialized = serialize();
+	checksum = crc32c_compute(serialized.data(), serialized.size());
 }
 
 bool CDocumentMsgBody::validateChecksum() const
 {
-	/* TODO: Implement CRC32C validation */
+	// Validation is performed at message level since checksum covers header+body.
 	return true;
 }
 
@@ -639,17 +655,34 @@ bool CDocumentWireMessage::parseFromBytes(const std::vector<uint8_t>& data)
 	// TODO: Implement body parsing when body classes are defined
 	// For now, just skip body parsing to allow basic initialization
 	
-	switch (static_cast<CDocumentOpCode>(header_.opCode))
-	{
+    switch (static_cast<CDocumentOpCode>(header_.opCode))
+    {
 	case CDocumentOpCode::OP_MSG:
 	{
 		msgBody_ = std::make_unique<CDocumentMsgBody>();
-		if (!msgBody_->deserialize(data, offset))
-		{
-			return false;
-		}
-		break;
-	}
+        if (!msgBody_->deserialize(data, offset))
+        {
+            return false;
+        }
+        // If checksumPresent, validate CRC-32C over entire message minus last 4 bytes
+        if (msgBody_->flagBits & static_cast<int32_t>(CDocumentMsgFlags::CHECKSUM_PRESENT))
+        {
+            if (header_.messageLength < 20 || header_.messageLength > static_cast<int32_t>(data.size()))
+            {
+                return false;
+            }
+            size_t crcLen = static_cast<size_t>(header_.messageLength) - 4;
+            uint32_t crc = crc32c_compute(data.data(), crcLen);
+            // Extract stored checksum (last 4 bytes of the message)
+            uint32_t stored = 0;
+            std::memcpy(&stored, data.data() + crcLen, sizeof(uint32_t));
+            if (crc != stored)
+            {
+                return false;
+            }
+        }
+        break;
+    }
 	case CDocumentOpCode::OP_COMPRESSED:
 	{
 		compressedBody_ = std::make_unique<CDocumentCompressedBody>();
@@ -1098,12 +1131,11 @@ bool CDocumentWireParser::validateBsonSize(size_t size) const
 uint32_t CDocumentWireParser::computeCRC32C(const std::vector<uint8_t>& data,
 										 size_t start, size_t length) const
 {
-	(void)data;	  // Suppress unused parameter warning
-	(void)start;  // Suppress unused parameter warning
-	(void)length; // Suppress unused parameter warning
-	/* TODO: Implement CRC32C computation using Castagnoli polynomial 0x1EDC6F41
-	 */
-	return 0;
+	if (start + length > data.size())
+	{
+		return 0;
+	}
+	return crc32c_compute(data.data() + start, length);
 }
 
 // End of file

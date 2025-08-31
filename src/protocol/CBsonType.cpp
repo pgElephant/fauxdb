@@ -307,15 +307,12 @@ std::vector<uint8_t> CBsonType::getDocument() const
     }
     try
     {
-        char* json_str = bson_as_canonical_extended_json(bsonDoc_, nullptr);
-        if (!json_str)
-        {
-            setError("Failed to convert BSON to JSON");
-            return std::vector<uint8_t>{};
-        }
-        
-        std::vector<uint8_t> result(json_str, json_str + strlen(json_str));
-        bson_free(json_str);
+        // Return raw BSON bytes (little-endian), not JSON text.
+        const uint8_t* data = static_cast<const uint8_t*>(bson_get_data(bsonDoc_));
+        size_t len = bsonDoc_->len;
+        std::vector<uint8_t> result;
+        result.resize(len);
+        std::memcpy(result.data(), data, len);
         return result;
     }
     catch(const std::exception& e)

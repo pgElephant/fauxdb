@@ -57,26 +57,43 @@ vector<uint8_t> COpMsgHandler::handleHello(const OpMsgCommand& command)
 		return vector<uint8_t>();
 	if (!bsonBuilder.beginDocument())
 		return vector<uint8_t>();
+		
+	/* Standard success response */
 	if (!bsonBuilder.addDouble("ok", 1.0))
 		return vector<uint8_t>();
+		
+	/* Required hello response fields per MongoDB spec */
 	if (!bsonBuilder.addBool("isWritablePrimary", true))
 		return vector<uint8_t>();
-	if (!bsonBuilder.addBool("ismaster", true))
+	if (!bsonBuilder.addBool("ismaster", true))  /* Legacy field for compatibility */
 		return vector<uint8_t>();
-	if (!bsonBuilder.addInt32("minWireVersion", 0))
+	if (!bsonBuilder.addBool("helloOk", true))   /* Indicates hello command support */
 		return vector<uint8_t>();
-	if (!bsonBuilder.addInt32("maxWireVersion", 21))
+		
+	/* Wire protocol version - OP_MSG support (MongoDB 3.6) */
+	if (!bsonBuilder.addInt32("minWireVersion", 6))
 		return vector<uint8_t>();
-	if (!bsonBuilder.addInt32("maxBsonObjectSize", 16777216))
+	if (!bsonBuilder.addInt32("maxWireVersion", 6))
 		return vector<uint8_t>();
-	if (!bsonBuilder.addInt32("maxMessageSizeBytes", 48000000))
+		
+	/* Message size limits per MongoDB defaults */
+	if (!bsonBuilder.addInt32("maxBsonObjectSize", 16777216))      /* 16MB */
 		return vector<uint8_t>();
-	if (!bsonBuilder.addInt32("maxWriteBatchSize", 100000))
+	if (!bsonBuilder.addInt32("maxMessageSizeBytes", 48000000))    /* 48MB */
 		return vector<uint8_t>();
-	if (!bsonBuilder.addString("compression", "none"))
+	if (!bsonBuilder.addInt32("maxWriteBatchSize", 100000))        /* 100k docs */
 		return vector<uint8_t>();
-	if (!bsonBuilder.addInt32("logicalSessionTimeoutMinutes", 30))
+		
+	/* Server information */
+	if (!bsonBuilder.addString("msg", "FauxDB"))
 		return vector<uint8_t>();
+	if (!bsonBuilder.addInt64("localTime", 1000LL * time(nullptr))) /* Current time in ms */
+		return vector<uint8_t>();
+		
+	/* Connection information */
+	if (!bsonBuilder.addInt32("connectionId", 1))
+		return vector<uint8_t>();
+		
 	if (!bsonBuilder.endDocument())
 		return vector<uint8_t>();
 	return buildSuccessResponse(bsonBuilder.getDocument());
@@ -123,7 +140,7 @@ vector<uint8_t> COpMsgHandler::handleBuildInfo(const OpMsgCommand& command)
 		return vector<uint8_t>();
 	if (!bsonBuilder.endDocument())
 		return vector<uint8_t>();
-	return bsonBuilder.getDocument();
+	return buildSuccessResponse(bsonBuilder.getDocument());
 }
 vector<uint8_t> COpMsgHandler::handleGetParameter(const OpMsgCommand& command)
 {

@@ -1,0 +1,11 @@
+server:
+  port: 27018
+  bind_address: "0.0.0.0"
+  worker_threads: 4
+
+postgresql:
+  host: "localhost"
+  port: 5432
+  database: "fauxdb"
+  user: "fauxdb"
+  password: "fauxdb"

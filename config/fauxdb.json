@@ -1,0 +1,33 @@
+{
+  "server": {
+    "port": 27018,
+    "bind_address": "0.0.0.0",
+    "daemon_mode": false,
+    "max_connections": 1000,
+    "connection_timeout": 30,
+    "worker_threads": 4
+  },
+  "postgresql": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "fauxdb",
+    "user": "fauxdb",
+    "password": "fauxdb",
+    "pool_size": 10,
+    "timeout": 10
+  },
+  "logging": {
+    "log_file": "fauxdb.log",
+    "verbose": false,
+    "debug": false,
+    "log_level": "INFO"
+  },
+  "security": {
+    "auth_required": false,
+    "auth_database": "admin"
+  },
+  "performance": {
+    "query_cache_enabled": true,
+    "query_cache_size": 1000
+  }
+}

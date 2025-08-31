@@ -5,6 +5,8 @@
 #include <sstream>
 
 // Library headers
+#include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
 
 // Project headers
 #include "CConfig.hpp"
@@ -97,80 +99,69 @@ std::error_code CConfig::loadFromJson(const std::string& jsonContent)
 
 	try
 	{
-		size_t pos = 0;
-		while (pos < jsonContent.length())
+		nlohmann::json j = nlohmann::json::parse(jsonContent);
+		
+		for (auto it = j.begin(); it != j.end(); ++it)
 		{
-			size_t keyStart = jsonContent.find('"', pos);
-			if (keyStart == std::string::npos)
-				break;
-
-			size_t keyEnd = jsonContent.find('"', keyStart + 1);
-			if (keyEnd == std::string::npos)
-				break;
-
-			std::string key =
-				jsonContent.substr(keyStart + 1, keyEnd - keyStart - 1);
-
-			size_t colonPos = jsonContent.find(':', keyEnd + 1);
-			if (colonPos == std::string::npos)
-				break;
-
-			size_t valueStart =
-				jsonContent.find_first_not_of(" \t\n\r", colonPos + 1);
-			if (valueStart == std::string::npos)
-				break;
-
-			size_t valueEnd = valueStart;
-			if (jsonContent[valueStart] == '"')
+			std::string key = it.key();
+			
+			if (it.value().is_string())
 			{
-				valueStart++;
-				valueEnd = jsonContent.find('"', valueStart);
-				if (valueEnd == std::string::npos)
-					break;
-				std::string value =
-					jsonContent.substr(valueStart, valueEnd - valueStart);
-				set(key, value);
-				pos = valueEnd + 1;
+				set(key, it.value().get<std::string>());
+			}
+			else if (it.value().is_number_integer())
+			{
+				set(key, it.value().get<int>());
+			}
+			else if (it.value().is_number_float())
+			{
+				set(key, it.value().get<double>());
+			}
+			else if (it.value().is_boolean())
+			{
+				set(key, it.value().get<bool>());
+			}
+			else if (it.value().is_array())
+			{
+				std::vector<std::string> arrayValues;
+				for (const auto& item : it.value())
+				{
+					if (item.is_string())
+					{
+						arrayValues.push_back(item.get<std::string>());
+					}
+					else
+					{
+						arrayValues.push_back(item.dump());
+					}
+				}
+				set(key, arrayValues);
 			}
 			else
 			{
-				while (valueEnd < jsonContent.length() &&
-					   (std::isalnum(jsonContent[valueEnd]) ||
-						jsonContent[valueEnd] == '.' ||
-						jsonContent[valueEnd] == '-'))
-				{
-					valueEnd++;
-				}
-				std::string value =
-					jsonContent.substr(valueStart, valueEnd - valueStart);
-				if (value == "true" || value == "false")
-				{
-					set(key, value == "true");
-				}
-				else
-				{
-					try
-					{
-						double numValue = std::stod(value);
-						set(key, numValue);
-					}
-					catch (...)
-					{
-						set(key, value);
-					}
-				}
-				pos = valueEnd;
+				// Convert other types to string
+				set(key, it.value().dump());
 			}
-
-			pos = jsonContent.find(',', pos);
-			if (pos != std::string::npos)
-				pos++;
 		}
 
 		return std::error_code{};
 	}
+	catch (const nlohmann::json::exception& e)
+	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::ERROR, 
+				std::string("JSON parsing error: ") + e.what());
+		}
+		return std::make_error_code(std::errc::invalid_argument);
+	}
 	catch (const std::exception& e)
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::ERROR, 
+				std::string("JSON loading error: ") + e.what());
+		}
 		return std::make_error_code(std::errc::invalid_argument);
 	}
 }
@@ -184,60 +175,99 @@ std::error_code CConfig::loadFromYaml(const std::string& yamlContent)
 
 	try
 	{
-		std::istringstream stream(yamlContent);
-		std::string line;
-		std::string currentKey;
-
-		while (std::getline(stream, line))
-		{
-			if (line.empty() || line[0] == '#')
-				continue;
-
-			size_t start = line.find_first_not_of(" \t");
-			if (start == std::string::npos)
-				continue;
-
-			size_t colonPos = line.find(':', start);
-			if (colonPos == std::string::npos)
-				continue;
-
-			std::string key = line.substr(start, colonPos - start);
-			std::string value = line.substr(colonPos + 1);
-
-			value.erase(0, value.find_first_not_of(" \t"));
-			value.erase(value.find_last_not_of(" \t") + 1);
-
-			if (!value.empty())
-			{
-				if (value[0] == '"' && value[value.length() - 1] == '"')
-				{
-					value = value.substr(1, value.length() - 2);
-					set(key, value);
-				}
-				else if (value == "true" || value == "false")
-				{
-					set(key, value == "true");
-				}
-				else
-				{
-					try
-					{
-						double numValue = std::stod(value);
-						set(key, numValue);
-					}
-					catch (...)
-					{
-						set(key, value);
-					}
-				}
-			}
-		}
-
+		YAML::Node config = YAML::Load(yamlContent);
+		
+		// Recursively process YAML nodes
+		processYamlNode("", config);
+		
 		return std::error_code{};
+	}
+	catch (const YAML::Exception& e)
+	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::ERROR, 
+				std::string("YAML parsing error: ") + e.what());
+		}
+		return std::make_error_code(std::errc::invalid_argument);
 	}
 	catch (const std::exception& e)
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::ERROR, 
+				std::string("YAML loading error: ") + e.what());
+		}
 		return std::make_error_code(std::errc::invalid_argument);
+	}
+}
+
+void CConfig::processYamlNode(const std::string& prefix, const YAML::Node& node)
+{
+	if (node.IsMap())
+	{
+		for (const auto& pair : node)
+		{
+			std::string key = pair.first.as<std::string>();
+			std::string fullKey = prefix.empty() ? key : prefix + "." + key;
+			processYamlNode(fullKey, pair.second);
+		}
+	}
+	else if (node.IsScalar())
+	{
+		if (node.IsNull())
+		{
+			set(prefix, std::string(""));
+		}
+		else
+		{
+			// Try to determine the type
+			std::string strValue = node.as<std::string>();
+			
+			// Check if it's a boolean
+			if (strValue == "true" || strValue == "false")
+			{
+				set(prefix, strValue == "true");
+			}
+			// Check if it's a number
+			else
+			{
+				try
+				{
+					if (strValue.find('.') != std::string::npos)
+					{
+						set(prefix, std::stod(strValue));
+					}
+					else
+					{
+						set(prefix, std::stoi(strValue));
+					}
+				}
+				catch (...)
+				{
+					set(prefix, strValue);
+				}
+			}
+		}
+	}
+	else if (node.IsSequence())
+	{
+		std::vector<std::string> arrayValues;
+		for (const auto& item : node)
+		{
+			if (item.IsScalar())
+			{
+				arrayValues.push_back(item.as<std::string>());
+			}
+			else
+			{
+				// Convert complex types to string representation
+				std::stringstream ss;
+				ss << item;
+				arrayValues.push_back(ss.str());
+			}
+		}
+		set(prefix, arrayValues);
 	}
 }
 
@@ -364,45 +394,45 @@ std::string CConfig::toJson() const
 {
 	try
 	{
-		std::string json = "{";
-		bool first = true;
+		nlohmann::json j;
+		
 		for (const auto& [key, value] : *config_values_)
 		{
-			if (!first)
-				json += ",";
-			json += "\"" + key + "\":";
-
 			std::visit(
-				[&json](const auto& v)
+				[&j, &key](const auto& v)
 				{
 					using T = std::decay_t<decltype(v)>;
 					if constexpr (std::is_same_v<T, std::string>)
 					{
-						json += "\"" + v + "\"";
+						j[key] = v;
 					}
-					else if constexpr (std::is_same_v<T,
-													  std::vector<std::string>>)
+					else if constexpr (std::is_same_v<T, std::vector<std::string>>)
 					{
-						json += "[";
-						for (size_t i = 0; i < v.size(); ++i)
-						{
-							if (i > 0)
-								json += ",";
-							json += "\"" + v[i] + "\"";
-						}
-						json += "]";
+						j[key] = v;
+					}
+					else if constexpr (std::is_same_v<T, bool>)
+					{
+						j[key] = v;
+					}
+					else if constexpr (std::is_same_v<T, int> || 
+									  std::is_same_v<T, int64_t> || 
+									  std::is_same_v<T, uint64_t>)
+					{
+						j[key] = v;
+					}
+					else if constexpr (std::is_same_v<T, double>)
+					{
+						j[key] = v;
 					}
 					else
 					{
-						json += std::to_string(v);
+						j[key] = std::to_string(v);
 					}
 				},
 				value);
-
-			first = false;
 		}
-		json += "}";
-		return json;
+		
+		return j.dump(2); // Pretty print with 2 spaces indentation
 	}
 	catch (const std::exception& e)
 	{
@@ -592,5 +622,7 @@ std::error_code CConfig::watchFile(const std::string& filename)
 }
 
 } // namespace FauxDB
+
+
 
 

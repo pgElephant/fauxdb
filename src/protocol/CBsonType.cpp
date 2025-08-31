@@ -7,7 +7,13 @@ namespace FauxDB
 {
 
 CBsonType::CBsonType()
-    : bsonDoc_(nullptr), bsonArray_(nullptr), hasErrors_(false), inArray_(false)
+    : bsonDoc_(nullptr),
+      bsonArray_(nullptr),
+      lastError_(),
+      hasErrors_(false),
+      inArray_(false),
+      currentArrayKey_(),
+      currentArrayIndex_(0)
 {
     bsonDoc_ = bson_new();
     if (!bsonDoc_)
@@ -19,307 +25,445 @@ CBsonType::CBsonType()
 CBsonType::~CBsonType()
 {
     if (bsonArray_)
-    {
         bson_destroy(bsonArray_);
-    }
     if (bsonDoc_)
-    {
         bson_destroy(bsonDoc_);
-    }
 }
 
 bool CBsonType::initialize()
 {
     if (bsonDoc_)
-    {
         bson_destroy(bsonDoc_);
-    }
+
     bsonDoc_ = bson_new();
     if (!bsonDoc_)
     {
         setError("Failed to initialize BSON document");
         return false;
     }
-
     clearErrors();
     inArray_ = false;
+    currentArrayKey_.clear();
+    currentArrayIndex_ = 0;
     return true;
 }
 
 bool CBsonType::beginDocument()
 {
-    if (!checkBsonHandle())
-    {
-        return false;
-    }
-    return true;
+    return checkBsonHandle();
 }
 
 bool CBsonType::endDocument()
 {
-    if (!checkBsonHandle())
-    {
-        return false;
-    }
-    return true;
+    return checkBsonHandle();
 }
 
 bool CBsonType::beginArray(const std::string& key)
 {
     if (!checkBsonHandle())
+        return false;
+    if (inArray_)
     {
+        setError("Nested arrays not supported in this builder");
         return false;
     }
-    try
+
+    bsonArray_ = bson_new();
+    if (!bsonArray_)
     {
-        bsonArray_ = bson_new();
-        if (!bsonArray_)
-        {
-            setError("Failed to create BSON array");
-            return false;
-        }
-        inArray_ = true;
-        currentArrayKey_ = key;
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to begin array: " + std::string(e.what()));
+        setError("Failed to create BSON array");
         return false;
     }
+    inArray_ = true;
+    currentArrayKey_ = key;
+    currentArrayIndex_ = 0;
+    return true;
 }
 
 bool CBsonType::endArray()
 {
-    if (!checkBsonHandle() || !inArray_)
+    if (!checkBsonHandle())
+        return false;
+    if (!inArray_)
     {
+        setError("endArray called without beginArray");
         return false;
     }
-    try
+
+    // Append array to the document
+    if (!bson_append_array(bsonDoc_,
+                           currentArrayKey_.c_str(),
+                           -1,
+                           bsonArray_))
     {
-        if (bsonArray_)
-        {
-            bson_destroy(bsonArray_);
-            bsonArray_ = nullptr;
-        }
-        inArray_ = false;
-        currentArrayKey_.clear();
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to end array: " + std::string(e.what()));
+        setError("Failed to append array to document");
         return false;
     }
+
+    bson_destroy(bsonArray_);
+    bsonArray_ = nullptr;
+    inArray_ = false;
+    currentArrayKey_.clear();
+    currentArrayIndex_ = 0;
+    return true;
 }
 
 bool CBsonType::addString(const std::string& key, const std::string& value)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_utf8(bsonDoc_, key.c_str(), -1, value.c_str(), -1))
     {
+        setError("Failed to add string");
         return false;
     }
-    try
-    {
-        if (!bson_append_utf8(bsonDoc_, key.c_str(), -1, value.c_str(), -1))
-        {
-            setError("Failed to add string to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add string: " + std::string(e.what()));
-        return false;
-    }
+    return true;
 }
 
 bool CBsonType::addInt32(const std::string& key, int32_t value)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_int32(bsonDoc_, key.c_str(), -1, value))
     {
+        setError("Failed to add int32");
         return false;
     }
-    try
-    {
-        if (!bson_append_int32(bsonDoc_, key.c_str(), -1, value))
-        {
-            setError("Failed to add int32 to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add int32: " + std::string(e.what()));
-        return false;
-    }
+    return true;
 }
 
 bool CBsonType::addInt64(const std::string& key, int64_t value)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_int64(bsonDoc_, key.c_str(), -1, value))
     {
+        setError("Failed to add int64");
         return false;
     }
-    try
-    {
-        if (!bson_append_int64(bsonDoc_, key.c_str(), -1, value))
-        {
-            setError("Failed to add int64 to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add int64: " + std::string(e.what()));
-        return false;
-    }
+    return true;
 }
 
 bool CBsonType::addDouble(const std::string& key, double value)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_double(bsonDoc_, key.c_str(), -1, value))
     {
+        setError("Failed to add double");
         return false;
     }
-    try
-    {
-        if (!bson_append_double(bsonDoc_, key.c_str(), -1, value))
-        {
-            setError("Failed to add double to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add double: " + std::string(e.what()));
-        return false;
-    }
+    return true;
 }
 
 bool CBsonType::addBool(const std::string& key, bool value)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_bool(bsonDoc_, key.c_str(), -1, value))
     {
+        setError("Failed to add bool");
         return false;
     }
-    try
-    {
-        if (!bson_append_bool(bsonDoc_, key.c_str(), -1, value))
-        {
-            setError("Failed to add bool to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add bool: " + std::string(e.what()));
-        return false;
-    }
+    return true;
 }
 
 bool CBsonType::addNull(const std::string& key)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_null(bsonDoc_, key.c_str(), -1))
     {
+        setError("Failed to add null");
         return false;
     }
-    try
-    {
-        if (!bson_append_null(bsonDoc_, key.c_str(), -1))
-        {
-            setError("Failed to add null to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add null: " + std::string(e.what()));
-        return false;
-    }
+    return true;
 }
 
 bool CBsonType::addObjectId(const std::string& key, const std::string& objectId)
 {
     if (!checkBsonHandle())
+        return false;
+
+    bson_oid_t oid;
+    if (!bson_oid_is_valid(objectId.c_str(), objectId.length()))
     {
+        setError("Invalid ObjectId format");
         return false;
     }
-    try
+    bson_oid_init_from_string(&oid, objectId.c_str());
+
+    if (!bson_append_oid(bsonDoc_, key.c_str(), -1, &oid))
     {
-        bson_oid_t oid;
-        if (bson_oid_is_valid(objectId.c_str(), objectId.length()))
-        {
-            bson_oid_init_from_string(&oid, objectId.c_str());
-            if (!bson_append_oid(bsonDoc_, key.c_str(), -1, &oid))
-            {
-                setError("Failed to add objectId to BSON document");
-                return false;
-            }
-            return true;
-        }
-        else
-        {
-            setError("Invalid objectId format");
-            return false;
-        }
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add objectId: " + std::string(e.what()));
+        setError("Failed to add ObjectId");
         return false;
     }
+    return true;
 }
 
 bool CBsonType::addDateTime(const std::string& key, int64_t timestamp)
 {
     if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_date_time(bsonDoc_, key.c_str(), -1, timestamp))
     {
+        setError("Failed to add datetime");
         return false;
     }
-    try
+    return true;
+}
+
+bool CBsonType::addBinary(const std::string& key,
+                          bson_subtype_t subtype,
+                          const uint8_t* data,
+                          size_t size)
+{
+    if (!checkBsonHandle())
+        return false;
+    if (!data && size != 0)
     {
-        if (!bson_append_date_time(bsonDoc_, key.c_str(), -1, timestamp))
-        {
-            setError("Failed to add datetime to BSON document");
-            return false;
-        }
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to add datetime: " + std::string(e.what()));
+        setError("Binary data is null with nonzero size");
         return false;
     }
+
+    if (!bson_append_binary(bsonDoc_,
+                            key.c_str(),
+                            -1,
+                            subtype,
+                            data,
+                            size))
+    {
+        setError("Failed to add binary");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addDocument(const std::string& key, const CBsonType& subdoc)
+{
+    if (!checkBsonHandle())
+        return false;
+    if (!subdoc.getBsonHandle())
+    {
+        setError("Subdocument handle is null");
+        return false;
+    }
+    if (!bson_append_document(bsonDoc_, key.c_str(), -1, subdoc.getBsonHandle()))
+    {
+        setError("Failed to add embedded document");
+        return false;
+    }
+    return true;
+}
+
+/* Array element helpers */
+
+std::string CBsonType::nextArrayIndexKey()
+{
+    std::ostringstream oss;
+    oss << currentArrayIndex_++;
+    return oss.str();
+}
+
+bool CBsonType::addArrayString(const std::string& value)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayString used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_utf8(bsonArray_, k.c_str(), -1, value.c_str(), -1))
+    {
+        setError("Failed to add array string");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayInt32(int32_t value)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayInt32 used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_int32(bsonArray_, k.c_str(), -1, value))
+    {
+        setError("Failed to add array int32");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayInt64(int64_t value)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayInt64 used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_int64(bsonArray_, k.c_str(), -1, value))
+    {
+        setError("Failed to add array int64");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayDouble(double value)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayDouble used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_double(bsonArray_, k.c_str(), -1, value))
+    {
+        setError("Failed to add array double");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayBool(bool value)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayBool used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_bool(bsonArray_, k.c_str(), -1, value))
+    {
+        setError("Failed to add array bool");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayNull()
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayNull used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_null(bsonArray_, k.c_str(), -1))
+    {
+        setError("Failed to add array null");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayObjectId(const std::string& objectId)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayObjectId used outside array");
+        return false;
+    }
+
+    if (!bson_oid_is_valid(objectId.c_str(), objectId.length()))
+    {
+        setError("Invalid ObjectId for array");
+        return false;
+    }
+    bson_oid_t oid;
+    bson_oid_init_from_string(&oid, objectId.c_str());
+
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_oid(bsonArray_, k.c_str(), -1, &oid))
+    {
+        setError("Failed to add array ObjectId");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayDateTime(int64_t timestamp)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayDateTime used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_date_time(bsonArray_, k.c_str(), -1, timestamp))
+    {
+        setError("Failed to add array datetime");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayBinary(bson_subtype_t subtype,
+                               const uint8_t* data,
+                               size_t size)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayBinary used outside array");
+        return false;
+    }
+    if (!data && size != 0)
+    {
+        setError("Array binary data is null with nonzero size");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_binary(bsonArray_, k.c_str(), -1, subtype, data, size))
+    {
+        setError("Failed to add array binary");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayDocument(const CBsonType& subdoc)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayDocument used outside array");
+        return false;
+    }
+    if (!subdoc.getBsonHandle())
+    {
+        setError("Array subdocument handle is null");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_document(bsonArray_, k.c_str(), -1, subdoc.getBsonHandle()))
+    {
+        setError("Failed to add array document");
+        return false;
+    }
+    return true;
 }
 
 std::vector<uint8_t> CBsonType::getDocument() const
 {
     if (!checkBsonHandle())
-    {
-        return std::vector<uint8_t>{};
-    }
-    try
-    {
-        // Return raw BSON bytes (little-endian), not JSON text.
-        const uint8_t* data = static_cast<const uint8_t*>(bson_get_data(bsonDoc_));
-        size_t len = bsonDoc_->len;
-        std::vector<uint8_t> result;
-        result.resize(len);
-        std::memcpy(result.data(), data, len);
-        return result;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to get document: " + std::string(e.what()));
-        return std::vector<uint8_t>{};
-    }
+        return {};
+
+    const uint8_t* data = static_cast<const uint8_t*>(bson_get_data(bsonDoc_));
+    size_t len = bsonDoc_->len;
+
+    std::vector<uint8_t> result(len);
+    std::memcpy(result.data(), data, len);
+    return result;
 }
 
 bson_t* CBsonType::getBsonHandle() const
@@ -329,26 +473,32 @@ bson_t* CBsonType::getBsonHandle() const
 
 bool CBsonType::parseDocument(const std::vector<uint8_t>& data)
 {
-    try
+    if (bsonDoc_)
+        bson_destroy(bsonDoc_);
+
+    if (data.empty())
     {
-        if (bsonDoc_)
-        {
-            bson_destroy(bsonDoc_);
-        }
-        bsonDoc_ = bson_new_from_data(data.data(), data.size());
-        if (!bsonDoc_)
-        {
-            setError("Failed to parse BSON data");
-            return false;
-        }
-        clearErrors();
-        return true;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to parse document: " + std::string(e.what()));
+        setError("Empty input for parseDocument");
+        bsonDoc_ = bson_new(); // keep valid handle
         return false;
     }
+
+    bsonDoc_ = bson_new_from_data(data.data(), data.size());
+    if (!bsonDoc_)
+    {
+        setError("Failed to parse BSON data");
+        return false;
+    }
+    clearErrors();
+    inArray_ = false;
+    if (bsonArray_)
+    {
+        bson_destroy(bsonArray_);
+        bsonArray_ = nullptr;
+    }
+    currentArrayKey_.clear();
+    currentArrayIndex_ = 0;
+    return true;
 }
 
 bool CBsonType::parseDocument(const uint8_t* data, size_t size)
@@ -364,119 +514,97 @@ bool CBsonType::parseDocument(const uint8_t* data, size_t size)
 
 bool CBsonType::isValidBson(const std::vector<uint8_t>& data) const
 {
-    try
-    {
-        bson_t* temp_doc = bson_new_from_data(data.data(), data.size());
-        if (temp_doc)
-        {
-            bson_destroy(temp_doc);
-            return true;
-        }
+    if (data.empty())
         return false;
-    }
-    catch(...)
-    {
+
+    bson_t* temp = bson_new_from_data(data.data(), data.size());
+    if (!temp)
         return false;
-    }
+
+    bool ok = bson_validate(temp, BSON_VALIDATE_NONE, nullptr);
+    bson_destroy(temp);
+    return ok;
 }
 
 bool CBsonType::isValidBson(const uint8_t* data, size_t size) const
 {
     if (!data || size == 0)
-    {
         return false;
-    }
-    std::vector<uint8_t> vec(data, data + size);
-    return isValidBson(vec);
+
+    bson_t* temp = bson_new_from_data(data, size);
+    if (!temp)
+        return false;
+
+    bool ok = bson_validate(temp, BSON_VALIDATE_NONE, nullptr);
+    bson_destroy(temp);
+    return ok;
 }
 
 std::string CBsonType::toJson() const
 {
     if (!checkBsonHandle())
+        return std::string();
+
+    size_t len = 0;
+    char* json = bson_as_canonical_extended_json(bsonDoc_, &len);
+    if (!json)
     {
-        return "";
+        setError("Failed to convert to canonical JSON");
+        return std::string();
     }
-    try
-    {
-        char* json_str = bson_as_canonical_extended_json(bsonDoc_, nullptr);
-        if (!json_str)
-        {
-            setError("Failed to convert BSON to JSON");
-            return "";
-        }
-        
-        std::string result(json_str);
-        bson_free(json_str);
-        return result;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to convert to JSON: " + std::string(e.what()));
-        return "";
-    }
+    std::string s(json, len);
+    bson_free(json);
+    return s;
 }
 
 std::string CBsonType::toJsonExtended() const
 {
-    return toJson(); // Simplified implementation
+    if (!checkBsonHandle())
+        return std::string();
+
+    size_t len = 0;
+    char* json = bson_as_relaxed_extended_json(bsonDoc_, &len);
+    if (!json)
+    {
+        setError("Failed to convert to relaxed JSON");
+        return std::string();
+    }
+    std::string s(json, len);
+    bson_free(json);
+    return s;
 }
 
 size_t CBsonType::getDocumentSize() const
 {
     if (!checkBsonHandle())
-    {
         return 0;
-    }
-    try
-    {
-        return bsonDoc_->len;
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to get document size: " + std::string(e.what()));
-        return 0;
-    }
+    return bsonDoc_->len;
 }
 
 void CBsonType::clear()
 {
-    try
+    if (bsonArray_)
     {
-        if (bsonArray_)
-        {
-            bson_destroy(bsonArray_);
-            bsonArray_ = nullptr;
-        }
-        if (bsonDoc_)
-        {
-            bson_destroy(bsonDoc_);
-        }
-        bsonDoc_ = bson_new();
-        clearErrors();
-        inArray_ = false;
-        currentArrayKey_.clear();
+        bson_destroy(bsonArray_);
+        bsonArray_ = nullptr;
     }
-    catch(const std::exception& e)
-    {
-        setError("Failed to clear document: " + std::string(e.what()));
-    }
+    if (bsonDoc_)
+        bson_destroy(bsonDoc_);
+
+    bsonDoc_ = bson_new();
+    clearErrors();
+    inArray_ = false;
+    currentArrayKey_.clear();
+    currentArrayIndex_ = 0;
 }
 
 bool CBsonType::isEmpty() const
 {
     if (!checkBsonHandle())
-    {
         return true;
-    }
-    try
-    {
-        return bsonDoc_->len == 5; // Empty BSON document is 5 bytes
-    }
-    catch(const std::exception& e)
-    {
-        setError("Failed to check if empty: " + std::string(e.what()));
-        return true;
-    }
+
+    // Empty BSON document is 5 bytes
+    return bsonDoc_->len == 5;
 }
 
 std::string CBsonType::getLastError() const

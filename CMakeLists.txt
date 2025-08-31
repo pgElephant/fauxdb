@@ -26,6 +26,7 @@ find_package(Boost REQUIRED COMPONENTS
 # Find additional packages
 find_package(GTest REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(yaml-cpp REQUIRED)
 find_package(Threads REQUIRED)
 find_package(OpenSSL)
 
@@ -274,6 +275,7 @@ if(POSTGRESQL_FOUND)
         ${MONGOC_LIBRARIES}
         ${POSTGRESQL_LIBRARY}
         nlohmann_json::nlohmann_json
+        yaml-cpp
         Threads::Threads
         ${CMAKE_DL_LIBS}
         # Boost libraries
@@ -351,6 +353,7 @@ else()
     target_link_libraries(fauxdb 
         ${MONGOC_LIBRARIES}
         nlohmann_json::nlohmann_json
+        yaml-cpp
         Threads::Threads
         ${CMAKE_DL_LIBS}
         # Boost libraries

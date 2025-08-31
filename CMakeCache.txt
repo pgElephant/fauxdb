@@ -301,6 +301,9 @@ pkgcfg_lib__OPENSSL_ssl:FILEPATH=/opt/homebrew/Cellar/openssl@3/3.5.2/lib/libssl
 //The directory containing a CMake configuration file for spdlog.
 spdlog_DIR:PATH=/opt/homebrew/lib/cmake/spdlog
 
+//The directory containing a CMake configuration file for yaml-cpp.
+yaml-cpp_DIR:PATH=/opt/homebrew/lib/cmake/yaml-cpp
+
 
 ########################
 # INTERNAL cache entries

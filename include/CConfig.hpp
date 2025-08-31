@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
+#include <yaml-cpp/yaml.h>
 #include "CLogger.hpp"
 #include <vector>
 
@@ -84,6 +85,7 @@ private:
 	void parseYamlValue(const std::string& key, const std::string& value);
 	void parseTomlValue(const std::string& key, const std::string& value);
 	void parseIniValue(const std::string& key, const std::string& value);
+	void processYamlNode(const std::string& prefix, const YAML::Node& node);
 	std::string escapeString(const std::string& str) const;
 	std::string unescapeString(const std::string& str) const;
 };

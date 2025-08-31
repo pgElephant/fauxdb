@@ -18,3 +18,12 @@
 [2025-08-31 15:05:43] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4
 [2025-08-31 15:06:32] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4
 [2025-09-01 04:11:02] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4
+[2025-09-01 04:20:22] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4
+[2025-09-01 04:26:59] [ERROR] [Startup] FauxDB daemon failed to start server process. Check network/database configuration and logs for details.
+[2025-09-01 04:27:06] [ERROR] [Startup] FauxDB daemon failed to start server process. Check network/database configuration and logs for details.
+[2025-09-01 04:28:07] [ERROR] [Startup] FauxDB daemon failed to start server process. Check network/database configuration and logs for details.
+[2025-09-01 04:28:31] [ERROR] [Startup] FauxDB daemon failed to start server process. Check network/database configuration and logs for details.
+[2025-09-01 04:28:34] [ERROR] [Startup] FauxDB daemon failed to start server process. Check network/database configuration and logs for details.
+[2025-09-01 04:29:08] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4
+[2025-09-01 04:30:00] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4
+[2025-09-01 04:30:34] [ERROR] [Startup] FauxDB daemon failed to initialize server with config: address=0.0.0.0, port=27017, threads=4

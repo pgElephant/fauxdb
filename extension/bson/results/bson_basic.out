@@ -1,0 +1,131 @@
+-- Basic BSON functionality tests
+-- Test basic type creation, input/output, and simple operations
+-- Create extension if not exists
+CREATE EXTENSION IF NOT EXISTS bson;
+-- Test basic type creation
+SELECT '{}'::bson;
+ bson 
+------
+ { }
+(1 row)
+
+SELECT '[]'::bson;
+ bson 
+------
+ { }
+(1 row)
+
+SELECT '"hello"'::bson;
+         bson          
+-----------------------
+ { "value" : "hello" }
+(1 row)
+
+SELECT '123'::bson;
+                  bson                  
+----------------------------------------
+ { "value" : { "$numberInt" : "123" } }
+(1 row)
+
+SELECT 'true'::bson;
+        bson        
+--------------------
+ { "value" : true }
+(1 row)
+
+SELECT 'null'::bson;
+        bson        
+--------------------
+ { "value" : null }
+(1 row)
+
+-- Test basic operators
+SELECT '{"name": "test"}'::bson -> 'name';
+       ?column?       
+----------------------
+ { "value" : "test" }
+(1 row)
+
+SELECT '{"name": "test"}'::bson ->> 'name';
+ ?column? 
+----------
+ test
+(1 row)
+
+SELECT '{"name": "test"}'::bson ? 'name';
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '{"name": "test"}'::bson ? 'missing';
+ ?column? 
+----------
+ f
+(1 row)
+
+-- Test array operations
+SELECT '["a", "b", "c"]'::bson -> '0';
+     ?column?      
+-------------------
+ { "value" : "a" }
+(1 row)
+
+SELECT '["a", "b", "c"]'::bson ->> '0';
+ ?column? 
+----------
+ a
+(1 row)
+
+-- Test nested objects
+SELECT '{"user": {"name": "john", "age": 30}}'::bson -> 'user' -> 'name';
+ ?column? 
+----------
+ 
+(1 row)
+
+SELECT '{"user": {"name": "john", "age": 30}}'::bson -> 'user' ->> 'age';
+ ?column? 
+----------
+ 
+(1 row)
+
+-- Test comparison operators
+SELECT '{"a": 1}'::bson = '{"a": 1}'::bson;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '{"a": 1}'::bson != '{"a": 2}'::bson;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Test containment operators
+SELECT '{"a": 1, "b": 2}'::bson @> '{"a": 1}'::bson;
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '{"a": 1}'::bson <@ '{"a": 1, "b": 2}'::bson;
+ ?column? 
+----------
+ t
+(1 row)
+
+-- Test existence operators
+SELECT '{"a": 1, "b": 2}'::bson ?| ARRAY['a', 'c'];
+ ?column? 
+----------
+ t
+(1 row)
+
+SELECT '{"a": 1, "b": 2}'::bson ?& ARRAY['a', 'b'];
+ ?column? 
+----------
+ t
+(1 row)
+

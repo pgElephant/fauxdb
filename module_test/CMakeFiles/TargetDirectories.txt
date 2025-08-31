@@ -1,0 +1,4 @@
+/Users/ibrarahmed/pgelephant/pge/fauxdb/module_test/CMakeFiles/network_server.dir
+/Users/ibrarahmed/pgelephant/pge/fauxdb/module_test/CMakeFiles/network_client.dir
+/Users/ibrarahmed/pgelephant/pge/fauxdb/module_test/CMakeFiles/edit_cache.dir
+/Users/ibrarahmed/pgelephant/pge/fauxdb/module_test/CMakeFiles/rebuild_cache.dir

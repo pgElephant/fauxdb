@@ -1,0 +1,113 @@
+-- BSON operators functionality tests
+
+-- Test BSON query operators
+ bson_eq_op 
+------------
+ f
+(1 row)
+
+ bson_ne_op 
+------------
+ f
+(1 row)
+
+ bson_gt_op 
+------------
+ f
+(1 row)
+
+ bson_lt_op 
+------------
+ f
+(1 row)
+
+ bson_gte_op 
+--------------
+ f
+(1 row)
+
+ bson_lte_op 
+--------------
+ f
+(1 row)
+
+-- Test array operators
+ bson_in_op 
+------------
+ f
+(1 row)
+
+ bson_nin_op 
+-------------
+ f
+(1 row)
+
+ bson_all_op 
+-------------
+ f
+(1 row)
+
+ bson_size_op 
+--------------
+ f
+(1 row)
+
+-- Test type checking
+ bson_type_op 
+--------------
+ f
+(1 row)
+
+ bson_type_op 
+--------------
+ f
+(1 row)
+
+ bson_type_op 
+--------------
+ f
+(1 row)
+
+ bson_type_op 
+--------------
+ f
+(1 row)
+
+-- Test regex operator
+ bson_regex_op 
+---------------
+ f
+(1 row)
+
+ bson_regex_op 
+---------------
+ f
+(1 row)
+
+-- Test modulo operator
+ bson_mod_op 
+-------------
+ f
+(1 row)
+
+ bson_mod_op 
+-------------
+ f
+(1 row)
+
+-- Test element match
+ bson_elem_match_op 
+--------------------
+ f
+(1 row)
+
+-- Test exists operator
+ bson_exists_op 
+----------------
+ f
+(1 row)
+
+ bson_exists_op 
+----------------
+ f
+(1 row)

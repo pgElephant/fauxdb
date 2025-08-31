@@ -1,0 +1,12 @@
+[
+    {
+        "_id": "ObjectId(...)",
+        "name": "Alice",
+        "age": 30,
+        "skills": ["python", "sql"],
+        "address": {
+            "city": "San Francisco",
+            "state": "CA"
+        }
+    }
+]

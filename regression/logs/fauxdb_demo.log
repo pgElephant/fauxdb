@@ -1,0 +1,33 @@
+[2025-08-27 01:16:10] [INFO] === FauxDB Modular Server Starting ===
+[2025-08-27 01:16:10] [INFO] Database Type: PostgreSQL
+[2025-08-27 01:16:10] [INFO] Protocol Type: MongoDB
+[2025-08-27 01:16:10] [INFO] Port: 27017
+[2025-08-27 01:16:10] [INFO] Bind Address: 0.0.0.0
+[2025-08-27 01:16:10] [INFO] Max Connections: 1000
+[2025-08-27 01:16:10] [INFO] Worker Threads: 4
+[2025-08-27 01:16:10] [INFO] Creating server components...
+[2025-08-27 01:16:10] [INFO] Database interface set
+[2025-08-27 01:16:10] [INFO] Query translator set
+[2025-08-27 01:16:10] [INFO] Protocol handler set
+[2025-08-27 01:16:10] [INFO] Network manager set
+[2025-08-27 01:16:10] [INFO] Components configured successfully
+[2025-08-27 01:16:10] [INFO] Initializing server...
+[2025-08-27 01:16:10] [INFO] All required components are set
+[2025-08-27 01:16:10] [INFO] Server orchestrator initialized successfully
+[2025-08-27 01:16:10] [INFO] Server initialized successfully
+[2025-08-27 01:16:10] [INFO] Starting server...
+[2025-08-27 01:16:10] [INFO] Started %zu worker threads
+[2025-08-27 01:16:10] [WARN] Health check failed
+[2025-08-27 01:16:10] [INFO] Server started successfully
+[2025-08-27 01:16:10] [INFO] Stats: Total=%llu, Success=%llu, Failed=%llu, Active=%llu
+[2025-08-27 01:16:10] [INFO] Server started successfully
+[2025-08-27 01:16:10] [INFO] Server is now running. Press Ctrl+C to stop.
+[2025-08-27 01:16:10] [WARN] Health check failed
+[2025-08-27 01:16:10] [WARN] Server health check failed
+[2025-08-27 01:16:10] [WARN] Health check failed
+[2025-08-27 01:16:10] [INFO] Stats: Total=%llu, Success=%llu, Failed=%llu, Active=%llu
+[2025-08-27 01:16:14] [INFO] Received shutdown signal, stopping server...
+[2025-08-27 01:16:20] [INFO] Stopping server...
+[2025-08-27 01:16:40] [INFO] Worker threads stopped
+[2025-08-27 01:16:40] [INFO] Server stopped
+[2025-08-27 01:16:40] [INFO] Server stopped

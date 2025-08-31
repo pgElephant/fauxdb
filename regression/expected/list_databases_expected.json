@@ -1,0 +1,16 @@
+{
+    "databases": [
+        {
+            "name": "testdb",
+            "sizeOnDisk": 0,
+            "empty": true
+        },
+        {
+            "name": "admin",
+            "sizeOnDisk": 0,
+            "empty": true
+        }
+    ],
+    "totalSize": 0,
+    "ok": 1.0
+}

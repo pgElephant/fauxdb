@@ -1,0 +1,39 @@
+[Unit]
+Description=FauxDB MongoDB-compatible database server
+Documentation=https://github.com/fauxdb/fauxdb
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=forking
+User=fauxdb
+Group=fauxdb
+ExecStart=/usr/local/bin/fauxdb --daemon --config /etc/fauxdb/fauxdb.conf
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+PIDFile=/var/run/fauxdb/fauxdb.pid
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=60s
+TimeoutStopSec=30s
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/fauxdb /var/run/fauxdb /tmp
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# Environment
+Environment=FAUXDB_HOME=/var/lib/fauxdb
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target

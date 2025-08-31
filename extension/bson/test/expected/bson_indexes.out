@@ -1,0 +1,102 @@
+-- BSON indexing tests
+-- Test various index types and query performance
+
+-- Create test table
+CREATE TABLE
+
+-- Insert test data
+INSERT 0 5
+
+-- Test B-tree index
+CREATE INDEX
+
+-- Test queries using B-tree index
+                    QUERY PLAN                    
+--------------------------------------------------
+ Index Scan using idx_bson_test_btree on bson_test
+   Index Cond: (data = '{"name": "john", "age": 30, "city": "new york"}'::bson)
+(2 rows)
+
+ id |                                data                                
+----+--------------------------------------------------------------------
+  1 | {"name": "john", "age": 30, "city": "new york"}
+(1 row)
+
+-- Test hash index
+CREATE INDEX
+
+-- Test queries using hash index
+                    QUERY PLAN                    
+--------------------------------------------------
+ Index Scan using idx_bson_test_hash on bson_test
+   Index Cond: (data = '{"name": "jane", "age": 25, "city": "los angeles"}'::bson)
+(2 rows)
+
+ id |                                      data                                      
+----+------------------------------------------------------------------------------
+  2 | {"name": "jane", "age": 25, "city": "los angeles"}
+(1 row)
+
+-- Test GIN index (if supported)
+-- CREATE INDEX idx_bson_test_gin ON bson_test USING gin (data);
+
+-- Test containment queries
+                    QUERY PLAN                    
+--------------------------------------------------
+ Seq Scan on bson_test
+   Filter: (data @> '{"city": "new york"}'::bson)
+(2 rows)
+
+ id |                                data                                
+----+--------------------------------------------------------------------
+  1 | {"name": "john", "age": 30, "city": "new york"}
+(1 row)
+
+-- Test existence queries
+                    QUERY PLAN                    
+--------------------------------------------------
+ Seq Scan on bson_test
+   Filter: (data ? 'age'::text)
+(2 rows)
+
+ id |                                data                                
+----+--------------------------------------------------------------------
+  1 | {"name": "john", "age": 30, "city": "new york"}
+  2 | {"name": "jane", "age": 25, "city": "los angeles"}
+  3 | {"name": "bob", "age": 35, "city": "chicago"}
+  4 | {"name": "alice", "age": 28, "city": "boston"}
+  5 | {"name": "charlie", "age": 32, "city": "seattle"}
+(5 rows)
+
+-- Test comparison queries
+                    QUERY PLAN                    
+--------------------------------------------------
+ Index Scan using idx_bson_test_btree on bson_test
+   Index Cond: (data > '{"name": "a"}'::bson)
+(2 rows)
+
+ id |                                data                                
+----+--------------------------------------------------------------------
+  1 | {"name": "john", "age": 30, "city": "new york"}
+  2 | {"name": "jane", "age": 25, "city": "los angeles"}
+  3 | {"name": "bob", "age": 35, "city": "chicago"}
+  4 | {"name": "alice", "age": 28, "city": "boston"}
+  5 | {"name": "charlie", "age": 32, "city": "seattle"}
+(5 rows)
+
+-- Test path queries
+                    QUERY PLAN                    
+--------------------------------------------------
+ Seq Scan on bson_test
+   Filter: ((data ->> 'age'::text))::integer > 30
+(2 rows)
+
+ id |                                data                                
+----+--------------------------------------------------------------------
+  1 | {"name": "john", "age": 30, "city": "new york"}
+  3 | {"name": "bob", "age": 35, "city": "chicago"}
+  5 | {"name": "charlie", "age": 32, "city": "seattle"}
+(3 rows)
+
+-- Clean up
+DROP TABLE

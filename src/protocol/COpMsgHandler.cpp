@@ -45,7 +45,7 @@ OpMsgCommand COpMsgHandler::parseMessage(const vector<uint8_t>& message)
 	if (!command.sections.empty() &&
 		command.sections[0].kind == SectionKind::DOCUMENT)
 	{
-		command.database = "test";
+		command.database = "admin";  // Default database for admin commands
 		command.commandName = "hello";
 	}
 	return command;
@@ -166,7 +166,8 @@ vector<uint8_t> COpMsgHandler::handleFind(const OpMsgCommand& command)
 		return vector<uint8_t>();
 	if (!bsonBuilder.addDouble("ok", 1.0))
 		return vector<uint8_t>();
-	string collection = "test";
+	// Collection name should be extracted from command, but for now use default
+	string collection = "unknown";
 	string ns = command.database + "." + collection;
 	if (!bsonBuilder.addInt64("cursorId", 0))
 		return vector<uint8_t>();

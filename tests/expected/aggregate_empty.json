@@ -1,0 +1,8 @@
+{
+  "ok": 1,
+  "cursor": {
+    "id": 0,
+    "ns": "test.collection",
+    "firstBatch": []
+  }
+}

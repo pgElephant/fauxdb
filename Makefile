@@ -582,6 +582,30 @@ src/parsing/CParser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CParser.cpp.s
 .PHONY : src/parsing/CParser.cpp.s
 
+src/protocol/BaseCommand.o: src/protocol/BaseCommand.cpp.o
+.PHONY : src/protocol/BaseCommand.o
+
+# target to build an object file
+src/protocol/BaseCommand.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/BaseCommand.cpp.o
+.PHONY : src/protocol/BaseCommand.cpp.o
+
+src/protocol/BaseCommand.i: src/protocol/BaseCommand.cpp.i
+.PHONY : src/protocol/BaseCommand.i
+
+# target to preprocess a source file
+src/protocol/BaseCommand.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/BaseCommand.cpp.i
+.PHONY : src/protocol/BaseCommand.cpp.i
+
+src/protocol/BaseCommand.s: src/protocol/BaseCommand.cpp.s
+.PHONY : src/protocol/BaseCommand.s
+
+# target to generate assembly for a file
+src/protocol/BaseCommand.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/BaseCommand.cpp.s
+.PHONY : src/protocol/BaseCommand.cpp.s
+
 src/protocol/CBsonType.o: src/protocol/CBsonType.cpp.o
 .PHONY : src/protocol/CBsonType.o
 
@@ -750,53 +774,173 @@ src/protocol/COpReplyHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpReplyHandler.cpp.s
 .PHONY : src/protocol/COpReplyHandler.cpp.s
 
-src/protocol/query_response/CQueryTranslator.o: src/protocol/query_response/CQueryTranslator.cpp.o
-.PHONY : src/protocol/query_response/CQueryTranslator.o
+src/protocol/CQueryTranslator.o: src/protocol/CQueryTranslator.cpp.o
+.PHONY : src/protocol/CQueryTranslator.o
 
 # target to build an object file
-src/protocol/query_response/CQueryTranslator.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/query_response/CQueryTranslator.cpp.o
-.PHONY : src/protocol/query_response/CQueryTranslator.cpp.o
+src/protocol/CQueryTranslator.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CQueryTranslator.cpp.o
+.PHONY : src/protocol/CQueryTranslator.cpp.o
 
-src/protocol/query_response/CQueryTranslator.i: src/protocol/query_response/CQueryTranslator.cpp.i
-.PHONY : src/protocol/query_response/CQueryTranslator.i
+src/protocol/CQueryTranslator.i: src/protocol/CQueryTranslator.cpp.i
+.PHONY : src/protocol/CQueryTranslator.i
 
 # target to preprocess a source file
-src/protocol/query_response/CQueryTranslator.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/query_response/CQueryTranslator.cpp.i
-.PHONY : src/protocol/query_response/CQueryTranslator.cpp.i
+src/protocol/CQueryTranslator.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CQueryTranslator.cpp.i
+.PHONY : src/protocol/CQueryTranslator.cpp.i
 
-src/protocol/query_response/CQueryTranslator.s: src/protocol/query_response/CQueryTranslator.cpp.s
-.PHONY : src/protocol/query_response/CQueryTranslator.s
+src/protocol/CQueryTranslator.s: src/protocol/CQueryTranslator.cpp.s
+.PHONY : src/protocol/CQueryTranslator.s
 
 # target to generate assembly for a file
-src/protocol/query_response/CQueryTranslator.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/query_response/CQueryTranslator.cpp.s
-.PHONY : src/protocol/query_response/CQueryTranslator.cpp.s
+src/protocol/CQueryTranslator.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CQueryTranslator.cpp.s
+.PHONY : src/protocol/CQueryTranslator.cpp.s
 
-src/protocol/query_response/CResponseBuilder.o: src/protocol/query_response/CResponseBuilder.cpp.o
-.PHONY : src/protocol/query_response/CResponseBuilder.o
+src/protocol/CResponseBuilder.o: src/protocol/CResponseBuilder.cpp.o
+.PHONY : src/protocol/CResponseBuilder.o
 
 # target to build an object file
-src/protocol/query_response/CResponseBuilder.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/query_response/CResponseBuilder.cpp.o
-.PHONY : src/protocol/query_response/CResponseBuilder.cpp.o
+src/protocol/CResponseBuilder.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CResponseBuilder.cpp.o
+.PHONY : src/protocol/CResponseBuilder.cpp.o
 
-src/protocol/query_response/CResponseBuilder.i: src/protocol/query_response/CResponseBuilder.cpp.i
-.PHONY : src/protocol/query_response/CResponseBuilder.i
+src/protocol/CResponseBuilder.i: src/protocol/CResponseBuilder.cpp.i
+.PHONY : src/protocol/CResponseBuilder.i
 
 # target to preprocess a source file
-src/protocol/query_response/CResponseBuilder.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/query_response/CResponseBuilder.cpp.i
-.PHONY : src/protocol/query_response/CResponseBuilder.cpp.i
+src/protocol/CResponseBuilder.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CResponseBuilder.cpp.i
+.PHONY : src/protocol/CResponseBuilder.cpp.i
 
-src/protocol/query_response/CResponseBuilder.s: src/protocol/query_response/CResponseBuilder.cpp.s
-.PHONY : src/protocol/query_response/CResponseBuilder.s
+src/protocol/CResponseBuilder.s: src/protocol/CResponseBuilder.cpp.s
+.PHONY : src/protocol/CResponseBuilder.s
 
 # target to generate assembly for a file
-src/protocol/query_response/CResponseBuilder.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/query_response/CResponseBuilder.cpp.s
-.PHONY : src/protocol/query_response/CResponseBuilder.cpp.s
+src/protocol/CResponseBuilder.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CResponseBuilder.cpp.s
+.PHONY : src/protocol/CResponseBuilder.cpp.s
+
+src/protocol/CollectionNameParser.o: src/protocol/CollectionNameParser.cpp.o
+.PHONY : src/protocol/CollectionNameParser.o
+
+# target to build an object file
+src/protocol/CollectionNameParser.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CollectionNameParser.cpp.o
+.PHONY : src/protocol/CollectionNameParser.cpp.o
+
+src/protocol/CollectionNameParser.i: src/protocol/CollectionNameParser.cpp.i
+.PHONY : src/protocol/CollectionNameParser.i
+
+# target to preprocess a source file
+src/protocol/CollectionNameParser.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CollectionNameParser.cpp.i
+.PHONY : src/protocol/CollectionNameParser.cpp.i
+
+src/protocol/CollectionNameParser.s: src/protocol/CollectionNameParser.cpp.s
+.PHONY : src/protocol/CollectionNameParser.s
+
+# target to generate assembly for a file
+src/protocol/CollectionNameParser.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CollectionNameParser.cpp.s
+.PHONY : src/protocol/CollectionNameParser.cpp.s
+
+src/protocol/CommandRegistry.o: src/protocol/CommandRegistry.cpp.o
+.PHONY : src/protocol/CommandRegistry.o
+
+# target to build an object file
+src/protocol/CommandRegistry.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CommandRegistry.cpp.o
+.PHONY : src/protocol/CommandRegistry.cpp.o
+
+src/protocol/CommandRegistry.i: src/protocol/CommandRegistry.cpp.i
+.PHONY : src/protocol/CommandRegistry.i
+
+# target to preprocess a source file
+src/protocol/CommandRegistry.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CommandRegistry.cpp.i
+.PHONY : src/protocol/CommandRegistry.cpp.i
+
+src/protocol/CommandRegistry.s: src/protocol/CommandRegistry.cpp.s
+.PHONY : src/protocol/CommandRegistry.s
+
+# target to generate assembly for a file
+src/protocol/CommandRegistry.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CommandRegistry.cpp.s
+.PHONY : src/protocol/CommandRegistry.cpp.s
+
+src/protocol/CountCommand.o: src/protocol/CountCommand.cpp.o
+.PHONY : src/protocol/CountCommand.o
+
+# target to build an object file
+src/protocol/CountCommand.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CountCommand.cpp.o
+.PHONY : src/protocol/CountCommand.cpp.o
+
+src/protocol/CountCommand.i: src/protocol/CountCommand.cpp.i
+.PHONY : src/protocol/CountCommand.i
+
+# target to preprocess a source file
+src/protocol/CountCommand.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CountCommand.cpp.i
+.PHONY : src/protocol/CountCommand.cpp.i
+
+src/protocol/CountCommand.s: src/protocol/CountCommand.cpp.s
+.PHONY : src/protocol/CountCommand.s
+
+# target to generate assembly for a file
+src/protocol/CountCommand.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CountCommand.cpp.s
+.PHONY : src/protocol/CountCommand.cpp.s
+
+src/protocol/FindCommand.o: src/protocol/FindCommand.cpp.o
+.PHONY : src/protocol/FindCommand.o
+
+# target to build an object file
+src/protocol/FindCommand.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindCommand.cpp.o
+.PHONY : src/protocol/FindCommand.cpp.o
+
+src/protocol/FindCommand.i: src/protocol/FindCommand.cpp.i
+.PHONY : src/protocol/FindCommand.i
+
+# target to preprocess a source file
+src/protocol/FindCommand.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindCommand.cpp.i
+.PHONY : src/protocol/FindCommand.cpp.i
+
+src/protocol/FindCommand.s: src/protocol/FindCommand.cpp.s
+.PHONY : src/protocol/FindCommand.s
+
+# target to generate assembly for a file
+src/protocol/FindCommand.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindCommand.cpp.s
+.PHONY : src/protocol/FindCommand.cpp.s
+
+src/protocol/FindOneCommand.o: src/protocol/FindOneCommand.cpp.o
+.PHONY : src/protocol/FindOneCommand.o
+
+# target to build an object file
+src/protocol/FindOneCommand.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindOneCommand.cpp.o
+.PHONY : src/protocol/FindOneCommand.cpp.o
+
+src/protocol/FindOneCommand.i: src/protocol/FindOneCommand.cpp.i
+.PHONY : src/protocol/FindOneCommand.i
+
+# target to preprocess a source file
+src/protocol/FindOneCommand.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindOneCommand.cpp.i
+.PHONY : src/protocol/FindOneCommand.cpp.i
+
+src/protocol/FindOneCommand.s: src/protocol/FindOneCommand.cpp.s
+.PHONY : src/protocol/FindOneCommand.s
+
+# target to generate assembly for a file
+src/protocol/FindOneCommand.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindOneCommand.cpp.s
+.PHONY : src/protocol/FindOneCommand.cpp.s
 
 # Help Target
 help:
@@ -862,6 +1006,9 @@ help:
 	@echo "... src/parsing/CParser.o"
 	@echo "... src/parsing/CParser.i"
 	@echo "... src/parsing/CParser.s"
+	@echo "... src/protocol/BaseCommand.o"
+	@echo "... src/protocol/BaseCommand.i"
+	@echo "... src/protocol/BaseCommand.s"
 	@echo "... src/protocol/CBsonType.o"
 	@echo "... src/protocol/CBsonType.i"
 	@echo "... src/protocol/CBsonType.s"
@@ -883,12 +1030,27 @@ help:
 	@echo "... src/protocol/COpReplyHandler.o"
 	@echo "... src/protocol/COpReplyHandler.i"
 	@echo "... src/protocol/COpReplyHandler.s"
-	@echo "... src/protocol/query_response/CQueryTranslator.o"
-	@echo "... src/protocol/query_response/CQueryTranslator.i"
-	@echo "... src/protocol/query_response/CQueryTranslator.s"
-	@echo "... src/protocol/query_response/CResponseBuilder.o"
-	@echo "... src/protocol/query_response/CResponseBuilder.i"
-	@echo "... src/protocol/query_response/CResponseBuilder.s"
+	@echo "... src/protocol/CQueryTranslator.o"
+	@echo "... src/protocol/CQueryTranslator.i"
+	@echo "... src/protocol/CQueryTranslator.s"
+	@echo "... src/protocol/CResponseBuilder.o"
+	@echo "... src/protocol/CResponseBuilder.i"
+	@echo "... src/protocol/CResponseBuilder.s"
+	@echo "... src/protocol/CollectionNameParser.o"
+	@echo "... src/protocol/CollectionNameParser.i"
+	@echo "... src/protocol/CollectionNameParser.s"
+	@echo "... src/protocol/CommandRegistry.o"
+	@echo "... src/protocol/CommandRegistry.i"
+	@echo "... src/protocol/CommandRegistry.s"
+	@echo "... src/protocol/CountCommand.o"
+	@echo "... src/protocol/CountCommand.i"
+	@echo "... src/protocol/CountCommand.s"
+	@echo "... src/protocol/FindCommand.o"
+	@echo "... src/protocol/FindCommand.i"
+	@echo "... src/protocol/FindCommand.s"
+	@echo "... src/protocol/FindOneCommand.o"
+	@echo "... src/protocol/FindOneCommand.i"
+	@echo "... src/protocol/FindOneCommand.s"
 .PHONY : help
 
 

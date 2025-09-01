@@ -5,6 +5,7 @@
 #include <string>
 #include <chrono>
 #include <functional>
+#include "CLogger.hpp"
 
 namespace FauxDB {
 
@@ -87,12 +88,14 @@ public:
 	virtual void setConnectionAcquiredCallback(function<void(shared_ptr<void>)> callback) = 0;
 	virtual void setConnectionReleasedCallback(function<void(shared_ptr<void>)> callback) = 0;
 	virtual void setConnectionFailedCallback(function<void(shared_ptr<void>, const string&)> callback) = 0;
+	virtual void setLogger(std::shared_ptr<CLogger> logger);
 
 protected:
 	CConnectionPoolConfig config_;
 	CConnectionPoolStats stats_;
 	bool isRunning_;
 	steady_clock::time_point startTime_;
+	std::shared_ptr<CLogger> logger_;
 	function<bool(shared_ptr<void>)> connectionValidator_;
 	function<shared_ptr<void>()> connectionFactory_;
 	function<void(shared_ptr<void>)> connectionAcquiredCallback_;

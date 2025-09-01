@@ -1,0 +1,1 @@
+MongoServerError: The 'cursor' option is required, except for aggregate with the explain argument

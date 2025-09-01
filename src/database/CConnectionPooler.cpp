@@ -89,6 +89,12 @@ void CConnectionPooler::logConnectionEvent(const std::string& event,
 		stats_.failedRequests++;
 	}
 
+	/* Use logger if available */
+	if (logger_)
+	{
+		logger_->log(CLogLevel::DEBUG, "Connection pool event: " + event + " - " + details);
+	}
+
 	/* Use details parameter for additional logging */
 	if (!details.empty())
 	{
@@ -183,5 +189,10 @@ bool CConnectionPooler::isTimeForValidation() const
 		   std::chrono::milliseconds(config_.validationInterval);
 }
 
+
+void CConnectionPooler::setLogger(std::shared_ptr<CLogger> logger)
+{
+	logger_ = logger;
+}
 
 } /* namespace FauxDB */

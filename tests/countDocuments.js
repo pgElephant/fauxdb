@@ -1,0 +1,1 @@
+db.runCommand({countDocuments: "test"})

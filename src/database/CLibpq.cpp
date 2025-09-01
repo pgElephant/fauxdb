@@ -11,6 +11,7 @@
 #include "CLibpq.hpp"
 
 #include <algorithm>
+#include <iostream>
 #include <libpq-fe.h>
 #include <sstream>
 #include <stdexcept>
@@ -209,11 +210,30 @@ bool CLibpq::connect(const std::string& connectionString)
 
 	try
 	{
+		/* Debug: Print connection string (without password) */
+		std::string debugString = connectionString;
+		size_t passwordPos = debugString.find("password=");
+		if (passwordPos != std::string::npos)
+		{
+			size_t endPos = debugString.find(" ", passwordPos);
+			if (endPos != std::string::npos)
+			{
+				debugString.replace(passwordPos, endPos - passwordPos, "password=***");
+			}
+			else
+			{
+				debugString.replace(passwordPos, std::string::npos, "password=***");
+			}
+		}
+		std::cerr << "DEBUG: Connecting with string: " << debugString << std::endl;
+		
 		connection_ = PQconnectdb(connectionString.c_str());
 
 		if (!connection_ || PQstatus(connection_) != CONNECTION_OK)
 		{
-			setError(PQerrorMessage(connection_));
+			std::string errorMsg = connection_ ? PQerrorMessage(connection_) : "PQconnectdb returned null";
+			std::cerr << "DEBUG: Connection failed: " << errorMsg << std::endl;
+			setError(errorMsg);
 			return false;
 		}
 

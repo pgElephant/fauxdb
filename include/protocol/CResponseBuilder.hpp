@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "../../CTypes.hpp"
+#include "../CTypes.hpp"
 
 #include <memory>
 #include <string>

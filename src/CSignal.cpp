@@ -486,10 +486,15 @@ void CSignal::handleSystemSignal(int signalNumber)
 
 void CSignal::logSignal(CSignalType signalType, const std::string& action)
 {
-	if (monitoringEnabled_)
+	if (monitoringEnabled_ && logger_)
 	{
-		std::cout << "Signal: " << getSignalName(signalType) << " - " << action << std::endl;
+		logger_->log(CLogLevel::INFO, getSignalName(signalType) + " - " + action);
 	}
+}
+
+void CSignal::setLogger(std::shared_ptr<CLogger> logger)
+{
+	logger_ = logger;
 }
 
 void CSignal::updateSignalCount(CSignalType signalType)

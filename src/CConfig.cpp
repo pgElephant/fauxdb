@@ -101,49 +101,9 @@ std::error_code CConfig::loadFromJson(const std::string& jsonContent)
 	{
 		nlohmann::json j = nlohmann::json::parse(jsonContent);
 		
-		for (auto it = j.begin(); it != j.end(); ++it)
-		{
-			std::string key = it.key();
-			
-			if (it.value().is_string())
-			{
-				set(key, it.value().get<std::string>());
-			}
-			else if (it.value().is_number_integer())
-			{
-				set(key, it.value().get<int>());
-			}
-			else if (it.value().is_number_float())
-			{
-				set(key, it.value().get<double>());
-			}
-			else if (it.value().is_boolean())
-			{
-				set(key, it.value().get<bool>());
-			}
-			else if (it.value().is_array())
-			{
-				std::vector<std::string> arrayValues;
-				for (const auto& item : it.value())
-				{
-					if (item.is_string())
-					{
-						arrayValues.push_back(item.get<std::string>());
-					}
-					else
-					{
-						arrayValues.push_back(item.dump());
-					}
-				}
-				set(key, arrayValues);
-			}
-			else
-			{
-				// Convert other types to string
-				set(key, it.value().dump());
-			}
-		}
-
+		// Recursively process JSON nodes to flatten nested structure
+		processJsonNode("", j);
+		
 		return std::error_code{};
 	}
 	catch (const nlohmann::json::exception& e)
@@ -163,6 +123,56 @@ std::error_code CConfig::loadFromJson(const std::string& jsonContent)
 				std::string("JSON loading error: ") + e.what());
 		}
 		return std::make_error_code(std::errc::invalid_argument);
+	}
+}
+
+void CConfig::processJsonNode(const std::string& prefix, const nlohmann::json& node)
+{
+	if (node.is_object())
+	{
+		for (auto it = node.begin(); it != node.end(); ++it)
+		{
+			std::string key = it.key();
+			std::string fullKey = prefix.empty() ? key : prefix + "." + key;
+			processJsonNode(fullKey, it.value());
+		}
+	}
+	else if (node.is_string())
+	{
+		set(prefix, node.get<std::string>());
+	}
+	else if (node.is_number_integer())
+	{
+		set(prefix, node.get<int>());
+	}
+	else if (node.is_number_float())
+	{
+		set(prefix, node.get<double>());
+	}
+	else if (node.is_boolean())
+	{
+		set(prefix, node.get<bool>());
+	}
+	else if (node.is_array())
+	{
+		std::vector<std::string> arrayValues;
+		for (const auto& item : node)
+		{
+			if (item.is_string())
+			{
+				arrayValues.push_back(item.get<std::string>());
+			}
+			else
+			{
+				arrayValues.push_back(item.dump());
+			}
+		}
+		set(prefix, arrayValues);
+	}
+	else
+	{
+		// Convert other types to string
+		set(prefix, node.dump());
 	}
 }
 

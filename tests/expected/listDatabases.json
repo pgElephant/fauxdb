@@ -1,0 +1,11 @@
+{
+  "ok": 1,
+  "databases": [
+    {
+      "name": "test",
+      "sizeOnDisk": 1024,
+      "empty": false
+    }
+  ],
+  "totalSize": 1024
+}

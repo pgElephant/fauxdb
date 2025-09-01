@@ -1,0 +1,53 @@
+Title: C++ house style for Cursor
+
+Function layout
+return_type
+FunctionName(args)
+{
+/* declare all variables first /
+/ then statements */
+}
+
+Declarations
+Place all variables at the start of each function. No mixed declarations later in the body.
+
+Spacing
+Put exactly two blank lines between function definitions. No extra blank lines.
+
+Braces
+Opening brace on a new line for functions, classes, structs, and namespaces.
+
+Comments
+Use only C style comments like /* ... */. Do not use // comments. Write only necessary comments.
+
+Headers
+Do not add banner blocks or long headers. Keep files lean.
+
+Edits
+When editing existing files, preserve the style above. Keep diffs minimal. Do not inject extra comments.
+
+Whitespace
+No trailing spaces. End each file with a single newline.
+
+Example
+/* good */
+int
+Add(int a, int b)
+{
+int sum;
+
+sum = a + b;
+
+return sum;
+}
+
+
+int
+Mul(int a, int b)
+{
+int prod;
+
+prod = a * b;
+
+return prod;
+}

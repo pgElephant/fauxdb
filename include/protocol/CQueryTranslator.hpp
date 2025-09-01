@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include "../../CTypes.hpp"
-#include "../../IInterfaces.hpp"
-#include "../../database/CDatabase.hpp"
+#include "../CTypes.hpp"
+#include "../IInterfaces.hpp"
+#include "../database/CDatabase.hpp"
 
 #include <functional>
 #include <memory>

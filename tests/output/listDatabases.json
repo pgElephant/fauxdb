@@ -1,0 +1,7 @@
+{
+  '0': { name: 'test', sizeOnDisk: Long('1024'), empty: false },
+  ok: 1,
+  databases: [],
+  totalSize: Long('1024'),
+  totalSizeMb: Long('1')
+}

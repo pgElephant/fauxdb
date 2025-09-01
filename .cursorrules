@@ -1,0 +1,95 @@
+# C++ House Style Rules for Cursor AI
+
+## Function Layout
+- Return type on its own line
+- Function name and parameters on the next line
+- Opening brace on a new line
+- All variable declarations at the start of the function
+- Statements after declarations
+
+```cpp
+return_type
+FunctionName(args)
+{
+    /* declare all variables first */
+    /* then statements */
+}
+```
+
+## Declarations
+- Place ALL variables at the start of each function
+- NO variable declarations later in the function body
+- Declare all variables before any statements
+
+## Spacing
+- Use exactly TWO blank lines between function definitions
+- Use ONE blank line between variable declarations and statements
+
+## Braces
+- Opening brace on a NEW LINE for:
+  - Functions
+  - Classes
+  - Structs
+  - Namespaces
+- Opening brace on SAME LINE for:
+  - Control structures (if, for, while, etc.)
+
+## Comments
+- Use ONLY C-style comments: `/* ... */`
+- Keep comments minimal and necessary
+- NO C++ style comments (`//`)
+
+## Whitespace
+- NO trailing spaces
+- End each file with a single newline
+- Consistent indentation
+
+## Edits
+- ALWAYS preserve this style when editing existing files
+- Apply this style to any new code written
+
+## Examples
+
+```cpp
+/* good */
+int
+Add(int a, int b)
+{
+    int sum;
+
+    sum = a + b;
+    return sum;
+}
+
+
+int
+Mul(int a, int b)
+{
+    int prod;
+
+    prod = a * b;
+    return prod;
+}
+
+
+class
+MyClass
+{
+    int member;
+
+public:
+    void
+    Method()
+    {
+        int local;
+
+        local = member + 1;
+        member = local;
+    }
+};
+```
+
+## Enforcement
+- Apply these rules to ALL C++ files in the project
+- Maintain consistency across the entire codebase
+- When refactoring or adding new code, follow this style exactly

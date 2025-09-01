@@ -45,6 +45,7 @@ struct CServerConfig
 	bool enableProfiling;
 	bool enableHotReload;
 	std::string configFormat;
+	bool daemonMode;
 
 
 	std::string pgHost;
@@ -63,7 +64,7 @@ struct CServerConfig
 		  cloudProvider("none"), observabilityBackend("none"),
 		  compressionAlgorithm("none"), serializationFormat("json"),
 		  enableMetrics(false), enableTracing(false), enableProfiling(false),
-		  enableHotReload(false), configFormat("json"),
+		  enableHotReload(false), configFormat("json"), daemonMode(false),
 		  pgHost("localhost"), pgPort("5432"), pgDatabase("fauxdb"),
 		  pgUser("fauxdb"), pgPassword("fauxdb"), pgPoolSize(10),
 		  pgTimeout(10000)

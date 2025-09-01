@@ -11,8 +11,12 @@
 #pragma once
 
 #include "CDocumentWireProtocol.hpp"
-#include "query_response/CQueryTranslator.hpp"
-#include "query_response/CResponseBuilder.hpp"
+#include "CQueryTranslator.hpp"
+#include "CResponseBuilder.hpp"
+#include "CBsonType.hpp"
+#include "../database/CPGConnectionPooler.hpp"
+/* #include "CommandRegistry.hpp"
+#include "CollectionNameParser.hpp" */
 
 #include <functional>
 #include <memory>
@@ -28,6 +32,21 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 using std::function;
+using std::shared_ptr;
+
+// Forward declarations
+
+// CRUD operation structures - simplified without CBsonType objects
+struct UpdateOperation
+{
+    string filterJson;
+    string updateJson;
+};
+
+struct DeleteOperation
+{
+    string filterJson;
+};
 
 class IDocumentCommandHandler
 {
@@ -66,6 +85,9 @@ public:
 							  unique_ptr<IDocumentCommandHandler> handler);
 	void unregisterCommandHandler(const string& command);
 
+	/* Set connection pooler for PostgreSQL access */
+	void setConnectionPooler(shared_ptr<CPGConnectionPooler> pooler);
+
 private:
 	bool initialized_;
 	bool isRunning_;
@@ -80,6 +102,8 @@ private:
 	unique_ptr<CDocumentWireParser> parser_;
 	unique_ptr<CQueryTranslator> queryTranslator_;
 	unique_ptr<CResponseBuilder> responseBuilder_;
+	shared_ptr<CPGConnectionPooler> connectionPooler_;
+	/* unique_ptr<CommandRegistry> commandRegistry_; */
 
 	bool parseMessage(const vector<uint8_t>& messageData,
 					 CDocumentWireMessage& message);
@@ -89,6 +113,9 @@ private:
 	void initializeConfiguration();
 	void initializeDefaultCommandHandlers();
 	vector<uint8_t> createErrorBsonDocument(int errorCode, const string& errorMessage);
+	vector<uint8_t> createCommandResponse(const string& commandName, int32_t requestID, const vector<uint8_t>& buffer, ssize_t bytesRead);
+	string extractCommandName(const CDocumentWireMessage& request);
+	string extractCollectionName(const vector<uint8_t>& buffer, ssize_t bytesRead);
 	
 	// Additional methods referenced in implementation
 	unique_ptr<CDocumentWireMessage> routeCommand(const CDocumentWireMessage& request);
@@ -100,20 +127,18 @@ private:
 	vector<uint8_t> createBsonDocument(const unordered_map<string, int32_t>& fields);
 	vector<uint8_t> createBsonDocument(const unordered_map<string, double>& fields);
 	vector<uint8_t> createBsonDocument(const unordered_map<string, bool>& fields);
-	void setMaxBsonSize(size_t size);
-	void setCompressionEnabled(bool enabled);
-	void setChecksumEnabled(bool enabled);
-	bool validateMessage(const CDocumentWireMessage& message) const;
-	unique_ptr<CDocumentWireMessage> processMessage(const CDocumentWireMessage& message);
-	string extractCommandName(const CDocumentWireMessage& message);
-	vector<uint8_t> createHelloBsonDocument();
 	
-	// Additional methods from implementation
-	void logError(const string& operation, const string& error);
-	unique_ptr<CDocumentWireMessage> handleCommonCommand(const CDocumentWireMessage& request, const string& commandName);
-	vector<uint8_t> createBuildInfoBsonDocument();
-	vector<uint8_t> createIsMasterBsonDocument();
-	vector<uint8_t> createBsonArray(const string& key, const vector<string>& values);
+	/* Helper methods for PostgreSQL queries */
+	vector<uint8_t> createFindResponseFromPostgreSQL(const string& collectionName, int32_t requestID);
+	vector<CBsonType> queryPostgreSQLCollection(const string& collectionName);
+	
+	/* CRUD operation helper methods */
+	vector<CBsonType> extractDocumentsFromInsert(const vector<uint8_t>& buffer, ssize_t bytesRead);
+	vector<UpdateOperation> extractUpdateOperations(const vector<uint8_t>& buffer, ssize_t bytesRead);
+	vector<DeleteOperation> extractDeleteOperations(const vector<uint8_t>& buffer, ssize_t bytesRead);
+	string convertBsonToInsertSQL(const string& collectionName, const CBsonType& doc);
+	string convertUpdateToSQL(const string& collectionName, const string& filterJson, const string& updateJson);
+	string convertDeleteToSQL(const string& collectionName, const string& filterJson);
 };
 
 class CHelloCommandHandler : public IDocumentCommandHandler

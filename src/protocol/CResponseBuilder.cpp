@@ -1,5 +1,5 @@
 
-#include "protocol/query_response/CResponseBuilder.hpp"
+#include "protocol/CResponseBuilder.hpp"
 
 using namespace FauxDB;
 #include "CBsonType.hpp"

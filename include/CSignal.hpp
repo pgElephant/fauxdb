@@ -18,6 +18,7 @@
 #include <mutex>
 #include <string>
 #include <unordered_map>
+#include "CLogger.hpp"
 
 namespace FauxDB
 {
@@ -136,6 +137,9 @@ class CSignal
 	virtual void clearErrors();
 	virtual bool hasErrors() const;
 
+	/* Logger management */
+	virtual void setLogger(std::shared_ptr<CLogger> logger);
+
   protected:
 	/* Signal state */
 	CSignalConfig config_;
@@ -154,6 +158,9 @@ class CSignal
 
 	/* Error state */
 	mutable std::string lastError_;
+
+	/* Logger */
+	std::shared_ptr<CLogger> logger_;
 
 	/* Protected utility methods */
 	virtual void setError(const std::string& error) const;

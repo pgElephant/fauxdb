@@ -6,6 +6,7 @@
 #include <functional>
 #include <iostream>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
 #include <string>
@@ -85,6 +86,7 @@ private:
 	void parseYamlValue(const std::string& key, const std::string& value);
 	void parseTomlValue(const std::string& key, const std::string& value);
 	void parseIniValue(const std::string& key, const std::string& value);
+	void processJsonNode(const std::string& prefix, const nlohmann::json& node);
 	void processYamlNode(const std::string& prefix, const YAML::Node& node);
 	std::string escapeString(const std::string& str) const;
 	std::string unescapeString(const std::string& str) const;

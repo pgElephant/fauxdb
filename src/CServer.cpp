@@ -18,8 +18,8 @@
 #include "database/CDatabase.hpp"
 #include "network/CNetwork.hpp"
 #include "parsing/CParser.hpp"
-#include "query_response/CQueryTranslator.hpp"
-#include "query_response/CResponseBuilder.hpp"
+#include "protocol/CQueryTranslator.hpp"
+#include "protocol/CResponseBuilder.hpp"
 
 using namespace std;
 
@@ -34,8 +34,10 @@ CServer::CServer()
 	: status_(CServerStatus::Stopped), running_(false), maintenanceMode_(false),
 	  lastErrorTime_(std::chrono::steady_clock::now()), metricsEnabled_(false)
 {
+	std::cerr << "DEBUG: CServer constructor called" << std::endl;
 	initializeDefaults();
 	initializeComponentPointers();
+	std::cerr << "DEBUG: CServer constructor completed" << std::endl;
 }
 
 CServer::~CServer()
@@ -48,12 +50,30 @@ bool CServer::initialize(const CServerConfig& config)
 {
 	try
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Starting server initialization");
+		}
+		else
+		{
+			std::cerr << "DEBUG: Starting server initialization" << std::endl;
+		}
+		
 		setConfig(config);
 
 		if (!validateConfig(config))
 		{
 			handleServerError("Invalid configuration");
 			return false;
+		}
+
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Configuration validated, initializing components");
+		}
+		else
+		{
+			std::cerr << "DEBUG: Configuration validated, initializing components" << std::endl;
 		}
 
 		if (!initializeComponents())
@@ -161,6 +181,18 @@ CServerStatus CServer::getStatus() const
 void CServer::setConfig(const CServerConfig& config)
 {
 	config_ = config;
+	
+	if (logger_)
+	{
+		logger_->log(CLogLevel::DEBUG, "Config set on server: port=" + std::to_string(config.port) + 
+			", bind_address=" + config.bindAddress + ", max_connections=" + std::to_string(config.maxConnections));
+	}
+	else
+	{
+		std::cerr << "DEBUG: Config set on server: port=" << config.port 
+				  << ", bind_address=" << config.bindAddress 
+				  << ", max_connections=" << config.maxConnections << std::endl;
+	}
 	
 	/* Initialize TCP server with config if not already initialized */
 	if (!tcpServer_)
@@ -359,36 +391,118 @@ bool CServer::initializeComponents()
 {
 	try
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Starting component initialization");
+		}
+		
 		if (!initializeNetworkComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Network component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Network component initialized successfully");
 		}
 		
 		if (!initializeDatabaseComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Database component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Database component initialized successfully");
 		}
 		
 		if (!initializeProtocolComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Protocol component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Protocol component initialized successfully");
 		}
 		
 		if (!initializeParsingComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Parsing component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Parsing component initialized successfully");
 		}
 		
 		if (!initializeQueryComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Query component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Query component initialized successfully");
 		}
 		
 		if (!initializeResponseComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Response component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Response component initialized successfully");
 		}
 		
 		if (!initializeLoggingComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Logging component initialization failed");
+			}
 			return false;
 		}
 		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Logging component initialized successfully");
+		}
+		
 		if (!initializeConfigurationComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Configuration component initialization failed");
+			}
 			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Configuration component initialized successfully");
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "All components initialized successfully");
 		}
 		
 		return true;
@@ -404,10 +518,116 @@ bool CServer::startComponents()
 {
 	try
 	{
-		return startNetworkComponent() && startDatabaseComponent() &&
-			   startProtocolComponent() && startParsingComponent() &&
-			   startQueryComponent() && startResponseComponent() &&
-			   startLoggingComponent() && startConfigurationComponent();
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Starting component startup process");
+		}
+		
+		if (!startNetworkComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Network component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Network component started successfully");
+		}
+		
+		if (!startDatabaseComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Database component startup failed");
+			}
+			return false;
+		}
+		
+		if (!startProtocolComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Protocol component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Protocol component started successfully");
+		}
+		
+		if (!startParsingComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Parsing component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Parsing component started successfully");
+		}
+		
+		if (!startQueryComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Query component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Query component started successfully");
+		}
+		
+		if (!startResponseComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Response component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Response component started successfully");
+		}
+		
+		if (!startLoggingComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Logging component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Logging component started successfully");
+		}
+		
+		if (!startConfigurationComponent()) {
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Configuration component startup failed");
+			}
+			return false;
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Configuration component started successfully");
+		}
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "All components started successfully");
+		}
+		
+		return true;
 	}
 	catch (const std::exception& e)
 	{
@@ -665,9 +885,48 @@ bool CServer::initializeNetworkComponent()
 {
 	try
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Starting network component initialization");
+		}
+		else
+		{
+			std::cerr << "DEBUG: Starting network component initialization" << std::endl;
+		}
 	
 		
 		/* Check if components exist */
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Checking if connection pooler exists: " + std::string(connectionPooler_ ? "yes" : "no"));
+		}
+		else
+		{
+			std::cerr << "DEBUG: Checking if connection pooler exists: " << (connectionPooler_ ? "yes" : "no") << std::endl;
+		}
+		
+		/* Always recreate the connection pooler to ensure proper configuration */
+		if (connectionPooler_)
+		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "Shutting down existing connection pooler");
+			}
+			connectionPooler_->shutdown();
+			connectionPooler_.reset();
+		}
+		
+		/* Always recreate the TCP server to ensure proper configuration */
+		if (tcpServer_)
+		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "Shutting down existing TCP server");
+			}
+			tcpServer_->stop();
+			tcpServer_.reset();
+		}
+		
 		if (!connectionPooler_)
 		{
 
@@ -690,6 +949,18 @@ bool CServer::initializeNetworkComponent()
 			poolConfig.validateConnections = true;
 			poolConfig.validationInterval = 30000;
 
+			/* Set logger for the connection pooler */
+			pooler->setLogger(logger_);
+
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "About to initialize PostgreSQL connection pooler");
+			}
+			else
+			{
+				std::cerr << "DEBUG: About to initialize PostgreSQL connection pooler" << std::endl;
+			}
+
 			if (!pooler->initialize(poolConfig))
 			{
 				setError("Failed to initialize PostgreSQL connection pooler");
@@ -705,10 +976,25 @@ bool CServer::initializeNetworkComponent()
 			/* Store the pooler */
 			connectionPooler_ = pooler;
 		}
+		else
+		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "Connection pooler already exists, checking if it's running");
+			}
+			else
+			{
+				std::cerr << "DEBUG: Connection pooler already exists, checking if it's running" << std::endl;
+			}
+		}
 
 
 		if (!tcpServer_)
 		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "Creating TCP server");
+			}
 
 			/* Create TCP network server */
 			auto tcpServer = std::make_unique<FauxDB::CTcp>(config_);
@@ -716,17 +1002,39 @@ bool CServer::initializeNetworkComponent()
 			/* Set the connection pooler in the TCP server */
 			tcpServer->setConnectionPooler(connectionPooler_);
 
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "About to initialize TCP server");
+			}
+
 			/* Initialize the TCP server */
 			auto initResult = tcpServer->initialize();
-			if (!initResult)  /* Fixed: check for failure, not success */
+			if (initResult)  /* Check for failure (non-zero error code) */
 			{
 				setError("Failed to initialize TCP server: " +
-						 std::to_string(initResult.value()));
+						 initResult.message());
 				return false;
+			}
+
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "TCP server initialized successfully");
 			}
 
 			/* Store the TCP server */
 			tcpServer_ = std::move(tcpServer);
+			
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "TCP server stored successfully");
+			}
+		}
+		else
+		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::DEBUG, "TCP server already exists");
+			}
 		}
 
 
@@ -744,6 +1052,15 @@ bool CServer::initializeDatabaseComponent()
 {
 	try
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Starting database component initialization");
+		}
+		else
+		{
+			std::cerr << "DEBUG: Starting database component initialization" << std::endl;
+		}
+		
 		/* Database component is now integrated with network component */
 		/* The connection pooler is created in initializeNetworkComponent() */
 		/* This method validates that the database connection pooler is working
@@ -751,26 +1068,54 @@ bool CServer::initializeDatabaseComponent()
 
 		if (!connectionPooler_)
 		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Database connection pooler not initialized - network component must be initialized first");
+			}
 			setError("Database connection pooler not initialized - network "
 					 "component must be initialized first");
 			return false;
+		}
+
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Connection pooler found, testing database connectivity");
 		}
 
 		/* Test database connectivity by getting a connection */
 		auto testConnection = connectionPooler_->getConnection();
 		if (!testConnection)
 		{
+			if (logger_)
+			{
+				logger_->log(CLogLevel::ERROR, "Failed to get test database connection - database may be unreachable");
+			}
 			setError("Failed to get test database connection - database may be "
 					 "unreachable");
 			return false;
 		}
 
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Test database connection acquired successfully");
+		}
+
 		/* Return the test connection to the pool */
 		connectionPooler_->releaseConnection(testConnection);
+		
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Test database connection returned to pool");
+		}
+		
 		return true;
 	}
 	catch (const std::exception& e)
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::ERROR, "Database component initialization failed with exception: " + std::string(e.what()));
+		}
 		setError("Database component initialization failed: " +
 				 std::string(e.what()));
 		return false;
@@ -788,6 +1133,12 @@ bool CServer::initializeProtocolComponent()
 		{
 			setError("Failed to initialize document protocol handler");
 			return false;
+		}
+
+		/* Set connection pooler for PostgreSQL access */
+		if (connectionPooler_)
+		{
+			documentProtocolHandler_->setConnectionPooler(connectionPooler_);
 		}
 
 		/* Initialize command handlers */
@@ -887,18 +1238,33 @@ bool CServer::startNetworkComponent()
 {
 	try
 	{
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "Starting network component");
+		}
+
 		if (!tcpServer_)
 		{
 			setError("TCP server not initialized");
 			return false;
 		}
 
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "About to start TCP server");
+		}
+
 		/* Start the TCP server */
 		auto startResult = tcpServer_->start();
-		if (startResult)
+		if (startResult)  /* Check for failure (non-zero error code) */
 		{
 			setError("Failed to start TCP server: " + startResult.message());
 			return false;
+		}
+
+		if (logger_)
+		{
+			logger_->log(CLogLevel::DEBUG, "TCP server started successfully");
 		}
 
 		return true;
@@ -1437,6 +1803,19 @@ void CServer::setError(const std::string& error)
 {
 	lastError_ = error;
 	addErrorToLog(error);
+}
+
+void CServer::setLogger(std::shared_ptr<CLogger> logger)
+{
+	logger_ = logger;
+	if (logger_)
+	{
+		logger_->log(CLogLevel::DEBUG, "Logger set on server");
+	}
+	else
+	{
+		std::cerr << "DEBUG: Logger set on server (null)" << std::endl;
+	}
 }
 
 } /* namespace FauxDB */

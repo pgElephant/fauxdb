@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CServerConfig.hpp"
+#include "CLogger.hpp"
 #include "database/CPGConnectionPooler.hpp"
 #include "network/CTcp.hpp"
 #include "protocol/CDocumentCommandHandler.hpp"
@@ -98,6 +99,9 @@ class CServer
 	virtual std::string getServerInfo() const;
 	virtual std::string getVersion() const;
 	virtual std::string getBuildInfo() const;
+
+	/* Logger management */
+	virtual void setLogger(std::shared_ptr<CLogger> logger);
 	virtual std::vector<std::string> getComponentInfo() const;
 
 	/* Database and network information */
@@ -151,6 +155,9 @@ class CServer
 	std::vector<std::thread> workerThreads_;
 	std::mutex serverMutex_;
 	std::condition_variable serverCondition_;
+
+	/* Logger */
+	std::shared_ptr<CLogger> logger_;
 
 	/* Protected utility methods */
 	virtual void setStatus(CServerStatus newStatus);

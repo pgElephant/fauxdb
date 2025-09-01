@@ -1,0 +1,13 @@
+{
+  "ok": 1,
+  "cursor": {
+    "id": 0,
+    "ns": "admin.$cmd.listCollections",
+    "firstBatch": [
+      {
+        "name": "test",
+        "type": "collection"
+      }
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 
-#include "query_response/CQueryTranslator.hpp"
+#include "protocol/CQueryTranslator.hpp"
 
 #include <sstream>
 #include <stdexcept>

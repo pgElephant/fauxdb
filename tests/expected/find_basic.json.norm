@@ -1,0 +1,24 @@
+{
+  "cursor": {
+    "firstBatch": [
+      {
+        "_id": "pg_1"
+      },
+      {
+        "_id": "pg_2"
+      },
+      {
+        "_id": "pg_3"
+      },
+      {
+        "_id": "pg_4"
+      },
+      {
+        "_id": "pg_5"
+      }
+    ],
+    "id": 0,
+    "ns": "test.collection"
+  },
+  "ok": 1
+}

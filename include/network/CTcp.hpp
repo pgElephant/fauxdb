@@ -5,8 +5,8 @@
 #include "../database/CPGConnectionPooler.hpp"
 #include "../protocol/CDocumentProtocolHandler.hpp"
 #include "../protocol/CDocumentWireProtocol.hpp"
-#include "../protocol/query_response/CQueryTranslator.hpp"
-#include "../protocol/query_response/CResponseBuilder.hpp"
+#include "../protocol/CQueryTranslator.hpp"
+#include "../protocol/CResponseBuilder.hpp"
 #include "CNetwork.hpp"
 #include "CThread.hpp"
 

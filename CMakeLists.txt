@@ -251,8 +251,14 @@ set(SOURCES
     src/protocol/CCommandHandler.cpp
     src/protocol/CDocumentCommandHandler.cpp
     src/protocol/CBsonType.cpp
-    src/protocol/query_response/CQueryTranslator.cpp
-    src/protocol/query_response/CResponseBuilder.cpp
+    src/protocol/CQueryTranslator.cpp
+    src/protocol/CResponseBuilder.cpp
+    src/protocol/CommandRegistry.cpp
+    src/protocol/CollectionNameParser.cpp
+    src/protocol/BaseCommand.cpp
+    src/protocol/FindCommand.cpp
+    src/protocol/FindOneCommand.cpp
+    src/protocol/CountCommand.cpp
     src/parsing/CParser.cpp
     src/parsing/CMessageParser.cpp
 )

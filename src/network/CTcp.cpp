@@ -34,18 +34,27 @@ error_code CTcp::initialize()
 		return error_code{};
 	try
 	{
+		std::cerr << "DEBUG: Creating socket for TCP server" << std::endl;
 		server_socket_ = socket(AF_INET, SOCK_STREAM, 0);
 		if (server_socket_ == -1)
+		{
+			std::cerr << "DEBUG: Failed to create socket, errno=" << errno << " (" << strerror(errno) << ")" << std::endl;
 			return make_error_code(errc::connection_refused);
+		}
+		std::cerr << "DEBUG: Socket created successfully, fd=" << server_socket_ << std::endl;
 		int opt = 1;
+		std::cerr << "DEBUG: Setting SO_REUSEADDR socket option" << std::endl;
 		if (setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &opt,
 					   sizeof(opt)) < 0)
 		{
+			std::cerr << "DEBUG: Failed to set SO_REUSEADDR, errno=" << errno << " (" << strerror(errno) << ")" << std::endl;
 			close(server_socket_);
 			server_socket_ = -1;
 			return make_error_code(errc::connection_refused);
 		}
+		std::cerr << "DEBUG: SO_REUSEADDR set successfully" << std::endl;
 		initialized_ = true;
+		std::cerr << "DEBUG: TCP server initialization completed successfully" << std::endl;
 		return error_code{};
 	}
 	catch (...)
@@ -56,17 +65,33 @@ error_code CTcp::initialize()
 
 error_code CTcp::start()
 {
+	std::cerr << "DEBUG: Starting TCP server" << std::endl;
 	if (!isInitialized())
+	{
+		std::cerr << "DEBUG: TCP server not initialized" << std::endl;
 		return make_error_code(errc::not_connected);
+	}
 	if (isRunning())
+	{
+		std::cerr << "DEBUG: TCP server already running" << std::endl;
 		return error_code{};
+	}
 	try
 	{
+		std::cerr << "DEBUG: About to bind to address: " << config_.bindAddress << ":" << config_.port << std::endl;
 		auto bindResult = bindToAddress(config_.bindAddress, config_.port);
 		if (bindResult)
+		{
+			std::cerr << "DEBUG: Bind failed: " << bindResult.message() << std::endl;
 			return bindResult;
+		}
+		std::cerr << "DEBUG: Bind successful, about to listen" << std::endl;
 		if (listen(server_socket_, SOMAXCONN) < 0)
+		{
+			std::cerr << "DEBUG: Listen failed, errno=" << errno << " (" << strerror(errno) << ")" << std::endl;
 			return make_error_code(errc::connection_refused);
+		}
+		std::cerr << "DEBUG: Listen successful" << std::endl;
 		running_ = true;
 		listener_thread_ = thread(&CTcp::listenerLoop, this);
 		if (logger_)
@@ -138,33 +163,21 @@ CTcp::getConnectionPooler() const
 
 void CTcp::listenerLoop()
 {
+		std::cerr << "DEBUG: Listener loop started" << std::endl;
 		while (running_.load()) {
 			sockaddr_in clientAddr{};
 			socklen_t clientAddrLen = sizeof(clientAddr);
+			std::cerr << "DEBUG: About to accept connection" << std::endl;
 			int clientSocket = accept(server_socket_, (sockaddr*)&clientAddr, &clientAddrLen);
 			if (clientSocket < 0) {
-				if (logger_) {
-					logger_->log(CLogLevel::ERROR,
-								 "Failed to accept client connection");
+				std::cerr << "DEBUG: Accept failed, errno=" << errno << " (" << strerror(errno) << ")" << std::endl;
+				/* Only log as error if it's not a normal interruption */
+				if (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK) {
+					if (logger_) {
+						logger_->log(CLogLevel::ERROR,
+									 "Failed to accept client connection: " + std::string(strerror(errno)));
+					}
 				}
-				continue;
-			}
-			auto pooler = getConnectionPooler();
-			if (!pooler) {
-				if (logger_) {
-					logger_->log(CLogLevel::ERROR,
-								 "No connection pooler available for client socket=" + std::to_string(clientSocket));
-				}
-				close(clientSocket);
-				continue;
-			}
-			auto pgConnection = pooler->getConnection();
-			if (!pgConnection) {
-				if (logger_) {
-					logger_->log(CLogLevel::ERROR,
-								 "Failed to acquire PostgreSQL connection for client socket=" + std::to_string(clientSocket));
-				}
-				close(clientSocket);
 				continue;
 			}
 			if (logger_) {
@@ -178,7 +191,7 @@ void CTcp::listenerLoop()
 
 void CTcp::connectionWorker(int clientSocket)
 {
-		auto pooler = getConnectionPooler();
+	auto pooler = getConnectionPooler();
 	if (!pooler)
 	{
 		if (logger_)
@@ -190,44 +203,35 @@ void CTcp::connectionWorker(int clientSocket)
 		close(clientSocket);
 		return;
 	}
-	auto pgConnection = pooler->getConnection();
-	if (!pgConnection)
-	{
-		if (logger_)
-		{
-			logger_->log(
-				CLogLevel::ERROR,
-				"Failed to acquire PostgreSQL connection for client socket=" +
-					std::to_string(clientSocket));
-		}
-		close(clientSocket);
-		return;
-	}
+
 	if (logger_)
 	{
 		logger_->log(CLogLevel::INFO,
 					 "Connection worker started for client socket=" +
-						 std::to_string(clientSocket) +
-						 " (PostgreSQL connection established)");
+						 std::to_string(clientSocket));
 	}
+	
 	auto documentHandler = make_unique<FauxDB::CDocumentProtocolHandler>();
 	if (!documentHandler->initialize())
 	{
 		if (logger_)
 		{
 			logger_->log(CLogLevel::ERROR,
-						 		"Failed to initialize document protocol handler for "
+						 "Failed to initialize document protocol handler for "
 						 "client socket=" +
 							 std::to_string(clientSocket));
 		}
+		close(clientSocket);
 		return;
 	}
-	auto pgConn =
-		static_pointer_cast<FauxDB::PGConnection>(pgConnection);
-	auto queryTranslator = make_unique<FauxDB::CQueryTranslator>(
-		static_pointer_cast<FauxDB::CDatabase>(pgConn->database));
-	auto responseBuilder =
-		make_unique<FauxDB::CBSONResponseBuilder>();
+	
+	/* Set the connection pooler on the document handler */
+	documentHandler->setConnectionPooler(pooler);
+	
+	/* Create dummy query translator and response builder */
+	auto queryTranslator = make_unique<FauxDB::CQueryTranslator>(nullptr);
+	auto responseBuilder = make_unique<FauxDB::CBSONResponseBuilder>();
+	
 	vector<uint8_t> buffer(16384);
 	while (running_.load())
 	{
@@ -239,13 +243,14 @@ void CTcp::connectionWorker(int clientSocket)
 		if (!response.empty())
 			send(clientSocket, response.data(), response.size(), 0);
 	}
+	
 	if (logger_)
 	{
 		logger_->log(CLogLevel::INFO,
 					 "Connection worker finished for client socket=" +
 						 std::to_string(clientSocket));
 	}
-	pooler->releaseConnection(pgConnection);
+	
 	close(clientSocket);
 	cleanupConnection(clientSocket);
 }

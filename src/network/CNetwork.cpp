@@ -29,12 +29,12 @@ using namespace FauxDB;
  *-------------------------------------------------------------------------*/
 
 CNetwork::CNetwork(const FauxDB::CServerConfig& config)
-	: config_(config), running_(false), initialized_(false), server_socket_(-1)
+    : config_(config), running_(false), initialized_(false), server_socket_(-1)
 {
-	logger_ = std::make_shared<FauxDB::CLogger>(config);
-	logger_->enableConsoleOutput(true);
-	logger_->setLogLevel(CLogLevel::ERROR);
-	logger_->initialize();
+    logger_ = std::make_shared<FauxDB::CLogger>(config);
+    logger_->enableConsoleOutput(true);
+    logger_->setLogLevel(CLogLevel::ERROR);
+    logger_->initialize();
 }
 
 CNetwork::~CNetwork()
@@ -43,43 +43,43 @@ CNetwork::~CNetwork()
 
 const FauxDB::CServerConfig& CNetwork::getConfig() const
 {
-	return config_;
+    return config_;
 }
 
 error_code CNetwork::bindToAddress(const string& address, int port)
 {
 
-	if (server_socket_ == -1)
-	{
-		logger_->log(CLogLevel::ERROR,
-					 "Network: Invalid server socket for bind (address=" +
-						 address + ", port=" + std::to_string(port) + ")");
-		return make_error_code(errc::connection_refused);
-	}
+    if (server_socket_ == -1)
+    {
+        logger_->log(CLogLevel::ERROR,
+                     "Network: Invalid server socket for bind (address=" +
+                         address + ", port=" + std::to_string(port) + ")");
+        return make_error_code(errc::connection_refused);
+    }
 
-	sockaddr_in serverAddr;
-	memset(&serverAddr, 0, sizeof(serverAddr));
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_port = htons(port);
+    sockaddr_in serverAddr;
+    memset(&serverAddr, 0, sizeof(serverAddr));
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(port);
 
-	if (inet_pton(AF_INET, address.c_str(), &serverAddr.sin_addr) <= 0)
-	{
-		logger_->log(CLogLevel::ERROR,
-					 "Network: Invalid bind address '" + address +
-						 "' (port=" + std::to_string(port) + ")");
-		return make_error_code(errc::invalid_argument);
-	}
+    if (inet_pton(AF_INET, address.c_str(), &serverAddr.sin_addr) <= 0)
+    {
+        logger_->log(CLogLevel::ERROR,
+                     "Network: Invalid bind address '" + address +
+                         "' (port=" + std::to_string(port) + ")");
+        return make_error_code(errc::invalid_argument);
+    }
 
-	if (bind(server_socket_, (sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
-	{
-		logger_->log(CLogLevel::ERROR,
-					 "Network: Failed to bind socket to " + address + ":" +
-						 std::to_string(port) + ", errno=" +
-						 std::to_string(errno) + " (" + strerror(errno) + ")");
-		return make_error_code(errc::connection_refused);
-	}
+    if (bind(server_socket_, (sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
+    {
+        logger_->log(CLogLevel::ERROR,
+                     "Network: Failed to bind socket to " + address + ":" +
+                         std::to_string(port) + ", errno=" +
+                         std::to_string(errno) + " (" + strerror(errno) + ")");
+        return make_error_code(errc::connection_refused);
+    }
 
-	return error_code{};
+    return error_code{};
 }
 
 /* Add logger member to CNetwork */

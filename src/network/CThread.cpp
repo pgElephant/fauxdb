@@ -16,81 +16,81 @@ mutex CThread::threadPoolMutex_;
 
 CThread::CThread()
 {
-	running_ = false;
+    running_ = false;
 }
 
 CThread::~CThread()
 {
-	stop();
+    stop();
 }
 
 bool CThread::start(function<void()> function)
 {
-	if (running_)
-		return false;
-	try
-	{
-		threadFunction_ = function;
-		thread_ = thread(
-			[this]()
-			{
-				if (threadFunction_)
-					threadFunction_();
-			});
-		running_ = true;
-		return true;
-	}
-	catch (...)
-	{
-		running_ = false;
-		return false;
-	}
+    if (running_)
+        return false;
+    try
+    {
+        threadFunction_ = function;
+        thread_ = thread(
+            [this]()
+            {
+                if (threadFunction_)
+                    threadFunction_();
+            });
+        running_ = true;
+        return true;
+    }
+    catch (...)
+    {
+        running_ = false;
+        return false;
+    }
 }
 
 void CThread::stop()
 {
-	if (running_ && thread_.joinable())
-	{
-		running_ = false;
-		thread_.join();
-	}
+    if (running_ && thread_.joinable())
+    {
+        running_ = false;
+        thread_.join();
+    }
 }
 
 void CThread::join()
 {
-	if (thread_.joinable())
-		thread_.join();
+    if (thread_.joinable())
+        thread_.join();
 }
 
 bool CThread::isRunning() const noexcept
 {
-	return running_;
+    return running_;
 }
 
 thread::id CThread::getId() const noexcept
 {
-	return thread_.get_id();
+    return thread_.get_id();
 }
 
 bool CThread::isJoinable() const noexcept
 {
-	return thread_.joinable();
+    return thread_.joinable();
 }
 
 void CThread::detach()
 {
-	if (thread_.joinable())
-		thread_.detach();
+    if (thread_.joinable())
+        thread_.detach();
 }
 
 void CThread::setMaxThreads(size_t maxThreads)
 {
-	maxThreads_ = maxThreads;
+    maxThreads_ = maxThreads;
 }
 
 size_t CThread::getActiveThreadCount()
 {
-	return activeThreadCount_.load();
+    return activeThreadCount_.load();
 }
 
 void CThread::shutdownAll()

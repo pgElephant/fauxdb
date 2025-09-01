@@ -774,30 +774,6 @@ src/protocol/COpReplyHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpReplyHandler.cpp.s
 .PHONY : src/protocol/COpReplyHandler.cpp.s
 
-src/protocol/CQueryTranslator.o: src/protocol/CQueryTranslator.cpp.o
-.PHONY : src/protocol/CQueryTranslator.o
-
-# target to build an object file
-src/protocol/CQueryTranslator.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CQueryTranslator.cpp.o
-.PHONY : src/protocol/CQueryTranslator.cpp.o
-
-src/protocol/CQueryTranslator.i: src/protocol/CQueryTranslator.cpp.i
-.PHONY : src/protocol/CQueryTranslator.i
-
-# target to preprocess a source file
-src/protocol/CQueryTranslator.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CQueryTranslator.cpp.i
-.PHONY : src/protocol/CQueryTranslator.cpp.i
-
-src/protocol/CQueryTranslator.s: src/protocol/CQueryTranslator.cpp.s
-.PHONY : src/protocol/CQueryTranslator.s
-
-# target to generate assembly for a file
-src/protocol/CQueryTranslator.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CQueryTranslator.cpp.s
-.PHONY : src/protocol/CQueryTranslator.cpp.s
-
 src/protocol/CResponseBuilder.o: src/protocol/CResponseBuilder.cpp.o
 .PHONY : src/protocol/CResponseBuilder.o
 
@@ -1558,9 +1534,6 @@ help:
 	@echo "... src/protocol/COpReplyHandler.o"
 	@echo "... src/protocol/COpReplyHandler.i"
 	@echo "... src/protocol/COpReplyHandler.s"
-	@echo "... src/protocol/CQueryTranslator.o"
-	@echo "... src/protocol/CQueryTranslator.i"
-	@echo "... src/protocol/CQueryTranslator.s"
 	@echo "... src/protocol/CResponseBuilder.o"
 	@echo "... src/protocol/CResponseBuilder.i"
 	@echo "... src/protocol/CResponseBuilder.s"

@@ -1,37 +1,37 @@
 #include "CDocumentProtocolHandler.hpp"
 
+#include "../database/CPGConnectionPooler.hpp"
 #include "CBsonType.hpp"
 #include "CLogger.hpp"
-#include "../database/CPGConnectionPooler.hpp"
-#include "commands/CDistinctCommand.hpp"
-#include "commands/CFindAndModifyCommand.hpp"
-#include "commands/CDropCommand.hpp"
-#include "commands/CCreateCommand.hpp"
-#include "commands/CCountCommand.hpp"
-#include "commands/CListCollectionsCommand.hpp"
-#include "commands/CExplainCommand.hpp"
 #include "commands/CAggregateCommand.hpp"
-#include "commands/CDbStatsCommand.hpp"
-#include "commands/CCollStatsCommand.hpp"
-#include "commands/CListDatabasesCommand.hpp"
-#include "commands/CServerStatusCommand.hpp"
-#include "commands/CCreateIndexesCommand.hpp"
-#include "commands/CListIndexesCommand.hpp"
-#include "commands/CDropIndexesCommand.hpp"
-#include "commands/CPingCommand.hpp"
-#include "commands/CHelloCommand.hpp"
 #include "commands/CBuildInfoCommand.hpp"
+#include "commands/CCollStatsCommand.hpp"
+#include "commands/CCountCommand.hpp"
+#include "commands/CCreateCommand.hpp"
+#include "commands/CCreateIndexesCommand.hpp"
+#include "commands/CDbStatsCommand.hpp"
+#include "commands/CDistinctCommand.hpp"
+#include "commands/CDropCommand.hpp"
+#include "commands/CDropIndexesCommand.hpp"
+#include "commands/CExplainCommand.hpp"
+#include "commands/CFindAndModifyCommand.hpp"
+#include "commands/CHelloCommand.hpp"
 #include "commands/CIsMasterCommand.hpp"
+#include "commands/CListCollectionsCommand.hpp"
+#include "commands/CListDatabasesCommand.hpp"
+#include "commands/CListIndexesCommand.hpp"
+#include "commands/CPingCommand.hpp"
+#include "commands/CServerStatusCommand.hpp"
 #include "commands/CWhatsMyUriCommand.hpp"
 
 #include <algorithm>
-#include <cstring>
 #include <chrono>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
-#include <iostream>
-#include <cstdio>
 
 using namespace std;
 using namespace FauxDB;
@@ -40,104 +40,112 @@ namespace FauxDB
 {
 
 CDocumentProtocolHandler::CDocumentProtocolHandler()
-	: initialized_(false), isRunning_(false), maxBsonSize_(16777216),
-	  compressionEnabled_(false), checksumEnabled_(false), messageCount_(0),
-	  errorCount_(0), compressedMessageCount_(0), connectionPooler_(nullptr),
-	  commandRegistry_(std::make_unique<CCommandRegistry>())
+    : initialized_(false), isRunning_(false), maxBsonSize_(16777216),
+      compressionEnabled_(false), checksumEnabled_(false), messageCount_(0),
+      errorCount_(0), compressedMessageCount_(0), connectionPooler_(nullptr),
+      commandRegistry_(std::make_unique<CCommandRegistry>())
 {
-	initializeConfiguration();
+    initializeConfiguration();
 }
 
 CDocumentProtocolHandler::~CDocumentProtocolHandler()
 {
-	shutdown();
+    shutdown();
 }
 
 bool CDocumentProtocolHandler::initialize()
 {
-	if (initialized_)
-		return true;
-	parser_ = make_unique<CDocumentWireParser>();
-	initializeDefaultCommandHandlers();
-	
-	/* Register modular commands */
-	if (commandRegistry_)
-	{
-		commandRegistry_->registerCommand(std::make_unique<CDistinctCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CFindAndModifyCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CDropCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CCreateCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CCountCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CListCollectionsCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CExplainCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CAggregateCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CDbStatsCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CCollStatsCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CListDatabasesCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CServerStatusCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CCreateIndexesCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CListIndexesCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CDropIndexesCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CPingCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CHelloCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CBuildInfoCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CIsMasterCommand>());
-		commandRegistry_->registerCommand(std::make_unique<CWhatsMyUriCommand>());
-	}
-	
-	initialized_ = true;
-	return true;
+    if (initialized_)
+        return true;
+    parser_ = make_unique<CDocumentWireParser>();
+    initializeDefaultCommandHandlers();
+
+    if (commandRegistry_)
+    {
+        commandRegistry_->registerCommand(std::make_unique<CDistinctCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CFindAndModifyCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CDropCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CCreateCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CCountCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CListCollectionsCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CExplainCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CAggregateCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CDbStatsCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CCollStatsCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CListDatabasesCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CServerStatusCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CCreateIndexesCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CListIndexesCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CDropIndexesCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CPingCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CHelloCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CBuildInfoCommand>());
+        commandRegistry_->registerCommand(std::make_unique<CIsMasterCommand>());
+        commandRegistry_->registerCommand(
+            std::make_unique<CWhatsMyUriCommand>());
+    }
+
+    initialized_ = true;
+    return true;
 }
 
 void CDocumentProtocolHandler::shutdown()
 {
-	if (!initialized_)
-		return;
-	commandHandlers_.clear();
-	parser_.reset();
-	initialized_ = false;
+    if (!initialized_)
+        return;
+    commandHandlers_.clear();
+    parser_.reset();
+    initialized_ = false;
 }
 
 bool CDocumentProtocolHandler::start()
 {
-	if (!initialized_)
-		return false;
-	isRunning_ = true;
-	return true;
+    if (!initialized_)
+        return false;
+    isRunning_ = true;
+    return true;
 }
 
 void CDocumentProtocolHandler::stop()
 {
-	if (!isRunning_)
-		return;
-	isRunning_ = false;
+    if (!isRunning_)
+        return;
+    isRunning_ = false;
 }
 
 bool CDocumentProtocolHandler::isRunning() const
 {
-	return isRunning_;
+    return isRunning_;
 }
 
 void CDocumentProtocolHandler::registerCommandHandler(
-	const string& command, unique_ptr<IDocumentCommandHandler> handler)
+    const string& command, unique_ptr<IDocumentCommandHandler> handler)
 {
-	if (handler)
-		commandHandlers_[command] = std::move(handler);
+    if (handler)
+        commandHandlers_[command] = std::move(handler);
 }
 
 void CDocumentProtocolHandler::unregisterCommandHandler(const string& command)
 {
-	commandHandlers_.erase(command);
+    commandHandlers_.erase(command);
 }
 
 vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
     const vector<uint8_t>& buffer, ssize_t bytesRead,
-    CQueryTranslator& queryTranslator,
     CResponseBuilder& responseBuilder)
 {
-    (void)queryTranslator;
     (void)responseBuilder;
-    
+
     if (buffer.empty() || bytesRead <= 0)
     {
         return createErrorBsonDocument(-1, "Empty buffer");
@@ -178,39 +186,52 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
             if (bytesRead >= 21)
             {
                 size_t offset = 20;
-                if (offset < static_cast<size_t>(bytesRead) && buffer[offset] == 0) // Kind 0
+                if (offset < static_cast<size_t>(bytesRead) &&
+                    buffer[offset] == 0) // Kind 0
                 {
                     offset++;
-                    // Parse BSON document to extract command name and database/collection
+                    // Parse BSON document to extract command name and
+                    // database/collection
                     if (offset + 4 < static_cast<size_t>(bytesRead))
                     {
                         int32_t docSize;
                         std::memcpy(&docSize, buffer.data() + offset, 4);
                         offset += 4;
 
-                        // Parse BSON fields to extract command, database, and collection
-                        while (offset < static_cast<size_t>(bytesRead) && offset < static_cast<size_t>(21 + docSize - 1))
+                        // Parse BSON fields to extract command, database, and
+                        // collection
+                        while (offset < static_cast<size_t>(bytesRead) &&
+                               offset < static_cast<size_t>(21 + docSize - 1))
                         {
-                            if (offset >= static_cast<size_t>(bytesRead)) break;
-                            
+                            if (offset >= static_cast<size_t>(bytesRead))
+                                break;
+
                             uint8_t fieldType = buffer[offset++];
-                            if (fieldType == 0x00) break; // End of document
-                            
+                            if (fieldType == 0x00)
+                                break; // End of document
+
                             // Read field name
                             size_t nameStart = offset;
-                            while (offset < static_cast<size_t>(bytesRead) && buffer[offset] != 0x00) offset++;
-                            if (offset >= static_cast<size_t>(bytesRead)) break;
-                            
-                            string fieldName(reinterpret_cast<const char*>(buffer.data() + nameStart), offset - nameStart);
+                            while (offset < static_cast<size_t>(bytesRead) &&
+                                   buffer[offset] != 0x00)
+                                offset++;
+                            if (offset >= static_cast<size_t>(bytesRead))
+                                break;
+
+                            string fieldName(reinterpret_cast<const char*>(
+                                                 buffer.data() + nameStart),
+                                             offset - nameStart);
                             offset++; // Skip null terminator
-                            
+
                             // Extract command name, database, and collection
-                            if (fieldName == "find" && fieldType == 0x02) // String type
+                            if (fieldName == "find" &&
+                                fieldType == 0x02) // String type
                             {
                                 commandName = "find";
                                 // Collection name will be extracted later
                             }
-                            else if (fieldName == "findOne" && fieldType == 0x02)
+                            else if (fieldName == "findOne" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "findOne";
                             }
@@ -218,11 +239,13 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                             {
                                 commandName = "count";
                             }
-                            else if (fieldName == "countDocuments" && fieldType == 0x02)
+                            else if (fieldName == "countDocuments" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "countDocuments";
                             }
-                            else if (fieldName == "estimatedDocumentCount" && fieldType == 0x02)
+                            else if (fieldName == "estimatedDocumentCount" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "estimatedDocumentCount";
                             }
@@ -234,11 +257,13 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                             {
                                 commandName = "update";
                             }
-                            else if (fieldName == "distinct" && fieldType == 0x02)
+                            else if (fieldName == "distinct" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "distinct";
                             }
-                            else if (fieldName == "findAndModify" && fieldType == 0x02)
+                            else if (fieldName == "findAndModify" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "findAndModify";
                             }
@@ -254,39 +279,48 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                             {
                                 commandName = "count";
                             }
-                            else if (fieldName == "listCollections" && fieldType == 0x10)
+                            else if (fieldName == "listCollections" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "listCollections";
                             }
-                            else if (fieldName == "explain" && fieldType == 0x03)
+                            else if (fieldName == "explain" &&
+                                     fieldType == 0x03)
                             {
                                 commandName = "explain";
                             }
-                            else if (fieldName == "dbStats" && fieldType == 0x10)
+                            else if (fieldName == "dbStats" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "dbStats";
                             }
-                            else if (fieldName == "collStats" && fieldType == 0x02)
+                            else if (fieldName == "collStats" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "collStats";
                             }
-                            else if (fieldName == "listDatabases" && fieldType == 0x10)
+                            else if (fieldName == "listDatabases" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "listDatabases";
                             }
-                            else if (fieldName == "serverStatus" && fieldType == 0x10)
+                            else if (fieldName == "serverStatus" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "serverStatus";
                             }
-                            else if (fieldName == "createIndexes" && fieldType == 0x02)
+                            else if (fieldName == "createIndexes" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "createIndexes";
                             }
-                            else if (fieldName == "listIndexes" && fieldType == 0x02)
+                            else if (fieldName == "listIndexes" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "listIndexes";
                             }
-                            else if (fieldName == "dropIndexes" && (fieldType == 0x02 || fieldType == 0x10))
+                            else if (fieldName == "dropIndexes" &&
+                                     (fieldType == 0x02 || fieldType == 0x10))
                             {
                                 commandName = "dropIndexes";
                             }
@@ -298,15 +332,18 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                             {
                                 commandName = "hello";
                             }
-                            else if (fieldName == "buildInfo" && fieldType == 0x10)
+                            else if (fieldName == "buildInfo" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "buildInfo";
                             }
-                            else if (fieldName == "isMaster" && fieldType == 0x10)
+                            else if (fieldName == "isMaster" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "isMaster";
                             }
-                            else if (fieldName == "whatsMyUri" && fieldType == 0x10)
+                            else if (fieldName == "whatsMyUri" &&
+                                     fieldType == 0x10)
                             {
                                 commandName = "whatsMyUri";
                             }
@@ -314,58 +351,75 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                             {
                                 commandName = "delete";
                             }
-                            else if (fieldName == "aggregate" && fieldType == 0x02)
+                            else if (fieldName == "aggregate" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "aggregate";
                             }
-                            else if (fieldName == "listCollections" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "listCollections" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "listCollections";
                             }
-                            else if (fieldName == "listDatabases" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "listDatabases" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "listDatabases";
                             }
-                            else if (fieldName == "listIndexes" && fieldType == 0x02)
+                            else if (fieldName == "listIndexes" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "listIndexes";
                             }
-                            else if (fieldName == "createIndexes" && fieldType == 0x02)
+                            else if (fieldName == "createIndexes" &&
+                                     fieldType == 0x02)
                             {
                                 commandName = "createIndexes";
                             }
-                            else if (fieldName == "dbStats" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "dbStats" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "dbStats";
                             }
-                            else if (fieldName == "buildInfo" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "buildInfo" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "buildInfo";
                             }
-                            else if (fieldName == "hello" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "hello" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "hello";
                             }
-                            else if (fieldName == "isMaster" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "isMaster" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "isMaster";
                             }
-                            else if (fieldName == "ping" && (fieldType == 0x01 || fieldType == 0x10))
+                            else if (fieldName == "ping" &&
+                                     (fieldType == 0x01 || fieldType == 0x10))
                             {
                                 commandName = "ping";
                             }
-                            else if (fieldName == "database" && fieldType == 0x02)
+                            else if (fieldName == "database" &&
+                                     fieldType == 0x02)
                             {
                                 // Extract database name
                                 if (offset + 4 < static_cast<size_t>(bytesRead))
                                 {
                                     int32_t strLen;
-                                    std::memcpy(&strLen, buffer.data() + offset, 4);
+                                    std::memcpy(&strLen, buffer.data() + offset,
+                                                4);
                                     offset += 4;
-                                    
-                                    if (strLen > 0 && offset + strLen - 1 < static_cast<size_t>(bytesRead))
+
+                                    if (strLen > 0 &&
+                                        offset + strLen - 1 <
+                                            static_cast<size_t>(bytesRead))
                                     {
-                                        database.assign(reinterpret_cast<const char*>(buffer.data() + offset), strLen - 1);
+                                        database.assign(
+                                            reinterpret_cast<const char*>(
+                                                buffer.data() + offset),
+                                            strLen - 1);
                                         offset += strLen;
                                     }
                                 }
@@ -375,21 +429,32 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                                 // Skip field value based on type
                                 switch (fieldType)
                                 {
-                                    case 0x01: offset += 8; break; // double
-                                    case 0x02: // string
-                                        if (offset + 4 < static_cast<size_t>(bytesRead))
-                                        {
-                                            int32_t strLen;
-                                            std::memcpy(&strLen, buffer.data() + offset, 4);
-                                            offset += 4 + strLen;
-                                        }
-                                        break;
-                                    case 0x08: offset += 1; break; // boolean
-                                    case 0x10: offset += 4; break; // int32
-                                    case 0x12: offset += 8; break; // int64
-                                    default:
-                                        // For other types, skip to end to avoid infinite loop
-                                        break;
+                                case 0x01:
+                                    offset += 8;
+                                    break; // double
+                                case 0x02: // string
+                                    if (offset + 4 <
+                                        static_cast<size_t>(bytesRead))
+                                    {
+                                        int32_t strLen;
+                                        std::memcpy(&strLen,
+                                                    buffer.data() + offset, 4);
+                                        offset += 4 + strLen;
+                                    }
+                                    break;
+                                case 0x08:
+                                    offset += 1;
+                                    break; // boolean
+                                case 0x10:
+                                    offset += 4;
+                                    break; // int32
+                                case 0x12:
+                                    offset += 8;
+                                    break; // int64
+                                default:
+                                    // For other types, skip to end to avoid
+                                    // infinite loop
+                                    break;
                                 }
                             }
                         }
@@ -399,18 +464,19 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         }
     }
 
-
-
     // Generate response based on command
     return createCommandResponse(commandName, requestID, buffer, bytesRead);
 }
 
-vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& commandName, int32_t requestID, const vector<uint8_t>& buffer, ssize_t bytesRead)
+vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(
+    const string& commandName, int32_t requestID, const vector<uint8_t>& buffer,
+    ssize_t bytesRead)
 {
     /* TODO: Enable modular system after testing - temporarily disabled
     if (commandRegistry_->hasCommand(commandName))
     {
-        string collectionName = CollectionNameParser::extractCollectionName(buffer, bytesRead, commandName);
+        string collectionName =
+    CollectionNameParser::extractCollectionName(buffer, bytesRead, commandName);
         if (collectionName.empty())
         {
             collectionName = "test";
@@ -418,23 +484,21 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
         auto command = commandRegistry_->getCommand(commandName);
         if (command)
         {
-            return command->execute(collectionName, buffer, bytesRead, connectionPooler_);
+            return command->execute(collectionName, buffer, bytesRead,
+    connectionPooler_);
         }
     }
     */
-    
-    /* Fallback to legacy command handling */
-    
+
     CBsonType bson;
     if (!bson.initialize() || !bson.beginDocument())
     {
         return createErrorBsonDocument(-6, "BSON init failed");
     }
 
-    /* Check modular command system first */
     if (commandRegistry_ && commandRegistry_->hasCommand(commandName))
     {
-        /* Use modular command system */
+
         CommandContext context;
         context.collectionName = extractCollectionName(buffer, bytesRead);
         context.databaseName = "fauxdb";
@@ -442,7 +506,7 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
         context.requestSize = bytesRead;
         context.requestID = requestID;
         context.connectionPooler = connectionPooler_;
-        
+
         return commandRegistry_->executeCommand(commandName, context);
     }
     else if (commandName == "hello" || commandName == "isMaster")
@@ -472,19 +536,17 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
     {
         // Extract collection name from the request
         string collectionName = extractCollectionName(buffer, bytesRead);
-        
 
-        
         bson.addDouble("ok", 1.0);
-        
+
         CBsonType cursorDoc;
         cursorDoc.initialize();
         cursorDoc.beginDocument();
         cursorDoc.addInt64("id", 0);
         cursorDoc.addString("ns", collectionName + ".collection");
-        
+
         cursorDoc.beginArray("firstBatch");
-        
+
         // Try PostgreSQL integration - behave like real MongoDB
         if (connectionPooler_)
         {
@@ -493,34 +555,41 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                 auto voidConnection = connectionPooler_->getConnection();
                 if (voidConnection)
                 {
-                    auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
+                    auto connection =
+                        std::static_pointer_cast<PGConnection>(voidConnection);
                     if (connection && connection->database)
                     {
                         // Use the already extracted collection name
-                        
+
                         // Try to query the PostgreSQL table
                         stringstream sql;
-                        sql << "SELECT * FROM " << collectionName << " LIMIT 10";
-                        
-                        auto result = connection->database->executeQuery(sql.str());
-                        
+                        sql << "SELECT * FROM " << collectionName
+                            << " LIMIT 10";
+
+                        auto result =
+                            connection->database->executeQuery(sql.str());
+
                         if (result.success)
                         {
                             // PostgreSQL query succeeded - add results
-                            
+
                             for (size_t i = 0; i < result.rows.size(); ++i)
                             {
                                 CBsonType doc;
                                 doc.initialize();
                                 doc.beginDocument();
-                                
+
                                 // Add _id field if not present
                                 bool hasId = false;
-                                for (size_t j = 0; j < result.columnNames.size() && j < result.rows[i].size(); ++j)
+                                for (size_t j = 0;
+                                     j < result.columnNames.size() &&
+                                     j < result.rows[i].size();
+                                     ++j)
                                 {
-                                    const string& colName = result.columnNames[j];
+                                    const string& colName =
+                                        result.columnNames[j];
                                     const string& value = result.rows[i][j];
-                                    
+
                                     if (colName == "_id" || colName == "id")
                                     {
                                         doc.addString("_id", value);
@@ -531,38 +600,58 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                                         // Simple type inference
                                         if (value == "true" || value == "false")
                                         {
-                                            doc.addBool(colName, value == "true");
+                                            doc.addBool(colName,
+                                                        value == "true");
                                         }
-                                        else if (value.find('.') != string::npos)
+                                        else if (value.find('.') !=
+                                                 string::npos)
                                         {
-                                            try { doc.addDouble(colName, std::stod(value)); }
-                                            catch (...) { doc.addString(colName, value); }
+                                            try
+                                            {
+                                                doc.addDouble(colName,
+                                                              std::stod(value));
+                                            }
+                                            catch (...)
+                                            {
+                                                doc.addString(colName, value);
+                                            }
                                         }
                                         else
                                         {
-                                            try { doc.addInt32(colName, std::stoi(value)); }
-                                            catch (...) { doc.addString(colName, value); }
+                                            try
+                                            {
+                                                doc.addInt32(colName,
+                                                             std::stoi(value));
+                                            }
+                                            catch (...)
+                                            {
+                                                doc.addString(colName, value);
+                                            }
                                         }
                                     }
                                 }
-                                
+
                                 // Add generated _id if not present
                                 if (!hasId)
                                 {
-                                    doc.addString("_id", "pg_" + std::to_string(i + 1));
+                                    doc.addString(
+                                        "_id", "pg_" + std::to_string(i + 1));
                                 }
-                                
+
                                 doc.endDocument();
                                 cursorDoc.addArrayDocument(doc);
                             }
-                            
-                            // If no rows returned, MongoDB returns empty array (which we already have)
+
+                            // If no rows returned, MongoDB returns empty array
+                            // (which we already have)
                         }
                         else
                         {
                             // PostgreSQL query failed - table might not exist
-                            // MongoDB behavior: return empty result set, not an error for missing collections
-                            // (MongoDB creates collections on first insert, so missing collections are normal)
+                            // MongoDB behavior: return empty result set, not an
+                            // error for missing collections (MongoDB creates
+                            // collections on first insert, so missing
+                            // collections are normal)
                         }
                     }
                     connectionPooler_->releaseConnection(voidConnection);
@@ -570,12 +659,14 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
             }
             catch (const std::exception& e)
             {
-                // PostgreSQL error - MongoDB behavior: return empty result for missing tables
-                // Real MongoDB doesn't error on missing collections, it returns empty results
+                // PostgreSQL error - MongoDB behavior: return empty result for
+                // missing tables Real MongoDB doesn't error on missing
+                // collections, it returns empty results
             }
         }
-        // If no connection pooler, return empty result (like MongoDB with no data)
-        
+        // If no connection pooler, return empty result (like MongoDB with no
+        // data)
+
         cursorDoc.endArray();
         cursorDoc.endDocument();
         bson.addDocument("cursor", cursorDoc);
@@ -584,9 +675,9 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
     {
         // Simple implementation - always use test collection for now
         string collectionName = "test";
-        
+
         bson.addDouble("ok", 1.0);
-        
+
         // Try PostgreSQL integration - behave like real MongoDB
         if (connectionPooler_)
         {
@@ -595,27 +686,33 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                 auto voidConnection = connectionPooler_->getConnection();
                 if (voidConnection)
                 {
-                    auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
+                    auto connection =
+                        std::static_pointer_cast<PGConnection>(voidConnection);
                     if (connection && connection->database)
                     {
-                        // Query PostgreSQL table - findOne returns single document
+                        // Query PostgreSQL table - findOne returns single
+                        // document
                         stringstream sql;
                         sql << "SELECT * FROM " << collectionName << " LIMIT 1";
-                        
-                        auto result = connection->database->executeQuery(sql.str());
-                        
+
+                        auto result =
+                            connection->database->executeQuery(sql.str());
+
                         if (result.success && !result.rows.empty())
                         {
-                            // PostgreSQL query succeeded - add first result as document
+                            // PostgreSQL query succeeded - add first result as
+                            // document
                             const auto& row = result.rows[0];
-                            
+
                             // Add _id field if not present
                             bool hasId = false;
-                            for (size_t j = 0; j < result.columnNames.size() && j < row.size(); ++j)
+                            for (size_t j = 0; j < result.columnNames.size() &&
+                                               j < row.size();
+                                 ++j)
                             {
                                 const string& colName = result.columnNames[j];
                                 const string& value = row[j];
-                                
+
                                 if (colName == "_id" || colName == "id")
                                 {
                                     bson.addString("_id", value);
@@ -630,17 +727,31 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                                     }
                                     else if (value.find('.') != string::npos)
                                     {
-                                        try { bson.addDouble(colName, std::stod(value)); }
-                                        catch (...) { bson.addString(colName, value); }
+                                        try
+                                        {
+                                            bson.addDouble(colName,
+                                                           std::stod(value));
+                                        }
+                                        catch (...)
+                                        {
+                                            bson.addString(colName, value);
+                                        }
                                     }
                                     else
                                     {
-                                        try { bson.addInt32(colName, std::stoi(value)); }
-                                        catch (...) { bson.addString(colName, value); }
+                                        try
+                                        {
+                                            bson.addInt32(colName,
+                                                          std::stoi(value));
+                                        }
+                                        catch (...)
+                                        {
+                                            bson.addString(colName, value);
+                                        }
                                     }
                                 }
                             }
-                            
+
                             // Add generated _id if not present
                             if (!hasId)
                             {
@@ -649,18 +760,21 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                         }
                         else
                         {
-                            // No results - MongoDB returns null for findOne with no results
+                            // No results - MongoDB returns null for findOne
+                            // with no results
                             bson.addNull("_id");
                         }
-                        
+
                         connectionPooler_->releaseConnection(voidConnection);
                     }
                     else
                     {
                         // No database - return null result
                         bson.addNull("_id");
-                        if (voidConnection) {
-                            connectionPooler_->releaseConnection(voidConnection);
+                        if (voidConnection)
+                        {
+                            connectionPooler_->releaseConnection(
+                                voidConnection);
                         }
                     }
                 }
@@ -686,11 +800,11 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
     {
         // Simple implementation - always use test collection for now
         string collectionName = "test";
-        
+
         bson.addDouble("ok", 1.0);
-        
+
         int64_t count = 0;
-        
+
         // Try PostgreSQL integration - behave like real MongoDB
         if (connectionPooler_)
         {
@@ -699,15 +813,17 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                 auto voidConnection = connectionPooler_->getConnection();
                 if (voidConnection)
                 {
-                    auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
+                    auto connection =
+                        std::static_pointer_cast<PGConnection>(voidConnection);
                     if (connection && connection->database)
                     {
                         // Query PostgreSQL table count
                         stringstream sql;
                         sql << "SELECT COUNT(*) FROM " << collectionName;
-                        
-                        auto result = connection->database->executeQuery(sql.str());
-                        
+
+                        auto result =
+                            connection->database->executeQuery(sql.str());
+
                         if (result.success && !result.rows.empty())
                         {
                             try
@@ -719,15 +835,17 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                                 count = 0;
                             }
                         }
-                        
+
                         connectionPooler_->releaseConnection(voidConnection);
                     }
                     else
                     {
                         // No database - return 0 count
                         count = 0;
-                        if (voidConnection) {
-                            connectionPooler_->releaseConnection(voidConnection);
+                        if (voidConnection)
+                        {
+                            connectionPooler_->releaseConnection(
+                                voidConnection);
                         }
                     }
                 }
@@ -748,18 +866,18 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
             // No connection pooler - return 0 count
             count = 0;
         }
-        
+
         bson.addInt64("n", count);
     }
     else if (commandName == "estimatedDocumentCount")
     {
         // Simple implementation - always use test collection for now
         string collectionName = "test";
-        
+
         bson.addDouble("ok", 1.0);
-        
+
         int64_t count = 0;
-        
+
         // Try PostgreSQL integration - behave like real MongoDB
         if (connectionPooler_)
         {
@@ -768,15 +886,18 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                 auto voidConnection = connectionPooler_->getConnection();
                 if (voidConnection)
                 {
-                    auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
+                    auto connection =
+                        std::static_pointer_cast<PGConnection>(voidConnection);
                     if (connection && connection->database)
                     {
-                        // Query PostgreSQL table count (same as countDocuments for now)
+                        // Query PostgreSQL table count (same as countDocuments
+                        // for now)
                         stringstream sql;
                         sql << "SELECT COUNT(*) FROM " << collectionName;
-                        
-                        auto result = connection->database->executeQuery(sql.str());
-                        
+
+                        auto result =
+                            connection->database->executeQuery(sql.str());
+
                         if (result.success && !result.rows.empty())
                         {
                             try
@@ -788,15 +909,17 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
                                 count = 0;
                             }
                         }
-                        
+
                         connectionPooler_->releaseConnection(voidConnection);
                     }
                     else
                     {
                         // No database - return 0 count
                         count = 0;
-                        if (voidConnection) {
-                            connectionPooler_->releaseConnection(voidConnection);
+                        if (voidConnection)
+                        {
+                            connectionPooler_->releaseConnection(
+                                voidConnection);
                         }
                     }
                 }
@@ -817,7 +940,7 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
             // No connection pooler - return 0 count
             count = 0;
         }
-        
+
         bson.addInt64("n", count);
     }
     else if (commandName == "buildInfo")
@@ -933,7 +1056,9 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
         bson.addInt32("createdCollectionAutomatically", 0);
         bson.addInt32("numIndexesBefore", 1);
         bson.addInt32("numIndexesAfter", 1);
-        bson.addString("note", "Index creation not implemented - PostgreSQL integration pending");
+        bson.addString(
+            "note",
+            "Index creation not implemented - PostgreSQL integration pending");
     }
     else if (commandName == "dbStats")
     {
@@ -969,120 +1094,137 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
 
     // Create a proper MongoDB OP_MSG response
     vector<uint8_t> response;
-    
+
     // Calculate sizes
     vector<uint8_t> bsonDoc = bson.getDocument();
-    int32_t bodySize = 4 + 1 + static_cast<int32_t>(bsonDoc.size()); // flagBits + kind + document
-    int32_t messageSize = 16 + bodySize; // header + body
-    
+    int32_t bodySize =
+        4 + 1 +
+        static_cast<int32_t>(bsonDoc.size()); // flagBits + kind + document
+    int32_t messageSize = 16 + bodySize;      // header + body
+
     // Reserve space
     response.resize(messageSize);
     size_t offset = 0;
-    
+
     // Write header
-    std::memcpy(response.data() + offset, &messageSize, 4); offset += 4;
-    std::memcpy(response.data() + offset, &requestID, 4); offset += 4;
+    std::memcpy(response.data() + offset, &messageSize, 4);
+    offset += 4;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
     int32_t responseTo = requestID;
-    std::memcpy(response.data() + offset, &responseTo, 4); offset += 4;
+    std::memcpy(response.data() + offset, &responseTo, 4);
+    offset += 4;
     int32_t opCode = 2013; // OP_MSG
-    std::memcpy(response.data() + offset, &opCode, 4); offset += 4;
-    
+    std::memcpy(response.data() + offset, &opCode, 4);
+    offset += 4;
+
     // Write body
     uint32_t flagBits = 0;
-    std::memcpy(response.data() + offset, &flagBits, 4); offset += 4;
+    std::memcpy(response.data() + offset, &flagBits, 4);
+    offset += 4;
     uint8_t kind = 0; // Kind 0 (Body)
     response[offset++] = kind;
     std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
-    
+
     return response;
 }
 
-vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(const string& collectionName, int32_t requestID)
+vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
+    const string& collectionName, int32_t requestID)
 {
     // Check if connection pooler is available
     if (!connectionPooler_)
     {
-        return createErrorBsonDocument(-10, "PostgreSQL connection pooler not available");
+        return createErrorBsonDocument(
+            -10, "PostgreSQL connection pooler not available");
     }
-    
+
     // Query PostgreSQL for the collection data
     vector<CBsonType> documents = queryPostgreSQLCollection(collectionName);
-    
+
     // Build response document
     CBsonType bson;
     if (!bson.initialize() || !bson.beginDocument())
     {
         return createErrorBsonDocument(-6, "BSON init failed");
     }
-    
+
     bson.addDouble("ok", 1.0);
-    
+
     // Create cursor subdocument
     CBsonType cursorDoc;
     cursorDoc.initialize();
     cursorDoc.beginDocument();
-    cursorDoc.addInt64("id", 0);  // No cursor needed for simple queries
-    cursorDoc.addString("ns", collectionName + ".collection");  // namespace
-    
+    cursorDoc.addInt64("id", 0); // No cursor needed for simple queries
+    cursorDoc.addString("ns", collectionName + ".collection"); // namespace
+
     // Create firstBatch array with PostgreSQL data
     cursorDoc.beginArray("firstBatch");
-    
+
     // Add documents from PostgreSQL
     for (const auto& doc : documents)
     {
         cursorDoc.addArrayDocument(doc);
     }
-    
-    cursorDoc.endArray();  // end firstBatch
-    cursorDoc.endDocument();  // end cursor
-    
+
+    cursorDoc.endArray();    // end firstBatch
+    cursorDoc.endDocument(); // end cursor
+
     // Add the cursor subdocument to main response
     bson.addDocument("cursor", cursorDoc);
-    
+
     if (!bson.endDocument())
     {
         return createErrorBsonDocument(-7, "BSON finalize failed");
     }
-    
+
     // Create a proper MongoDB OP_MSG response
     vector<uint8_t> response;
-    
+
     // Calculate sizes
     vector<uint8_t> bsonDoc = bson.getDocument();
-    int32_t bodySize = 4 + 1 + static_cast<int32_t>(bsonDoc.size()); // flagBits + kind + document
-    int32_t messageSize = 16 + bodySize; // header + body
-    
+    int32_t bodySize =
+        4 + 1 +
+        static_cast<int32_t>(bsonDoc.size()); // flagBits + kind + document
+    int32_t messageSize = 16 + bodySize;      // header + body
+
     // Reserve space
     response.resize(messageSize);
     size_t offset = 0;
-    
+
     // Write header
-    std::memcpy(response.data() + offset, &messageSize, 4); offset += 4;
-    std::memcpy(response.data() + offset, &requestID, 4); offset += 4;
+    std::memcpy(response.data() + offset, &messageSize, 4);
+    offset += 4;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
     int32_t responseTo = requestID;
-    std::memcpy(response.data() + offset, &responseTo, 4); offset += 4;
+    std::memcpy(response.data() + offset, &responseTo, 4);
+    offset += 4;
     int32_t opCode = 2013; // OP_MSG
-    std::memcpy(response.data() + offset, &opCode, 4); offset += 4;
-    
+    std::memcpy(response.data() + offset, &opCode, 4);
+    offset += 4;
+
     // Write body
     uint32_t flagBits = 0;
-    std::memcpy(response.data() + offset, &flagBits, 4); offset += 4;
+    std::memcpy(response.data() + offset, &flagBits, 4);
+    offset += 4;
     uint8_t kind = 0; // Kind 0 (Body)
     response[offset++] = kind;
     std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
-    
+
     return response;
 }
 
-vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName)
+vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
+    const string& collectionName)
 {
     vector<CBsonType> documents;
-    
+
     if (!connectionPooler_)
     {
         return documents;
     }
-    
+
     try
     {
         // Get connection from the pool
@@ -1092,23 +1234,24 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const stri
             // Return empty result if no connection available
             return documents;
         }
-        
+
         // Safely cast to PGConnection
-        auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
+        auto connection =
+            std::static_pointer_cast<PGConnection>(voidConnection);
         if (!connection || !connection->database)
         {
             // Return empty result if database is invalid
             connectionPooler_->releaseConnection(voidConnection);
             return documents;
         }
-        
+
         // Execute SQL query to get data from PostgreSQL
         stringstream sql;
         sql << "SELECT * FROM " << collectionName << " LIMIT 100";
-        
+
         // Execute the query using the PostgreSQL database
         auto result = connection->database->executeQuery(sql.str());
-        
+
         if (result.success && !result.rows.empty())
         {
             // Convert PostgreSQL results to BSON documents
@@ -1117,13 +1260,15 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const stri
                 CBsonType doc;
                 doc.initialize();
                 doc.beginDocument();
-                
+
                 // Add other fields from the result (including ID handling)
-                for (size_t col = 0; col < result.columnNames.size() && col < result.rows[row].size(); ++col)
+                for (size_t col = 0; col < result.columnNames.size() &&
+                                     col < result.rows[row].size();
+                     ++col)
                 {
                     string columnName = result.columnNames[col];
                     string value = result.rows[row][col];
-                    
+
                     // Handle the ID field specially for MongoDB compatibility
                     if (columnName == "id")
                     {
@@ -1135,28 +1280,38 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const stri
                         doc.addString("_id", value);
                         continue;
                     }
-                    
+
                     // Try to determine the type and add appropriately
-                    if (columnName == "count" || columnName == "quantity" || columnName == "amount")
+                    if (columnName == "count" || columnName == "quantity" ||
+                        columnName == "amount")
                     {
-                        try {
+                        try
+                        {
                             int32_t intVal = stoi(value);
                             doc.addInt32(columnName, intVal);
-                        } catch (...) {
+                        }
+                        catch (...)
+                        {
                             doc.addString(columnName, value);
                         }
                     }
-                    else if (columnName == "active" || columnName == "enabled" || columnName == "visible")
+                    else if (columnName == "active" ||
+                             columnName == "enabled" || columnName == "visible")
                     {
-                        bool boolVal = (value == "true" || value == "1" || value == "t" || value == "yes");
+                        bool boolVal = (value == "true" || value == "1" ||
+                                        value == "t" || value == "yes");
                         doc.addBool(columnName, boolVal);
                     }
-                    else if (columnName == "price" || columnName == "cost" || columnName == "rating")
+                    else if (columnName == "price" || columnName == "cost" ||
+                             columnName == "rating")
                     {
-                        try {
+                        try
+                        {
                             double doubleVal = stod(value);
                             doc.addDouble(columnName, doubleVal);
-                        } catch (...) {
+                        }
+                        catch (...)
+                        {
                             doc.addString(columnName, value);
                         }
                     }
@@ -1165,7 +1320,7 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const stri
                         doc.addString(columnName, value);
                     }
                 }
-                
+
                 doc.endDocument();
                 documents.push_back(doc);
             }
@@ -1183,7 +1338,7 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const stri
             fallbackDoc.endDocument();
             documents.push_back(fallbackDoc);
         }
-        
+
         // Return connection to pool
         connectionPooler_->releaseConnection(voidConnection);
     }
@@ -1199,285 +1354,323 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(const stri
         errorDoc.endDocument();
         documents.push_back(errorDoc);
     }
-    
+
     return documents;
 }
 
 unique_ptr<CDocumentWireMessage>
 CDocumentProtocolHandler::routeCommand(const CDocumentWireMessage& request)
 {
-	string cmd = extractCommandName(request);
-	auto it = commandHandlers_.find(cmd);
-	if (it != commandHandlers_.end())
-	{
-		return it->second->handleCommand(request);
-	}
-	return nullptr;
+    string cmd = extractCommandName(request);
+    auto it = commandHandlers_.find(cmd);
+    if (it != commandHandlers_.end())
+    {
+        return it->second->handleCommand(request);
+    }
+    return nullptr;
 }
 
 unique_ptr<CDocumentWireMessage>
 CDocumentProtocolHandler::createHelloResponse(int32_t requestID)
 {
-	return CDocumentWireMessage::createHelloResponse(requestID);
+    return CDocumentWireMessage::createHelloResponse(requestID);
 }
 
 unique_ptr<CDocumentWireMessage>
 CDocumentProtocolHandler::createBuildInfoResponse(int32_t requestID)
 {
-	return CDocumentWireMessage::createBuildInfoResponse(requestID);
+    return CDocumentWireMessage::createBuildInfoResponse(requestID);
 }
 
 unique_ptr<CDocumentWireMessage>
 CDocumentProtocolHandler::createIsMasterResponse(int32_t requestID)
 {
-	return CDocumentWireMessage::createIsMasterResponse(requestID);
+    return CDocumentWireMessage::createIsMasterResponse(requestID);
 }
 
-unique_ptr<CDocumentWireMessage>
-CDocumentProtocolHandler::createErrorResponse(int32_t requestID, int32_t errorCode,
-										   const string& errorMessage)
+unique_ptr<CDocumentWireMessage> CDocumentProtocolHandler::createErrorResponse(
+    int32_t requestID, int32_t errorCode, const string& errorMessage)
 {
-	(void)requestID;
+    (void)requestID;
 
-	auto errorDoc = createErrorBsonDocument(errorCode, errorMessage);
+    auto errorDoc = createErrorBsonDocument(errorCode, errorMessage);
 
-	CDocumentReplyBody replyBody;
-	replyBody.document = errorDoc;
-	auto msg = make_unique<CDocumentWireMessage>();
-	msg->setReplyBody(replyBody);
-	return msg;
-}
-
-vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
-	const unordered_map<string, string>& fields)
-{
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	for (const auto& [key, value] : fields)
-	{
-		bson.addString(key, value);
-	}
-	bson.endDocument();
-	return bson.getDocument();
+    CDocumentReplyBody replyBody;
+    replyBody.document = errorDoc;
+    auto msg = make_unique<CDocumentWireMessage>();
+    msg->setReplyBody(replyBody);
+    return msg;
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
-	const unordered_map<string, int32_t>& fields)
+    const unordered_map<string, string>& fields)
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	for (const auto& [key, value] : fields)
-	{
-		bson.addInt32(key, value);
-	}
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    for (const auto& [key, value] : fields)
+    {
+        bson.addString(key, value);
+    }
+    bson.endDocument();
+    return bson.getDocument();
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
-	const unordered_map<string, double>& fields)
+    const unordered_map<string, int32_t>& fields)
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	for (const auto& [key, value] : fields)
-	{
-		bson.addDouble(key, value);
-	}
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    for (const auto& [key, value] : fields)
+    {
+        bson.addInt32(key, value);
+    }
+    bson.endDocument();
+    return bson.getDocument();
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
-	const unordered_map<string, bool>& fields)
+    const unordered_map<string, double>& fields)
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	for (const auto& [key, value] : fields)
-	{
-		bson.addBool(key, value);
-	}
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    for (const auto& [key, value] : fields)
+    {
+        bson.addDouble(key, value);
+    }
+    bson.endDocument();
+    return bson.getDocument();
 }
 
-void CDocumentProtocolHandler::setConnectionPooler(shared_ptr<CPGConnectionPooler> pooler)
+vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
+    const unordered_map<string, bool>& fields)
 {
-	connectionPooler_ = pooler;
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    for (const auto& [key, value] : fields)
+    {
+        bson.addBool(key, value);
+    }
+    bson.endDocument();
+    return bson.getDocument();
+}
+
+void CDocumentProtocolHandler::setConnectionPooler(
+    shared_ptr<CPGConnectionPooler> pooler)
+{
+    connectionPooler_ = pooler;
 }
 
 vector<string> CDocumentProtocolHandler::getSupportedCommands() const
 {
-	vector<string> commands;
-	for (const auto& [cmd, _] : commandHandlers_)
-	{
-		commands.push_back(cmd);
-	}
-	return commands;
+    vector<string> commands;
+    for (const auto& [cmd, _] : commandHandlers_)
+    {
+        commands.push_back(cmd);
+    }
+    return commands;
 }
 
 void CDocumentProtocolHandler::initializeDefaultCommandHandlers()
 {
-	commandHandlers_["hello"] = make_unique<CHelloCommandHandler>();
-	commandHandlers_["buildInfo"] = make_unique<CBuildInfoCommandHandler>();
-	commandHandlers_["isMaster"] = make_unique<CIsMasterCommandHandler>();
+    commandHandlers_["hello"] = make_unique<CHelloCommandHandler>();
+    commandHandlers_["buildInfo"] = make_unique<CBuildInfoCommandHandler>();
+    commandHandlers_["isMaster"] = make_unique<CIsMasterCommandHandler>();
 }
 
 void CDocumentProtocolHandler::initializeConfiguration()
 {
-	maxBsonSize_ = 16777216;
-	compressionEnabled_ = false;
-	checksumEnabled_ = false;
+    maxBsonSize_ = 16777216;
+    compressionEnabled_ = false;
+    checksumEnabled_ = false;
+}
+
+string CDocumentProtocolHandler::extractCommandName(
+    const CDocumentWireMessage& request)
+{
+    // Try to extract command name from first key of Kind-0 BSON
+    if (request.isOpMsg() && request.getMsgBody() &&
+        !request.getMsgBody()->sections0.empty() &&
+        request.getMsgBody()->sections0.front())
+    {
+        const auto& doc = request.getMsgBody()->sections0.front()->bsonDoc;
+        if (doc.size() >= 5)
+        {
+            size_t off = 4; // skip size
+            if (off < doc.size())
+            {
+                // Skip type byte, read key cstring
+                off++;
+                size_t start = off;
+                while (off < doc.size() && doc[off] != 0x00)
+                    off++;
+                if (off < doc.size())
+                {
+                    return std::string(
+                        reinterpret_cast<const char*>(&doc[start]),
+                        off - start);
+                }
+            }
+        }
+    }
+    return "hello";
 }
 
 string
-CDocumentProtocolHandler::extractCommandName(const CDocumentWireMessage& request)
+CDocumentProtocolHandler::extractCollectionName(const vector<uint8_t>& buffer,
+                                                ssize_t bytesRead)
 {
-	// Try to extract command name from first key of Kind-0 BSON
-	if (request.isOpMsg() && request.getMsgBody() &&
-		!request.getMsgBody()->sections0.empty() &&
-		request.getMsgBody()->sections0.front())
-	{
-		const auto& doc = request.getMsgBody()->sections0.front()->bsonDoc;
-		if (doc.size() >= 5)
-		{
-			size_t off = 4; // skip size
-			if (off < doc.size())
-			{
-				// Skip type byte, read key cstring
-				off++;
-				size_t start = off;
-				while (off < doc.size() && doc[off] != 0x00) off++;
-				if (off < doc.size())
-				{
-					return std::string(reinterpret_cast<const char*>(&doc[start]), off - start);
-				}
-			}
-		}
-	}
-	return "hello";
-}
+    // Default collection name
+    string collectionName = "test";
 
-string
-CDocumentProtocolHandler::extractCollectionName(const vector<uint8_t>& buffer, ssize_t bytesRead)
-{
-	// Default collection name
-	string collectionName = "test";
-	
-	try
-	{
-		// Handle OP_MSG (opCode 2013) - same parsing as in processDocumentMessage
-		if (bytesRead >= 21)
-		{
-			// Skip header (16 bytes) + flagBits (4 bytes) + kind (1 byte)
-			size_t offset = 21;
-			
-			// Parse BSON document to extract collection name
-			if (offset + 4 < static_cast<size_t>(bytesRead))
-			{
-				int32_t docSize;
-				std::memcpy(&docSize, buffer.data() + offset, 4);
-				offset += 4;
-				
-				// Parse BSON fields to find collection name from various command formats
-				while (offset < static_cast<size_t>(bytesRead) && offset < static_cast<size_t>(21 + docSize - 1))
-				{
-					if (offset >= static_cast<size_t>(bytesRead)) break;
-					
-					uint8_t fieldType = buffer[offset++];
-					if (fieldType == 0x00) break; // End of document
-					
-					// Read field name
-					size_t nameStart = offset;
-					while (offset < static_cast<size_t>(bytesRead) && buffer[offset] != 0x00) offset++;
-					if (offset >= static_cast<size_t>(bytesRead)) break;
-					
-					string fieldName(reinterpret_cast<const char*>(buffer.data() + nameStart), offset - nameStart);
-					offset++; // Skip null terminator
-					
-					// Handle different command formats where the field value is a string containing the collection name
-					// This covers: find, findOne, countDocuments, count, estimatedDocumentCount, etc.
-					if ((fieldName == "find" || fieldName == "findOne" || fieldName == "count" || 
-						 fieldName == "countDocuments" || fieldName == "estimatedDocumentCount") && fieldType == 0x02)
-					{
-						// String type - this is the collection name
-						if (offset + 4 < static_cast<size_t>(bytesRead))
-						{
-							int32_t strLen;
-							std::memcpy(&strLen, buffer.data() + offset, 4);
-							offset += 4;
-							
-							if (strLen > 0 && offset + strLen - 1 < static_cast<size_t>(bytesRead))
-							{
-								collectionName = string(reinterpret_cast<const char*>(buffer.data() + offset), strLen - 1);
-								break;
-							}
-						}
-					}
-					else if (fieldName == "collection" && fieldType == 0x02)
-					{
-						// Collection field - this is the collection name
-						if (offset + 4 < static_cast<size_t>(bytesRead))
-						{
-							int32_t strLen;
-							std::memcpy(&strLen, buffer.data() + offset, 4);
-							offset += 4;
-							
-							if (strLen > 0 && offset + strLen - 1 < static_cast<size_t>(bytesRead))
-							{
-								collectionName = string(reinterpret_cast<const char*>(buffer.data() + offset), strLen - 1);
-								break;
-							}
-						}
-					}
-					else
-					{
-						// Skip field value based on type
-						switch (fieldType)
-						{
-							case 0x01: offset += 8; break; // double
-							case 0x02: // string
-								if (offset + 4 < static_cast<size_t>(bytesRead))
-								{
-									int32_t strLen;
-									std::memcpy(&strLen, buffer.data() + offset, 4);
-									offset += 4 + strLen;
-								}
-								break;
-							case 0x08: offset += 1; break; // boolean
-							case 0x10: offset += 4; break; // int32
-							case 0x12: offset += 8; break; // int64
-							default:
-								// For other types, skip to end to avoid infinite loop
-								break;
-						}
-					}
-				}
-			}
-		}
-	}
-	catch (...)
-	{
-		// If parsing fails, return default
-	}
-	
-	return collectionName;
+    try
+    {
+        // Handle OP_MSG (opCode 2013) - same parsing as in
+        // processDocumentMessage
+        if (bytesRead >= 21)
+        {
+            // Skip header (16 bytes) + flagBits (4 bytes) + kind (1 byte)
+            size_t offset = 21;
+
+            // Parse BSON document to extract collection name
+            if (offset + 4 < static_cast<size_t>(bytesRead))
+            {
+                int32_t docSize;
+                std::memcpy(&docSize, buffer.data() + offset, 4);
+                offset += 4;
+
+                // Parse BSON fields to find collection name from various
+                // command formats
+                while (offset < static_cast<size_t>(bytesRead) &&
+                       offset < static_cast<size_t>(21 + docSize - 1))
+                {
+                    if (offset >= static_cast<size_t>(bytesRead))
+                        break;
+
+                    uint8_t fieldType = buffer[offset++];
+                    if (fieldType == 0x00)
+                        break; // End of document
+
+                    // Read field name
+                    size_t nameStart = offset;
+                    while (offset < static_cast<size_t>(bytesRead) &&
+                           buffer[offset] != 0x00)
+                        offset++;
+                    if (offset >= static_cast<size_t>(bytesRead))
+                        break;
+
+                    string fieldName(reinterpret_cast<const char*>(
+                                         buffer.data() + nameStart),
+                                     offset - nameStart);
+                    offset++; // Skip null terminator
+
+                    // Handle different command formats where the field value is
+                    // a string containing the collection name This covers:
+                    // find, findOne, countDocuments, count,
+                    // estimatedDocumentCount, etc.
+                    if ((fieldName == "find" || fieldName == "findOne" ||
+                         fieldName == "count" ||
+                         fieldName == "countDocuments" ||
+                         fieldName == "estimatedDocumentCount") &&
+                        fieldType == 0x02)
+                    {
+                        // String type - this is the collection name
+                        if (offset + 4 < static_cast<size_t>(bytesRead))
+                        {
+                            int32_t strLen;
+                            std::memcpy(&strLen, buffer.data() + offset, 4);
+                            offset += 4;
+
+                            if (strLen > 0 &&
+                                offset + strLen - 1 <
+                                    static_cast<size_t>(bytesRead))
+                            {
+                                collectionName =
+                                    string(reinterpret_cast<const char*>(
+                                               buffer.data() + offset),
+                                           strLen - 1);
+                                break;
+                            }
+                        }
+                    }
+                    else if (fieldName == "collection" && fieldType == 0x02)
+                    {
+                        // Collection field - this is the collection name
+                        if (offset + 4 < static_cast<size_t>(bytesRead))
+                        {
+                            int32_t strLen;
+                            std::memcpy(&strLen, buffer.data() + offset, 4);
+                            offset += 4;
+
+                            if (strLen > 0 &&
+                                offset + strLen - 1 <
+                                    static_cast<size_t>(bytesRead))
+                            {
+                                collectionName =
+                                    string(reinterpret_cast<const char*>(
+                                               buffer.data() + offset),
+                                           strLen - 1);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Skip field value based on type
+                        switch (fieldType)
+                        {
+                        case 0x01:
+                            offset += 8;
+                            break; // double
+                        case 0x02: // string
+                            if (offset + 4 < static_cast<size_t>(bytesRead))
+                            {
+                                int32_t strLen;
+                                std::memcpy(&strLen, buffer.data() + offset, 4);
+                                offset += 4 + strLen;
+                            }
+                            break;
+                        case 0x08:
+                            offset += 1;
+                            break; // boolean
+                        case 0x10:
+                            offset += 4;
+                            break; // int32
+                        case 0x12:
+                            offset += 8;
+                            break; // int64
+                        default:
+                            // For other types, skip to end to avoid infinite
+                            // loop
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    catch (...)
+    {
+        // If parsing fails, return default
+    }
+
+    return collectionName;
 }
 
 vector<uint8_t>
 CDocumentProtocolHandler::createErrorBsonDocument(int errorCode,
-											   const string& errorMessage)
+                                                  const string& errorMessage)
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	bson.addInt32("code", errorCode);
-	bson.addString("errmsg", errorMessage);
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    bson.addInt32("code", errorCode);
+    bson.addString("errmsg", errorMessage);
+    bson.endDocument();
+    return bson.getDocument();
 }
 
 } // namespace FauxDB
@@ -1497,31 +1690,31 @@ CHelloCommandHandler::~CHelloCommandHandler()
 std::unique_ptr<CDocumentWireMessage>
 CHelloCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
-	(void)request;
-	auto response = std::make_unique<CDocumentWireMessage>();
-	// TODO: Implement hello response
-	return response;
+    (void)request;
+    auto response = std::make_unique<CDocumentWireMessage>();
+    // TODO: Implement hello response
+    return response;
 }
 
 std::vector<std::string> CHelloCommandHandler::getSupportedCommands() const
 {
-	return {"hello"};
+    return {"hello"};
 }
 
 bool CHelloCommandHandler::isCommandSupported(const std::string& command) const
 {
-	return command == "hello";
+    return command == "hello";
 }
 
 std::vector<uint8_t> CHelloCommandHandler::createHelloResponseDocument()
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	bson.addString("ok", "1.0");
-	bson.addString("msg", "hello");
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    bson.addString("ok", "1.0");
+    bson.addString("msg", "hello");
+    bson.endDocument();
+    return bson.getDocument();
 }
 
 CBuildInfoCommandHandler::CBuildInfoCommandHandler()
@@ -1535,31 +1728,32 @@ CBuildInfoCommandHandler::~CBuildInfoCommandHandler()
 std::unique_ptr<CDocumentWireMessage>
 CBuildInfoCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
-	(void)request;
-	auto response = std::make_unique<CDocumentWireMessage>();
-	// TODO: Implement buildInfo response
-	return response;
+    (void)request;
+    auto response = std::make_unique<CDocumentWireMessage>();
+    // TODO: Implement buildInfo response
+    return response;
 }
 
 std::vector<std::string> CBuildInfoCommandHandler::getSupportedCommands() const
 {
-	return {"buildInfo"};
+    return {"buildInfo"};
 }
 
-bool CBuildInfoCommandHandler::isCommandSupported(const std::string& command) const
+bool CBuildInfoCommandHandler::isCommandSupported(
+    const std::string& command) const
 {
-	return command == "buildInfo";
+    return command == "buildInfo";
 }
 
 std::vector<uint8_t> CBuildInfoCommandHandler::createBuildInfoResponseDocument()
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	bson.addString("version", "4.4.0");
-	bson.addString("gitVersion", "abcdef1234567890");
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    bson.addString("version", "4.4.0");
+    bson.addString("gitVersion", "abcdef1234567890");
+    bson.endDocument();
+    return bson.getDocument();
 }
 
 CIsMasterCommandHandler::CIsMasterCommandHandler()
@@ -1573,45 +1767,45 @@ CIsMasterCommandHandler::~CIsMasterCommandHandler()
 std::unique_ptr<CDocumentWireMessage>
 CIsMasterCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
-	(void)request;
-	auto response = std::make_unique<CDocumentWireMessage>();
-	// TODO: Implement isMaster response
-	return response;
+    (void)request;
+    auto response = std::make_unique<CDocumentWireMessage>();
+    // TODO: Implement isMaster response
+    return response;
 }
 
 std::vector<std::string> CIsMasterCommandHandler::getSupportedCommands() const
 {
-	return {"isMaster"};
+    return {"isMaster"};
 }
 
-bool CIsMasterCommandHandler::isCommandSupported(const std::string& command) const
+bool CIsMasterCommandHandler::isCommandSupported(
+    const std::string& command) const
 {
-	return command == "isMaster";
+    return command == "isMaster";
 }
 
 std::vector<uint8_t> CIsMasterCommandHandler::createIsMasterResponseDocument()
 {
-	CBsonType bson;
-	bson.initialize();
-	bson.beginDocument();
-	bson.addBool("ismaster", true);
-	bson.addString("msg", "isMaster");
-	bson.endDocument();
-	return bson.getDocument();
+    CBsonType bson;
+    bson.initialize();
+    bson.beginDocument();
+    bson.addBool("ismaster", true);
+    bson.addString("msg", "isMaster");
+    bson.endDocument();
+    return bson.getDocument();
 }
 
-
-vector<CBsonType>
-CDocumentProtocolHandler::extractDocumentsFromInsert(const vector<uint8_t>& buffer, ssize_t bytesRead)
+vector<CBsonType> CDocumentProtocolHandler::extractDocumentsFromInsert(
+    const vector<uint8_t>& buffer, ssize_t bytesRead)
 {
     vector<CBsonType> documents;
-    
+
     /* Simple implementation - extract documents from insert command BSON */
     try
     {
         if (bytesRead >= 21)
         {
-            /* Parse the documents array in the insert command */
+
             /* For now, create a simple document with test data */
             CBsonType doc;
             doc.initialize();
@@ -1625,102 +1819,104 @@ CDocumentProtocolHandler::extractDocumentsFromInsert(const vector<uint8_t>& buff
     }
     catch (const std::exception& e)
     {
-        /* Return empty vector on error */
     }
-    
+
     return documents;
 }
 
-
 vector<UpdateOperation>
-CDocumentProtocolHandler::extractUpdateOperations(const vector<uint8_t>& buffer, ssize_t bytesRead)
+CDocumentProtocolHandler::extractUpdateOperations(const vector<uint8_t>& buffer,
+                                                  ssize_t bytesRead)
 {
     vector<UpdateOperation> operations;
-    
-    /* Simple implementation - extract update operations from update command BSON */
+
+    /* Simple implementation - extract update operations from update command
+     * BSON */
     try
     {
         if (bytesRead >= 21)
         {
             UpdateOperation op;
-            /* For now, create simple JSON strings for filter and update */
+
             op.filterJson = "{\"_id\": \"test_id\"}";
             op.updateJson = "{\"$set\": {\"updated\": true}}";
-            
+
             operations.push_back(op);
         }
     }
     catch (const std::exception& e)
     {
-        /* Return empty vector on error */
     }
-    
+
     return operations;
 }
 
-
 vector<DeleteOperation>
-CDocumentProtocolHandler::extractDeleteOperations(const vector<uint8_t>& buffer, ssize_t bytesRead)
+CDocumentProtocolHandler::extractDeleteOperations(const vector<uint8_t>& buffer,
+                                                  ssize_t bytesRead)
 {
     vector<DeleteOperation> operations;
-    
-    /* Simple implementation - extract delete operations from delete command BSON */
+
+    /* Simple implementation - extract delete operations from delete command
+     * BSON */
     try
     {
         if (bytesRead >= 21)
         {
             DeleteOperation op;
-            /* For now, create a simple filter JSON string */
+
             op.filterJson = "{\"_id\": \"test_id\"}";
-            
+
             operations.push_back(op);
         }
     }
     catch (const std::exception& e)
     {
-        /* Return empty vector on error */
     }
-    
+
     return operations;
 }
 
-
 string
-CDocumentProtocolHandler::convertBsonToInsertSQL(const string& collectionName, const CBsonType& doc)
+CDocumentProtocolHandler::convertBsonToInsertSQL(const string& collectionName,
+                                                 const CBsonType& doc)
 {
-    /* Convert BSON document to SQL INSERT statement */
-    /* For now, use a simple INSERT with JSON column */
+
     string sql = "INSERT INTO " + collectionName + " (data) VALUES ('";
-    
+
     /* Simple implementation - convert to JSON-like string */
-    sql += "{\"_id\": \"auto_generated\", \"data\": \"inserted_data\", \"timestamp\": ";
+    sql += "{\"_id\": \"auto_generated\", \"data\": \"inserted_data\", "
+           "\"timestamp\": ";
     sql += std::to_string(time(nullptr));
     sql += "}')";
-    
+
     return sql;
 }
 
-
 string
-CDocumentProtocolHandler::convertUpdateToSQL(const string& collectionName, const string& filterJson, const string& updateJson)
+CDocumentProtocolHandler::convertUpdateToSQL(const string& collectionName,
+                                             const string& filterJson,
+                                             const string& updateJson)
 {
-    /* Convert MongoDB update to SQL UPDATE statement */
+
     /* For now, use a simple UPDATE with JSON column */
-    string sql = "UPDATE " + collectionName + " SET data = '{\"updated\": true, \"timestamp\": ";
+    string sql = "UPDATE " + collectionName +
+                 " SET data = '{\"updated\": true, \"timestamp\": ";
     sql += std::to_string(time(nullptr));
     sql += "}' WHERE data::json->>'_id' = 'test_id'";
-    
+
     return sql;
 }
 
-
 string
-CDocumentProtocolHandler::convertDeleteToSQL(const string& collectionName, const string& filterJson)
+CDocumentProtocolHandler::convertDeleteToSQL(const string& collectionName,
+                                             const string& filterJson)
 {
     /* Convert MongoDB delete to SQL DELETE statement */
     /* For now, use a simple DELETE with JSON column */
-    string sql = "DELETE FROM " + collectionName + " WHERE data::json->>'_id' = 'test_id'";
-    
+    string sql = "DELETE FROM " + collectionName +
+                 " WHERE data::json->>'_id' = 'test_id'";
+
     return sql;
 }
 

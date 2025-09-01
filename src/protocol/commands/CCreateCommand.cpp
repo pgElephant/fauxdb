@@ -9,27 +9,23 @@
  */
 
 #include "commands/CCreateCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
 
 namespace FauxDB
 {
-
 
 CCreateCommand::CCreateCommand()
 {
     /* Constructor */
 }
 
-
-string
-CCreateCommand::getCommandName() const
+string CCreateCommand::getCommandName() const
 {
     return "create";
 }
 
-
-vector<uint8_t>
-CCreateCommand::execute(const CommandContext& context)
+vector<uint8_t> CCreateCommand::execute(const CommandContext& context)
 {
     if (context.connectionPooler && requiresDatabase())
     {
@@ -41,52 +37,50 @@ CCreateCommand::execute(const CommandContext& context)
     }
 }
 
-
-bool
-CCreateCommand::requiresDatabase() const
+bool CCreateCommand::requiresDatabase() const
 {
     return true;
 }
-
 
 vector<uint8_t>
 CCreateCommand::executeWithDatabase(const CommandContext& context)
 {
     /* PostgreSQL implementation for create collection */
     string collection = getCollectionFromContext(context);
-    bool capped = extractCappedOption(context.requestBuffer, context.requestSize);
-    int64_t size = extractSizeOption(context.requestBuffer, context.requestSize);
+    bool capped =
+        extractCappedOption(context.requestBuffer, context.requestSize);
+    int64_t size =
+        extractSizeOption(context.requestBuffer, context.requestSize);
     int64_t max = extractMaxOption(context.requestBuffer, context.requestSize);
-    
+
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
-            /* Build and execute CREATE TABLE SQL */
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             string sql = buildCreateTableSQL(collection);
-            
-            /* Execute the create command */
+
             auto result = connection->database->executeQuery(sql);
-            
+
             if (result.success)
             {
                 bson.addDouble("ok", 1.0);
             }
             else
             {
-                /* Check if table already exists */
+
                 bson.addDouble("ok", 0.0);
                 bson.addString("errmsg", "collection already exists");
-                bson.addInt32("code", 48); /* NamespaceExists */
+                bson.addInt32("code", 48);
             }
-            
+
             context.connectionPooler->returnConnection(voidConnection);
         }
         else
@@ -100,11 +94,10 @@ CCreateCommand::executeWithDatabase(const CommandContext& context)
         bson.addDouble("ok", 0.0);
         bson.addString("errmsg", "create operation failed");
     }
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<uint8_t>
 CCreateCommand::executeWithoutDatabase(const CommandContext& context)
@@ -115,16 +108,15 @@ CCreateCommand::executeWithoutDatabase(const CommandContext& context)
     bson.beginDocument();
     bson.addDouble("ok", 1.0);
     bson.endDocument();
-    
+
     return bson.getDocument();
 }
 
-
-string
-CCreateCommand::buildCreateTableSQL(const string& collectionName)
+string CCreateCommand::buildCreateTableSQL(const string& collectionName)
 {
-    /* Create a basic table structure for document storage */
-    return "CREATE TABLE IF NOT EXISTS \"" + collectionName + "\" ("
+
+    return "CREATE TABLE IF NOT EXISTS \"" + collectionName +
+           "\" ("
            "_id VARCHAR(24) PRIMARY KEY, "
            "document JSONB NOT NULL, "
            "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
@@ -132,25 +124,22 @@ CCreateCommand::buildCreateTableSQL(const string& collectionName)
            ")";
 }
 
-
-bool
-CCreateCommand::extractCappedOption(const vector<uint8_t>& buffer, ssize_t bufferSize)
+bool CCreateCommand::extractCappedOption(const vector<uint8_t>& buffer,
+                                         ssize_t bufferSize)
 {
     /* Simple capped option extraction - placeholder implementation */
     return false;
 }
 
-
-int64_t
-CCreateCommand::extractSizeOption(const vector<uint8_t>& buffer, ssize_t bufferSize)
+int64_t CCreateCommand::extractSizeOption(const vector<uint8_t>& buffer,
+                                          ssize_t bufferSize)
 {
     /* Simple size option extraction - placeholder implementation */
     return 0;
 }
 
-
-int64_t
-CCreateCommand::extractMaxOption(const vector<uint8_t>& buffer, ssize_t bufferSize)
+int64_t CCreateCommand::extractMaxOption(const vector<uint8_t>& buffer,
+                                         ssize_t bufferSize)
 {
     /* Simple max option extraction - placeholder implementation */
     return 0;

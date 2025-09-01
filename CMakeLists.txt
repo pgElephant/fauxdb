@@ -251,7 +251,7 @@ set(SOURCES
     src/protocol/CCommandHandler.cpp
     src/protocol/CDocumentCommandHandler.cpp
     src/protocol/CBsonType.cpp
-    src/protocol/CQueryTranslator.cpp
+
     src/protocol/CResponseBuilder.cpp
     src/protocol/CommandRegistry.cpp
     src/protocol/CollectionNameParser.cpp

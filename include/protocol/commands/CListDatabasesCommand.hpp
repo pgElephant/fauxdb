@@ -24,20 +24,21 @@ struct DatabaseInfo
 
 class CListDatabasesCommand : public CBaseCommand
 {
-public:
+  public:
     CListDatabasesCommand();
     virtual ~CListDatabasesCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
+
     vector<DatabaseInfo> getDatabaseList(const CommandContext& context);
-    int64_t getDatabaseSize(const CommandContext& context, const string& dbName);
+    int64_t getDatabaseSize(const CommandContext& context,
+                            const string& dbName);
     bool isDatabaseEmpty(const CommandContext& context, const string& dbName);
     bool extractNameOnly(const vector<uint8_t>& buffer, ssize_t bufferSize);
     CBsonType createDatabasesResponse(const vector<DatabaseInfo>& databases);

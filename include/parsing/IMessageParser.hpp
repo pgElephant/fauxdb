@@ -24,14 +24,14 @@ namespace FauxDB
 class IMessageParser
 {
   public:
-	virtual ~IMessageParser() = default;
+    virtual ~IMessageParser() = default;
 
-	/* Core parsing interface */
-	virtual std::error_code
-	parseMessage(const std::vector<uint8_t>& rawMessage) = 0;
-	virtual bool isValidMessage() const noexcept = 0;
-	virtual std::string getErrorMessage() const = 0;
-	virtual void reset() noexcept = 0;
+    /* Core parsing interface */
+    virtual std::error_code
+    parseMessage(const std::vector<uint8_t>& rawMessage) = 0;
+    virtual bool isValidMessage() const noexcept = 0;
+    virtual std::string getErrorMessage() const = 0;
+    virtual void reset() noexcept = 0;
 };
 
 } /* namespace FauxDB */

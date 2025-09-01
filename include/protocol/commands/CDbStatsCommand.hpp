@@ -32,18 +32,18 @@ struct DatabaseStats
 
 class CDbStatsCommand : public CBaseCommand
 {
-public:
+  public:
     CDbStatsCommand();
     virtual ~CDbStatsCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
+
     DatabaseStats collectDatabaseStats(const CommandContext& context);
     int64_t getTableCount(const CommandContext& context);
     int64_t getTotalRows(const CommandContext& context);

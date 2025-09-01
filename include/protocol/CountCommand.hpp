@@ -11,17 +11,21 @@ namespace FauxDB
  */
 class CountCommand : public BaseCommand
 {
-protected:
+  protected:
     /**
      * @brief Execute count query on PostgreSQL
      * @param collection Collection name
      * @param database PostgreSQL database connection
      * @return Count result
      */
-    int64_t executeCountQuery(const string& collection, shared_ptr<CPostgresDatabase> database);
+    int64_t executeCountQuery(const string& collection,
+                              shared_ptr<CPostgresDatabase> database);
 
-public:
-    string getCommandName() const override { return "count"; }
+  public:
+    string getCommandName() const override
+    {
+        return "count";
+    }
 };
 
 /**
@@ -29,15 +33,16 @@ public:
  */
 class CountDocumentsCommand : public CountCommand
 {
-public:
-    vector<uint8_t> execute(
-        const string& collection,
-        const vector<uint8_t>& buffer,
-        ssize_t bytesRead,
-        shared_ptr<CPGConnectionPooler> connectionPooler
-    ) override;
-    
-    string getCommandName() const override { return "countDocuments"; }
+  public:
+    vector<uint8_t>
+    execute(const string& collection, const vector<uint8_t>& buffer,
+            ssize_t bytesRead,
+            shared_ptr<CPGConnectionPooler> connectionPooler) override;
+
+    string getCommandName() const override
+    {
+        return "countDocuments";
+    }
 };
 
 /**
@@ -45,15 +50,16 @@ public:
  */
 class EstimatedDocumentCountCommand : public CountCommand
 {
-public:
-    vector<uint8_t> execute(
-        const string& collection,
-        const vector<uint8_t>& buffer,
-        ssize_t bytesRead,
-        shared_ptr<CPGConnectionPooler> connectionPooler
-    ) override;
-    
-    string getCommandName() const override { return "estimatedDocumentCount"; }
+  public:
+    vector<uint8_t>
+    execute(const string& collection, const vector<uint8_t>& buffer,
+            ssize_t bytesRead,
+            shared_ptr<CPGConnectionPooler> connectionPooler) override;
+
+    string getCommandName() const override
+    {
+        return "estimatedDocumentCount";
+    }
 };
 
 } /* namespace FauxDB */

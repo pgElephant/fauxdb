@@ -9,27 +9,23 @@
  */
 
 #include "commands/CDropCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
 
 namespace FauxDB
 {
-
 
 CDropCommand::CDropCommand()
 {
     /* Constructor */
 }
 
-
-string
-CDropCommand::getCommandName() const
+string CDropCommand::getCommandName() const
 {
     return "drop";
 }
 
-
-vector<uint8_t>
-CDropCommand::execute(const CommandContext& context)
+vector<uint8_t> CDropCommand::execute(const CommandContext& context)
 {
     if (context.connectionPooler && requiresDatabase())
     {
@@ -41,37 +37,34 @@ CDropCommand::execute(const CommandContext& context)
     }
 }
 
-
-bool
-CDropCommand::requiresDatabase() const
+bool CDropCommand::requiresDatabase() const
 {
     return true;
 }
 
-
-vector<uint8_t>
-CDropCommand::executeWithDatabase(const CommandContext& context)
+vector<uint8_t> CDropCommand::executeWithDatabase(const CommandContext& context)
 {
     /* PostgreSQL implementation for drop collection */
     string collection = getCollectionFromContext(context);
-    
+
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             /* Build and execute DROP TABLE SQL */
             string sql = buildDropTableSQL(collection);
-            
+
             /* Execute the drop command */
             auto result = connection->database->executeQuery(sql);
-            
+
             if (result.success)
             {
                 bson.addDouble("ok", 1.0);
@@ -84,7 +77,7 @@ CDropCommand::executeWithDatabase(const CommandContext& context)
                 bson.addString("errmsg", "collection not found");
                 bson.addInt32("code", 26); /* NamespaceNotFound */
             }
-            
+
             context.connectionPooler->returnConnection(voidConnection);
         }
         else
@@ -98,11 +91,10 @@ CDropCommand::executeWithDatabase(const CommandContext& context)
         bson.addDouble("ok", 0.0);
         bson.addString("errmsg", "drop operation failed");
     }
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<uint8_t>
 CDropCommand::executeWithoutDatabase(const CommandContext& context)
@@ -113,15 +105,14 @@ CDropCommand::executeWithoutDatabase(const CommandContext& context)
     bson.beginDocument();
     bson.addDouble("ok", 1.0);
     bson.addInt32("nIndexesWas", 1);
-    bson.addString("ns", context.databaseName + "." + getCollectionFromContext(context));
+    bson.addString("ns", context.databaseName + "." +
+                             getCollectionFromContext(context));
     bson.endDocument();
-    
+
     return bson.getDocument();
 }
 
-
-string
-CDropCommand::buildDropTableSQL(const string& collectionName)
+string CDropCommand::buildDropTableSQL(const string& collectionName)
 {
     return "DROP TABLE IF EXISTS \"" + collectionName + "\"";
 }

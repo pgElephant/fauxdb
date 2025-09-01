@@ -9,27 +9,23 @@
  */
 
 #include "commands/CListCollectionsCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
 
 namespace FauxDB
 {
-
 
 CListCollectionsCommand::CListCollectionsCommand()
 {
     /* Constructor */
 }
 
-
-string
-CListCollectionsCommand::getCommandName() const
+string CListCollectionsCommand::getCommandName() const
 {
     return "listCollections";
 }
 
-
-vector<uint8_t>
-CListCollectionsCommand::execute(const CommandContext& context)
+vector<uint8_t> CListCollectionsCommand::execute(const CommandContext& context)
 {
     if (context.connectionPooler && requiresDatabase())
     {
@@ -41,13 +37,10 @@ CListCollectionsCommand::execute(const CommandContext& context)
     }
 }
 
-
-bool
-CListCollectionsCommand::requiresDatabase() const
+bool CListCollectionsCommand::requiresDatabase() const
 {
     return true;
 }
-
 
 vector<uint8_t>
 CListCollectionsCommand::executeWithDatabase(const CommandContext& context)
@@ -56,28 +49,30 @@ CListCollectionsCommand::executeWithDatabase(const CommandContext& context)
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             /* Build and execute list tables SQL */
             string sql = buildListTablesSQL();
             auto result = connection->database->executeQuery(sql);
-            
+
             /* Create cursor response */
             CBsonType cursor;
             cursor.initialize();
             cursor.beginDocument();
             cursor.addInt64("id", 0); /* No cursor needed for simple list */
-            cursor.addString("ns", context.databaseName + ".$cmd.listCollections");
-            
+            cursor.addString("ns",
+                             context.databaseName + ".$cmd.listCollections");
+
             /* Create firstBatch array */
             cursor.beginArray("firstBatch");
-            
+
             if (result.success)
             {
                 /* Add each table as a collection */
@@ -86,18 +81,19 @@ CListCollectionsCommand::executeWithDatabase(const CommandContext& context)
                     if (!row.empty())
                     {
                         string tableName = row[0];
-                        CBsonType collectionInfo = createCollectionInfo(tableName, "collection");
+                        CBsonType collectionInfo =
+                            createCollectionInfo(tableName, "collection");
                         cursor.addArrayDocument(collectionInfo);
                     }
                 }
             }
-            
-            cursor.endArray(); /* End firstBatch */
+
+            cursor.endArray();    /* End firstBatch */
             cursor.endDocument(); /* End cursor */
-            
+
             bson.addDocument("cursor", cursor);
             bson.addDouble("ok", 1.0);
-            
+
             context.connectionPooler->returnConnection(voidConnection);
         }
         else
@@ -111,11 +107,10 @@ CListCollectionsCommand::executeWithDatabase(const CommandContext& context)
         bson.addDouble("ok", 0.0);
         bson.addString("errmsg", "listCollections operation failed");
     }
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<uint8_t>
 CListCollectionsCommand::executeWithoutDatabase(const CommandContext& context)
@@ -124,58 +119,57 @@ CListCollectionsCommand::executeWithoutDatabase(const CommandContext& context)
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     /* Create cursor response with mock collections */
     CBsonType cursor;
     cursor.initialize();
     cursor.beginDocument();
     cursor.addInt64("id", 0);
     cursor.addString("ns", context.databaseName + ".$cmd.listCollections");
-    
+
     cursor.beginArray("firstBatch");
-    
+
     /* Add mock collections */
     CBsonType mockCollection1 = createCollectionInfo("users", "collection");
     cursor.addArrayDocument(mockCollection1);
-    
+
     CBsonType mockCollection2 = createCollectionInfo("products", "collection");
     cursor.addArrayDocument(mockCollection2);
-    
+
     cursor.endArray();
     cursor.endDocument();
-    
+
     bson.addDocument("cursor", cursor);
     bson.addDouble("ok", 1.0);
     bson.endDocument();
-    
+
     return bson.getDocument();
 }
 
-
-string
-CListCollectionsCommand::buildListTablesSQL()
+string CListCollectionsCommand::buildListTablesSQL()
 {
     /* Query to list all user tables in PostgreSQL */
-    return "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename";
+    return "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER "
+           "BY tablename";
 }
 
-
 CBsonType
-CListCollectionsCommand::createCollectionInfo(const string& collectionName, const string& collectionType)
+CListCollectionsCommand::createCollectionInfo(const string& collectionName,
+                                              const string& collectionType)
 {
     CBsonType info;
     info.initialize();
     info.beginDocument();
     info.addString("name", collectionName);
     info.addString("type", collectionType);
-    
+
     /* Add options document */
     CBsonType options;
     options.initialize();
     options.beginDocument();
     options.endDocument();
     info.addDocument("options", options);
-    
+
     /* Add info document with basic stats */
     CBsonType infoDoc;
     infoDoc.initialize();
@@ -183,14 +177,13 @@ CListCollectionsCommand::createCollectionInfo(const string& collectionName, cons
     infoDoc.addBool("readOnly", false);
     infoDoc.endDocument();
     info.addDocument("info", infoDoc);
-    
+
     info.endDocument();
     return info;
 }
 
-
-bool
-CListCollectionsCommand::extractFilter(const vector<uint8_t>& buffer, ssize_t bufferSize)
+bool CListCollectionsCommand::extractFilter(const vector<uint8_t>& buffer,
+                                            ssize_t bufferSize)
 {
     /* Simple filter extraction - placeholder implementation */
     return false;

@@ -7,6 +7,8 @@
  *
  *-------------------------------------------------------------------------*/
 
+#include "CConfiguration.hpp"
+
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -15,7 +17,6 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include "CConfiguration.hpp"
 
 namespace FauxDB
 {
@@ -40,43 +41,48 @@ CConfigurationEncryption::CConfigurationEncryption()
 {
 }
 
-std::unique_ptr<CConfiguration> CConfigurationFactory::createConfiguration(ConfigurationType type, const std::string& source)
+std::unique_ptr<CConfiguration>
+CConfigurationFactory::createConfiguration(ConfigurationType type,
+                                           const std::string& source)
 {
     return std::make_unique<CConfiguration>(source);
 }
 
-std::string CConfigurationFactory::getConfigurationTypeName(ConfigurationType type)
+std::string
+CConfigurationFactory::getConfigurationTypeName(ConfigurationType type)
 {
     switch (type)
     {
-        case ConfigurationType::File:
-            return "File";
-        case ConfigurationType::Database:
-            return "Database"; 
-        case ConfigurationType::Environment:
-            return "Environment";
-        case ConfigurationType::Network:
-            return "Network";
-        case ConfigurationType::Custom:
-            return "Custom";
-        default:
-            return "Unknown";
+    case ConfigurationType::File:
+        return "File";
+    case ConfigurationType::Database:
+        return "Database";
+    case ConfigurationType::Environment:
+        return "Environment";
+    case ConfigurationType::Network:
+        return "Network";
+    case ConfigurationType::Custom:
+        return "Custom";
+    default:
+        return "Unknown";
     }
 }
 
-CConfigurationFactory::ConfigurationType CConfigurationFactory::getConfigurationTypeFromString(const std::string& typeName)
+CConfigurationFactory::ConfigurationType
+CConfigurationFactory::getConfigurationTypeFromString(
+    const std::string& typeName)
 {
     if (typeName == "File")
         return ConfigurationType::File;
     if (typeName == "Database")
         return ConfigurationType::Database;
-    if (typeName == "Environment") 
+    if (typeName == "Environment")
         return ConfigurationType::Environment;
     if (typeName == "Network")
         return ConfigurationType::Network;
     if (typeName == "Custom")
         return ConfigurationType::Custom;
-        
+
     throw std::invalid_argument("Invalid configuration type name");
 }
 

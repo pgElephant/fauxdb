@@ -7,13 +7,8 @@ namespace FauxDB
 {
 
 CBsonType::CBsonType()
-    : bsonDoc_(nullptr),
-      bsonArray_(nullptr),
-      lastError_(),
-      hasErrors_(false),
-      inArray_(false),
-      currentArrayKey_(),
-      currentArrayIndex_(0)
+    : bsonDoc_(nullptr), bsonArray_(nullptr), lastError_(), hasErrors_(false),
+      inArray_(false), currentArrayKey_(), currentArrayIndex_(0)
 {
     bsonDoc_ = bson_new();
     if (!bsonDoc_)
@@ -91,10 +86,7 @@ bool CBsonType::endArray()
     }
 
     // Append array to the document
-    if (!bson_append_array(bsonDoc_,
-                           currentArrayKey_.c_str(),
-                           -1,
-                           bsonArray_))
+    if (!bson_append_array(bsonDoc_, currentArrayKey_.c_str(), -1, bsonArray_))
     {
         setError("Failed to append array to document");
         return false;
@@ -220,10 +212,8 @@ bool CBsonType::addDateTime(const std::string& key, int64_t timestamp)
     return true;
 }
 
-bool CBsonType::addBinary(const std::string& key,
-                          bson_subtype_t subtype,
-                          const uint8_t* data,
-                          size_t size)
+bool CBsonType::addBinary(const std::string& key, bson_subtype_t subtype,
+                          const uint8_t* data, size_t size)
 {
     if (!checkBsonHandle())
         return false;
@@ -233,12 +223,7 @@ bool CBsonType::addBinary(const std::string& key,
         return false;
     }
 
-    if (!bson_append_binary(bsonDoc_,
-                            key.c_str(),
-                            -1,
-                            subtype,
-                            data,
-                            size))
+    if (!bson_append_binary(bsonDoc_, key.c_str(), -1, subtype, data, size))
     {
         setError("Failed to add binary");
         return false;
@@ -255,7 +240,8 @@ bool CBsonType::addDocument(const std::string& key, const CBsonType& subdoc)
         setError("Subdocument handle is null");
         return false;
     }
-    if (!bson_append_document(bsonDoc_, key.c_str(), -1, subdoc.getBsonHandle()))
+    if (!bson_append_document(bsonDoc_, key.c_str(), -1,
+                              subdoc.getBsonHandle()))
     {
         setError("Failed to add embedded document");
         return false;
@@ -409,8 +395,7 @@ bool CBsonType::addArrayDateTime(int64_t timestamp)
     return true;
 }
 
-bool CBsonType::addArrayBinary(bson_subtype_t subtype,
-                               const uint8_t* data,
+bool CBsonType::addArrayBinary(bson_subtype_t subtype, const uint8_t* data,
                                size_t size)
 {
     if (!inArray_ || !bsonArray_)
@@ -445,7 +430,8 @@ bool CBsonType::addArrayDocument(const CBsonType& subdoc)
         return false;
     }
     std::string k = nextArrayIndexKey();
-    if (!bson_append_document(bsonArray_, k.c_str(), -1, subdoc.getBsonHandle()))
+    if (!bson_append_document(bsonArray_, k.c_str(), -1,
+                              subdoc.getBsonHandle()))
     {
         setError("Failed to add array document");
         return false;

@@ -1,9 +1,9 @@
 /* Collection Name Parser Utility */
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 using namespace std;
 
@@ -15,7 +15,7 @@ namespace FauxDB
  */
 class CollectionNameParser
 {
-public:
+  public:
     /**
      * @brief Extract collection name from BSON buffer
      * @param buffer BSON buffer
@@ -23,13 +23,11 @@ public:
      * @param commandName Known command name (for optimization)
      * @return Collection name or empty string if not found
      */
-    static string extractCollectionName(
-        const vector<uint8_t>& buffer,
-        ssize_t bytesRead,
-        const string& commandName = ""
-    );
+    static string extractCollectionName(const vector<uint8_t>& buffer,
+                                        ssize_t bytesRead,
+                                        const string& commandName = "");
 
-private:
+  private:
     /**
      * @brief Parse BSON document to find collection name
      * @param buffer BSON buffer
@@ -37,12 +35,10 @@ private:
      * @param commandName Known command name
      * @return Collection name or empty string
      */
-    static string parseBsonForCollection(
-        const vector<uint8_t>& buffer,
-        size_t offset,
-        const string& commandName
-    );
-    
+    static string parseBsonForCollection(const vector<uint8_t>& buffer,
+                                         size_t offset,
+                                         const string& commandName);
+
     /**
      * @brief Read BSON string from buffer
      * @param buffer BSON buffer
@@ -50,19 +46,17 @@ private:
      * @param stringLength Length of string
      * @return String value
      */
-    static string readBsonString(
-        const vector<uint8_t>& buffer,
-        size_t offset,
-        uint32_t stringLength
-    );
-    
+    static string readBsonString(const vector<uint8_t>& buffer, size_t offset,
+                                 uint32_t stringLength);
+
     /**
      * @brief Check if field name indicates collection name
      * @param fieldName Field name to check
      * @param commandName Command name for context
      * @return true if field contains collection name
      */
-    static bool isCollectionField(const string& fieldName, const string& commandName);
+    static bool isCollectionField(const string& fieldName,
+                                  const string& commandName);
 };
 
 } /* namespace FauxDB */

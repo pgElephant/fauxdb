@@ -9,27 +9,22 @@
  */
 
 #include "commands/CCountCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
 
 namespace FauxDB
 {
 
-
 CCountCommand::CCountCommand()
 {
-    /* Constructor */
 }
 
-
-string
-CCountCommand::getCommandName() const
+string CCountCommand::getCommandName() const
 {
     return "count";
 }
 
-
-vector<uint8_t>
-CCountCommand::execute(const CommandContext& context)
+vector<uint8_t> CCountCommand::execute(const CommandContext& context)
 {
     if (context.connectionPooler && requiresDatabase())
     {
@@ -41,51 +36,47 @@ CCountCommand::execute(const CommandContext& context)
     }
 }
 
-
-bool
-CCountCommand::requiresDatabase() const
+bool CCountCommand::requiresDatabase() const
 {
     return true;
 }
 
-
 vector<uint8_t>
 CCountCommand::executeWithDatabase(const CommandContext& context)
 {
-    /* PostgreSQL implementation for count */
+
     string collection = getCollectionFromContext(context);
     string query = extractQuery(context.requestBuffer, context.requestSize);
     int64_t limit = extractLimit(context.requestBuffer, context.requestSize);
     int64_t skip = extractSkip(context.requestBuffer, context.requestSize);
-    
+
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
-            /* Build and execute COUNT SQL */
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             string whereClause = convertQueryToWhere(query);
             string sql = buildCountSQL(collection, whereClause);
-            
+
             auto result = connection->database->executeQuery(sql);
-            
+
             if (result.success && !result.rows.empty())
             {
-                /* Get count from first row, first column */
+
                 int64_t count = 0;
                 if (!result.rows[0].empty())
                 {
                     try
                     {
                         count = std::stoll(result.rows[0][0]);
-                        
-                        /* Apply skip and limit if specified */
+
                         if (skip > 0)
                         {
                             count = std::max(0LL, count - skip);
@@ -100,7 +91,7 @@ CCountCommand::executeWithDatabase(const CommandContext& context)
                         count = 0;
                     }
                 }
-                
+
                 bson.addDouble("ok", 1.0);
                 bson.addInt64("n", count);
             }
@@ -110,7 +101,7 @@ CCountCommand::executeWithDatabase(const CommandContext& context)
                 bson.addDouble("ok", 1.0);
                 bson.addInt64("n", 0);
             }
-            
+
             context.connectionPooler->returnConnection(voidConnection);
         }
         else
@@ -124,11 +115,10 @@ CCountCommand::executeWithDatabase(const CommandContext& context)
         bson.addDouble("ok", 0.0);
         bson.addString("errmsg", "count operation failed");
     }
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<uint8_t>
 CCountCommand::executeWithoutDatabase(const CommandContext& context)
@@ -140,38 +130,34 @@ CCountCommand::executeWithoutDatabase(const CommandContext& context)
     bson.addDouble("ok", 1.0);
     bson.addInt64("n", 42); /* Mock count */
     bson.endDocument();
-    
+
     return bson.getDocument();
 }
 
-
-string
-CCountCommand::extractQuery(const vector<uint8_t>& buffer, ssize_t bufferSize)
+string CCountCommand::extractQuery(const vector<uint8_t>& buffer,
+                                   ssize_t bufferSize)
 {
     /* Simple query extraction - placeholder implementation */
     /* In a full implementation, this would parse the BSON query document */
     return "{}";
 }
 
-
-int64_t
-CCountCommand::extractLimit(const vector<uint8_t>& buffer, ssize_t bufferSize)
+int64_t CCountCommand::extractLimit(const vector<uint8_t>& buffer,
+                                    ssize_t bufferSize)
 {
     /* Simple limit extraction - placeholder implementation */
     return 0;
 }
 
-
-int64_t
-CCountCommand::extractSkip(const vector<uint8_t>& buffer, ssize_t bufferSize)
+int64_t CCountCommand::extractSkip(const vector<uint8_t>& buffer,
+                                   ssize_t bufferSize)
 {
     /* Simple skip extraction - placeholder implementation */
     return 0;
 }
 
-
-string
-CCountCommand::buildCountSQL(const string& collectionName, const string& whereClause)
+string CCountCommand::buildCountSQL(const string& collectionName,
+                                    const string& whereClause)
 {
     string sql = "SELECT COUNT(*) FROM \"" + collectionName + "\"";
     if (!whereClause.empty() && whereClause != "1=1")
@@ -181,17 +167,16 @@ CCountCommand::buildCountSQL(const string& collectionName, const string& whereCl
     return sql;
 }
 
-
-string
-CCountCommand::convertQueryToWhere(const string& query)
+string CCountCommand::convertQueryToWhere(const string& query)
 {
     /* Simple query to WHERE conversion - placeholder implementation */
-    /* In a full implementation, this would convert MongoDB query to SQL WHERE */
+    /* In a full implementation, this would convert MongoDB query to SQL WHERE
+     */
     if (query == "{}" || query.empty())
     {
         return "1=1"; /* No filter */
     }
-    
+
     /* For now, just return a basic condition */
     return "1=1";
 }

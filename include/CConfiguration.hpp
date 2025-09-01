@@ -2,6 +2,7 @@
 
 #include "CServer.hpp"
 #include "IInterfaces.hpp"
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -13,35 +14,35 @@ namespace FauxDB
 
 class CConfiguration
 {
-public:
+  public:
     explicit CConfiguration(const std::string& configFile = "");
     virtual ~CConfiguration();
 };
 
 class CConfigurationParser
 {
-public:
+  public:
     CConfigurationParser();
     virtual ~CConfigurationParser() = default;
 };
 
 class CConfigurationValidator
 {
-public:
+  public:
     CConfigurationValidator();
     virtual ~CConfigurationValidator() = default;
 };
 
 class CConfigurationEncryption
 {
-public:
+  public:
     CConfigurationEncryption();
     virtual ~CConfigurationEncryption() = default;
 };
 
 class CConfigurationFactory
 {
-public:
+  public:
     enum class ConfigurationType
     {
         File,
@@ -51,9 +52,11 @@ public:
         Custom
     };
 
-    static std::unique_ptr<CConfiguration> createConfiguration(ConfigurationType type, const std::string& source);
+    static std::unique_ptr<CConfiguration>
+    createConfiguration(ConfigurationType type, const std::string& source);
     static std::string getConfigurationTypeName(ConfigurationType type);
-    static ConfigurationType getConfigurationTypeFromString(const std::string& typeName);
+    static ConfigurationType
+    getConfigurationTypeFromString(const std::string& typeName);
 };
 
 } /* namespace FauxDB */

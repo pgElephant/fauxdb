@@ -22,26 +22,28 @@ struct IndexInfo
     int32_t version;
     bool unique;
     bool sparse;
-    string ns;  /* namespace */
+    string ns; /* namespace */
 };
 
 class CListIndexesCommand : public CBaseCommand
 {
-public:
+  public:
     CListIndexesCommand();
     virtual ~CListIndexesCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
-    vector<IndexInfo> getCollectionIndexes(const CommandContext& context, const string& collection);
+
+    vector<IndexInfo> getCollectionIndexes(const CommandContext& context,
+                                           const string& collection);
     CBsonType createIndexInfoDocument(const IndexInfo& info);
-    CBsonType createCursorResponse(const vector<IndexInfo>& indexes, const string& ns);
+    CBsonType createCursorResponse(const vector<IndexInfo>& indexes,
+                                   const string& ns);
 };
 
 } // namespace FauxDB

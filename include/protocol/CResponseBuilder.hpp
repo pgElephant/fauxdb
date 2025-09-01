@@ -26,10 +26,10 @@ namespace FauxDB
  */
 enum class CResponseFormat : uint8_t
 {
-	BSON = 0,
-	JSON = 1,
-	XML = 2,
-	PlainText = 3
+    BSON = 0,
+    JSON = 1,
+    XML = 2,
+    PlainText = 3
 };
 
 /**
@@ -37,10 +37,10 @@ enum class CResponseFormat : uint8_t
  */
 enum class CResponseStatus : uint8_t
 {
-	Success = 0,
-	Error = 1,
-	Warning = 2,
-	Info = 3
+    Success = 0,
+    Error = 1,
+    Warning = 2,
+    Info = 3
 };
 
 /**
@@ -48,19 +48,19 @@ enum class CResponseStatus : uint8_t
  */
 struct CResponseMetadata
 {
-	CResponseStatus status;
-	std::string message;
-	uint32_t requestId;
-	uint32_t responseTo;
-	std::chrono::system_clock::time_point timestamp;
-	std::string protocol;
-	std::string version;
+    CResponseStatus status;
+    std::string message;
+    uint32_t requestId;
+    uint32_t responseTo;
+    std::chrono::system_clock::time_point timestamp;
+    std::string protocol;
+    std::string version;
 
-	CResponseMetadata()
-		: status(CResponseStatus::Success), requestId(0), responseTo(0),
-		  timestamp(std::chrono::system_clock::now())
-	{
-	}
+    CResponseMetadata()
+        : status(CResponseStatus::Success), requestId(0), responseTo(0),
+          timestamp(std::chrono::system_clock::now())
+    {
+    }
 };
 
 /**
@@ -70,61 +70,61 @@ struct CResponseMetadata
 class CResponseBuilder
 {
   public:
-	CResponseBuilder();
-	virtual ~CResponseBuilder();
+    CResponseBuilder();
+    virtual ~CResponseBuilder();
 
-	/* Response building */
-	virtual std::vector<uint8_t> buildResponse(const CQueryResult& result) = 0;
-	virtual std::vector<uint8_t>
-	buildErrorResponse(const std::string& errorMessage, int errorCode) = 0;
-	virtual std::vector<uint8_t>
-	buildSuccessResponse(const std::string& message) = 0;
-	virtual std::vector<uint8_t> buildEmptyResponse() = 0;
+    /* Response building */
+    virtual std::vector<uint8_t> buildResponse(const CQueryResult& result) = 0;
+    virtual std::vector<uint8_t>
+    buildErrorResponse(const std::string& errorMessage, int errorCode) = 0;
+    virtual std::vector<uint8_t>
+    buildSuccessResponse(const std::string& message) = 0;
+    virtual std::vector<uint8_t> buildEmptyResponse() = 0;
 
-	/* Response configuration */
-	virtual void setResponseFormat(CResponseFormat format);
-	virtual void setProtocol(const std::string& protocol);
-	virtual void setVersion(const std::string& version);
-	virtual void setCompression(bool enabled);
+    /* Response configuration */
+    virtual void setResponseFormat(CResponseFormat format);
+    virtual void setProtocol(const std::string& protocol);
+    virtual void setVersion(const std::string& version);
+    virtual void setCompression(bool enabled);
 
-	/* Response metadata */
-	virtual void setRequestId(uint32_t requestId);
-	virtual void setResponseTo(uint32_t responseTo);
-	virtual void
-	setTimestamp(const std::chrono::system_clock::time_point& timestamp);
+    /* Response metadata */
+    virtual void setRequestId(uint32_t requestId);
+    virtual void setResponseTo(uint32_t responseTo);
+    virtual void
+    setTimestamp(const std::chrono::system_clock::time_point& timestamp);
 
-	/* Response validation */
-	virtual bool validateResponse(const std::vector<uint8_t>& response) const;
-	virtual std::string getValidationErrors() const;
+    /* Response validation */
+    virtual bool validateResponse(const std::vector<uint8_t>& response) const;
+    virtual std::string getValidationErrors() const;
 
-	/* Response statistics */
-	virtual size_t getResponseCount() const;
-	virtual size_t getErrorCount() const;
-	virtual void resetStatistics();
+    /* Response statistics */
+    virtual size_t getResponseCount() const;
+    virtual size_t getErrorCount() const;
+    virtual void resetStatistics();
 
   protected:
-	/* Response state */
-	CResponseFormat responseFormat_;
-	std::string protocol_;
-	std::string version_;
-	bool compressionEnabled_;
+    /* Response state */
+    CResponseFormat responseFormat_;
+    std::string protocol_;
+    std::string version_;
+    bool compressionEnabled_;
 
-	/* Response metadata */
-	CResponseMetadata metadata_;
+    /* Response metadata */
+    CResponseMetadata metadata_;
 
-	/* Response statistics */
-	size_t responseCount_;
-	size_t errorCount_;
+    /* Response statistics */
+    size_t responseCount_;
+    size_t errorCount_;
 
-	/* Protected utility methods */
-	virtual std::vector<uint8_t> serializeMetadata() const;
-	virtual std::vector<uint8_t>
-	compressResponse(const std::vector<uint8_t>& response) const;
-	virtual std::vector<uint8_t>
-	decompressResponse(const std::vector<uint8_t>& response) const;
-	virtual bool validateMetadata() const;
-	virtual std::string buildErrorMessage(const std::string& operation,
-										  const std::string& details) const;
+    /* Protected utility methods */
+    virtual std::vector<uint8_t> serializeMetadata() const;
+    virtual std::vector<uint8_t>
+    compressResponse(const std::vector<uint8_t>& response) const;
+    virtual std::vector<uint8_t>
+    decompressResponse(const std::vector<uint8_t>& response) const;
+    virtual bool validateMetadata() const;
+    virtual std::string buildErrorMessage(const std::string& operation,
+                                          const std::string& details) const;
 };
 
 /**
@@ -134,31 +134,31 @@ class CResponseBuilder
 class CBSONResponseBuilder : public CResponseBuilder
 {
   public:
-	CBSONResponseBuilder();
-	virtual ~CBSONResponseBuilder();
+    CBSONResponseBuilder();
+    virtual ~CBSONResponseBuilder();
 
-	/* BSON-specific response building */
-	virtual std::vector<uint8_t> buildBSONResponse(const CQueryResult& result);
-	virtual std::vector<uint8_t>
-	buildBSONDocument(const std::unordered_map<std::string, std::string>& data);
-	virtual std::vector<uint8_t>
-	buildBSONArray(const std::vector<std::string>& items);
+    /* BSON-specific response building */
+    virtual std::vector<uint8_t> buildBSONResponse(const CQueryResult& result);
+    virtual std::vector<uint8_t>
+    buildBSONDocument(const std::unordered_map<std::string, std::string>& data);
+    virtual std::vector<uint8_t>
+    buildBSONArray(const std::vector<std::string>& items);
 
-	/* Pure virtual method implementations */
-	std::vector<uint8_t> buildResponse(const CQueryResult& result) override;
-	std::vector<uint8_t> buildErrorResponse(const std::string& errorMessage,
-											int errorCode) override;
-	std::vector<uint8_t>
-	buildSuccessResponse(const std::string& message) override;
-	std::vector<uint8_t> buildEmptyResponse() override;
+    /* Pure virtual method implementations */
+    std::vector<uint8_t> buildResponse(const CQueryResult& result) override;
+    std::vector<uint8_t> buildErrorResponse(const std::string& errorMessage,
+                                            int errorCode) override;
+    std::vector<uint8_t>
+    buildSuccessResponse(const std::string& message) override;
+    std::vector<uint8_t> buildEmptyResponse() override;
 
   protected:
-	/* BSON-specific utility methods */
-	virtual std::vector<uint8_t> serializeBSONDocument(
-		const std::unordered_map<std::string, std::string>& data) const;
-	virtual std::vector<uint8_t>
-	serializeBSONArray(const std::vector<std::string>& items) const;
-	virtual uint32_t calculateBSONSize(const std::vector<uint8_t>& data) const;
+    /* BSON-specific utility methods */
+    virtual std::vector<uint8_t> serializeBSONDocument(
+        const std::unordered_map<std::string, std::string>& data) const;
+    virtual std::vector<uint8_t>
+    serializeBSONArray(const std::vector<std::string>& items) const;
+    virtual uint32_t calculateBSONSize(const std::vector<uint8_t>& data) const;
 };
 
 /**
@@ -168,30 +168,30 @@ class CBSONResponseBuilder : public CResponseBuilder
 class CJSONResponseBuilder : public CResponseBuilder
 {
   public:
-	CJSONResponseBuilder();
-	virtual ~CJSONResponseBuilder();
+    CJSONResponseBuilder();
+    virtual ~CJSONResponseBuilder();
 
-	// Pure virtual overrides from CResponseBuilder
-	std::vector<uint8_t> buildResponse(const CQueryResult& result) override;
-	std::vector<uint8_t> buildErrorResponse(const std::string& errorMessage,
-											int errorCode) override;
-	std::vector<uint8_t>
-	buildSuccessResponse(const std::string& message) override;
-	std::vector<uint8_t> buildEmptyResponse() override;
+    // Pure virtual overrides from CResponseBuilder
+    std::vector<uint8_t> buildResponse(const CQueryResult& result) override;
+    std::vector<uint8_t> buildErrorResponse(const std::string& errorMessage,
+                                            int errorCode) override;
+    std::vector<uint8_t>
+    buildSuccessResponse(const std::string& message) override;
+    std::vector<uint8_t> buildEmptyResponse() override;
 
-	/* JSON-specific response building */
-	virtual std::vector<uint8_t> buildJSONResponse(const CQueryResult& result);
-	virtual std::string
-	buildJSONDocument(const std::unordered_map<std::string, std::string>& data);
-	virtual std::string buildJSONArray(const std::vector<std::string>& items);
+    /* JSON-specific response building */
+    virtual std::vector<uint8_t> buildJSONResponse(const CQueryResult& result);
+    virtual std::string
+    buildJSONDocument(const std::unordered_map<std::string, std::string>& data);
+    virtual std::string buildJSONArray(const std::vector<std::string>& items);
 
   protected:
-	/* JSON-specific utility methods */
-	virtual std::string serializeJSONDocument(
-		const std::unordered_map<std::string, std::string>& data) const;
-	virtual std::string
-	serializeJSONArray(const std::vector<std::string>& items) const;
-	virtual std::string escapeJSONString(const std::string& str) const;
+    /* JSON-specific utility methods */
+    virtual std::string serializeJSONDocument(
+        const std::unordered_map<std::string, std::string>& data) const;
+    virtual std::string
+    serializeJSONArray(const std::vector<std::string>& items) const;
+    virtual std::string escapeJSONString(const std::string& str) const;
 };
 
 /**
@@ -201,23 +201,23 @@ class CJSONResponseBuilder : public CResponseBuilder
 class CResponseBuilderFactory
 {
   public:
-	CResponseBuilderFactory();
-	~CResponseBuilderFactory() = default;
+    CResponseBuilderFactory();
+    ~CResponseBuilderFactory() = default;
 
-	/* Factory methods */
-	virtual std::unique_ptr<CResponseBuilder>
-	createResponseBuilder(CResponseFormat format);
-	virtual std::unique_ptr<CResponseBuilder> createBSONResponseBuilder();
-	virtual std::unique_ptr<CResponseBuilder> createJSONResponseBuilder();
-	virtual std::unique_ptr<CResponseBuilder> createXMLResponseBuilder();
-	virtual std::unique_ptr<CResponseBuilder> createPlainTextResponseBuilder();
+    /* Factory methods */
+    virtual std::unique_ptr<CResponseBuilder>
+    createResponseBuilder(CResponseFormat format);
+    virtual std::unique_ptr<CResponseBuilder> createBSONResponseBuilder();
+    virtual std::unique_ptr<CResponseBuilder> createJSONResponseBuilder();
+    virtual std::unique_ptr<CResponseBuilder> createXMLResponseBuilder();
+    virtual std::unique_ptr<CResponseBuilder> createPlainTextResponseBuilder();
 
-	/* Factory configuration */
-	virtual void setDefaultFormat(CResponseFormat format);
-	virtual CResponseFormat getDefaultFormat() const;
+    /* Factory configuration */
+    virtual void setDefaultFormat(CResponseFormat format);
+    virtual CResponseFormat getDefaultFormat() const;
 
   private:
-	CResponseFormat defaultFormat_;
+    CResponseFormat defaultFormat_;
 };
 
 } /* namespace FauxDB */

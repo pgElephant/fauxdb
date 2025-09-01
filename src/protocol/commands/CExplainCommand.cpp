@@ -9,27 +9,23 @@
  */
 
 #include "commands/CExplainCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
 
 namespace FauxDB
 {
-
 
 CExplainCommand::CExplainCommand()
 {
     /* Constructor */
 }
 
-
-string
-CExplainCommand::getCommandName() const
+string CExplainCommand::getCommandName() const
 {
     return "explain";
 }
 
-
-vector<uint8_t>
-CExplainCommand::execute(const CommandContext& context)
+vector<uint8_t> CExplainCommand::execute(const CommandContext& context)
 {
     if (context.connectionPooler && requiresDatabase())
     {
@@ -41,47 +37,49 @@ CExplainCommand::execute(const CommandContext& context)
     }
 }
 
-
-bool
-CExplainCommand::requiresDatabase() const
+bool CExplainCommand::requiresDatabase() const
 {
     return false; /* Can work without database for basic explain */
 }
-
 
 vector<uint8_t>
 CExplainCommand::executeWithDatabase(const CommandContext& context)
 {
     /* PostgreSQL implementation for explain */
     string collection = getCollectionFromContext(context);
-    string explainedCommand = extractExplainedCommand(context.requestBuffer, context.requestSize);
-    string verbosity = extractVerbosity(context.requestBuffer, context.requestSize);
-    
+    string explainedCommand =
+        extractExplainedCommand(context.requestBuffer, context.requestSize);
+    string verbosity =
+        extractVerbosity(context.requestBuffer, context.requestSize);
+
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             /* Create explain result */
             bson.addDouble("ok", 1.0);
-            
+
             /* Add query planner info */
-            CBsonType queryPlanner = createQueryPlanner(collection, explainedCommand);
+            CBsonType queryPlanner =
+                createQueryPlanner(collection, explainedCommand);
             bson.addDocument("queryPlanner", queryPlanner);
-            
+
             /* Add execution stats if requested */
-            if (verbosity == "executionStats" || verbosity == "allPlansExecution")
+            if (verbosity == "executionStats" ||
+                verbosity == "allPlansExecution")
             {
                 CBsonType executionStats = createExecutionStats();
                 bson.addDocument("executionStats", executionStats);
             }
-            
+
             context.connectionPooler->returnConnection(voidConnection);
         }
         else
@@ -95,51 +93,47 @@ CExplainCommand::executeWithDatabase(const CommandContext& context)
         bson.addDouble("ok", 0.0);
         bson.addString("errmsg", "explain operation failed");
     }
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<uint8_t>
 CExplainCommand::executeWithoutDatabase(const CommandContext& context)
 {
     /* Simple implementation without database */
     string collection = getCollectionFromContext(context);
-    string explainedCommand = extractExplainedCommand(context.requestBuffer, context.requestSize);
-    
+    string explainedCommand =
+        extractExplainedCommand(context.requestBuffer, context.requestSize);
+
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
     bson.addDouble("ok", 1.0);
-    
+
     /* Add basic query planner info */
     CBsonType queryPlanner = createQueryPlanner(collection, explainedCommand);
     bson.addDocument("queryPlanner", queryPlanner);
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
 
-
-string
-CExplainCommand::extractExplainedCommand(const vector<uint8_t>& buffer, ssize_t bufferSize)
+string CExplainCommand::extractExplainedCommand(const vector<uint8_t>& buffer,
+                                                ssize_t bufferSize)
 {
     /* Simple command extraction - placeholder implementation */
     return "find";
 }
 
-
-string
-CExplainCommand::extractVerbosity(const vector<uint8_t>& buffer, ssize_t bufferSize)
+string CExplainCommand::extractVerbosity(const vector<uint8_t>& buffer,
+                                         ssize_t bufferSize)
 {
     /* Simple verbosity extraction - placeholder implementation */
     return "queryPlanner";
 }
 
-
-CBsonType
-CExplainCommand::createExecutionStats()
+CBsonType CExplainCommand::createExecutionStats()
 {
     CBsonType stats;
     stats.initialize();
@@ -153,9 +147,8 @@ CExplainCommand::createExecutionStats()
     return stats;
 }
 
-
-CBsonType
-CExplainCommand::createQueryPlanner(const string& collection, const string& command)
+CBsonType CExplainCommand::createQueryPlanner(const string& collection,
+                                              const string& command)
 {
     CBsonType planner;
     planner.initialize();
@@ -164,7 +157,7 @@ CExplainCommand::createQueryPlanner(const string& collection, const string& comm
     planner.addString("namespace", collection);
     planner.addBool("indexFilterSet", false);
     planner.addBool("parsedQuery", true);
-    
+
     /* Add winning plan */
     CBsonType winningPlan;
     winningPlan.initialize();
@@ -173,7 +166,7 @@ CExplainCommand::createQueryPlanner(const string& collection, const string& comm
     winningPlan.addString("direction", "forward");
     winningPlan.endDocument();
     planner.addDocument("winningPlan", winningPlan);
-    
+
     planner.endDocument();
     return planner;
 }

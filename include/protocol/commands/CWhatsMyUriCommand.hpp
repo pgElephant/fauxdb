@@ -17,18 +17,18 @@ namespace FauxDB
 
 class CWhatsMyUriCommand : public CBaseCommand
 {
-public:
+  public:
     CWhatsMyUriCommand();
     virtual ~CWhatsMyUriCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
+
     string getClientConnectionString();
     string getServerHostname();
     int32_t getServerPort();

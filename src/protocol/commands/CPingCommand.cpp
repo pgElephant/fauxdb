@@ -13,42 +13,32 @@
 namespace FauxDB
 {
 
-
 CPingCommand::CPingCommand()
 {
     /* Constructor */
 }
 
-
-string
-CPingCommand::getCommandName() const
+string CPingCommand::getCommandName() const
 {
     return "ping";
 }
 
-
-vector<uint8_t>
-CPingCommand::execute(const CommandContext& context)
+vector<uint8_t> CPingCommand::execute(const CommandContext& context)
 {
     /* Ping doesn't require database connection */
     return executeWithoutDatabase(context);
 }
 
-
-bool
-CPingCommand::requiresDatabase() const
+bool CPingCommand::requiresDatabase() const
 {
     return false; /* Ping should always work */
 }
 
-
-vector<uint8_t>
-CPingCommand::executeWithDatabase(const CommandContext& context)
+vector<uint8_t> CPingCommand::executeWithDatabase(const CommandContext& context)
 {
     /* Same as without database for ping */
     return executeWithoutDatabase(context);
 }
-
 
 vector<uint8_t>
 CPingCommand::executeWithoutDatabase(const CommandContext& context)
@@ -59,7 +49,7 @@ CPingCommand::executeWithoutDatabase(const CommandContext& context)
     bson.beginDocument();
     bson.addDouble("ok", 1.0);
     bson.endDocument();
-    
+
     return bson.getDocument();
 }
 

@@ -13,21 +13,17 @@
 namespace FauxDB
 {
 
-
 CCommandRegistry::CCommandRegistry()
 {
     initializeBuiltinCommands();
 }
-
 
 CCommandRegistry::~CCommandRegistry()
 {
     /* Unique pointers will clean up automatically */
 }
 
-
-void
-CCommandRegistry::registerCommand(unique_ptr<IDocumentCommand> command)
+void CCommandRegistry::registerCommand(unique_ptr<IDocumentCommand> command)
 {
     if (command)
     {
@@ -36,9 +32,7 @@ CCommandRegistry::registerCommand(unique_ptr<IDocumentCommand> command)
     }
 }
 
-
-void
-CCommandRegistry::unregisterCommand(const string& commandName)
+void CCommandRegistry::unregisterCommand(const string& commandName)
 {
     auto it = commands_.find(commandName);
     if (it != commands_.end())
@@ -47,23 +41,20 @@ CCommandRegistry::unregisterCommand(const string& commandName)
     }
 }
 
-
-bool
-CCommandRegistry::hasCommand(const string& commandName) const
+bool CCommandRegistry::hasCommand(const string& commandName) const
 {
     return commands_.find(commandName) != commands_.end();
 }
 
-
-vector<uint8_t>
-CCommandRegistry::executeCommand(const string& commandName, const CommandContext& context)
+vector<uint8_t> CCommandRegistry::executeCommand(const string& commandName,
+                                                 const CommandContext& context)
 {
     auto it = commands_.find(commandName);
     if (it != commands_.end())
     {
         return it->second->execute(context);
     }
-    
+
     /* Return command not found error */
     CBsonType bson;
     bson.initialize();
@@ -75,31 +66,25 @@ CCommandRegistry::executeCommand(const string& commandName, const CommandContext
     return bson.getDocument();
 }
 
-
-vector<string>
-CCommandRegistry::getRegisteredCommands() const
+vector<string> CCommandRegistry::getRegisteredCommands() const
 {
     vector<string> commandNames;
     commandNames.reserve(commands_.size());
-    
+
     for (const auto& pair : commands_)
     {
         commandNames.push_back(pair.first);
     }
-    
+
     return commandNames;
 }
 
-
-size_t
-CCommandRegistry::getCommandCount() const
+size_t CCommandRegistry::getCommandCount() const
 {
     return commands_.size();
 }
 
-
-void
-CCommandRegistry::initializeBuiltinCommands()
+void CCommandRegistry::initializeBuiltinCommands()
 {
     /* Built-in commands will be registered here */
     /* For now, we'll register them from the main protocol handler */

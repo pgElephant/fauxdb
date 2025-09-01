@@ -1,26 +1,25 @@
 /* MongoDB FindOne Command Implementation */
 #include "protocol/FindOneCommand.hpp"
+
 #include <sstream>
 
 namespace FauxDB
 {
 
 vector<uint8_t>
-FindOneCommand::execute(
-    const string& collection,
-    const vector<uint8_t>& buffer,
-    ssize_t bytesRead,
-    shared_ptr<CPGConnectionPooler> connectionPooler)
+FindOneCommand::execute(const string& collection, const vector<uint8_t>& buffer,
+                        ssize_t bytesRead,
+                        shared_ptr<CPGConnectionPooler> connectionPooler)
 {
     CBsonType response = createBaseResponse();
-    
+
     /* Simple test response */
     response.addString("test", "modular_findOne_works");
     response.endDocument();
     return response.getDocument();
-    
-    /* Commented out original implementation 
-    
+
+    /* Commented out original implementation
+
     // Try PostgreSQL integration */
     auto database = getConnection(connectionPooler);
     if (database)
@@ -29,20 +28,21 @@ FindOneCommand::execute(
         {
             stringstream sql;
             sql << "SELECT * FROM " << collection << " LIMIT 1";
-            
+
             auto result = database->executeQuery(sql.str());
-            
+
             if (result.success && !result.rows.empty())
             {
                 /* Add all fields from first row to response */
                 const auto& row = result.rows[0];
                 bool hasId = false;
-                
-                for (size_t j = 0; j < result.columnNames.size() && j < row.size(); ++j)
+
+                for (size_t j = 0;
+                     j < result.columnNames.size() && j < row.size(); ++j)
                 {
                     const string& colName = result.columnNames[j];
                     const string& value = row[j];
-                    
+
                     if (colName == "_id" || colName == "id")
                     {
                         response.addString("_id", value);
@@ -53,7 +53,7 @@ FindOneCommand::execute(
                         addInferredType(response, colName, value);
                     }
                 }
-                
+
                 /* Add generated _id if not present */
                 if (!hasId)
                 {
@@ -62,7 +62,8 @@ FindOneCommand::execute(
             }
             else
             {
-                /* No results - MongoDB returns null for findOne with no results */
+                /* No results - MongoDB returns null for findOne with no results
+                 */
                 response.addNull("_id");
             }
         }
@@ -77,7 +78,7 @@ FindOneCommand::execute(
         /* No connection - return null result */
         response.addNull("_id");
     }
-    
+
     // Original implementation was here but commented out for testing
 }
 

@@ -10,7 +10,7 @@ namespace FauxDB
 
 class CBsonType
 {
-public:
+  public:
     CBsonType();
     ~CBsonType();
 
@@ -31,10 +31,8 @@ public:
     bool addObjectId(const std::string& key, const std::string& objectId);
     bool addDateTime(const std::string& key, int64_t timestamp);
 
-    bool addBinary(const std::string& key,
-                   bson_subtype_t subtype,
-                   const uint8_t* data,
-                   size_t size);
+    bool addBinary(const std::string& key, bson_subtype_t subtype,
+                   const uint8_t* data, size_t size);
 
     bool addDocument(const std::string& key, const CBsonType& subdoc);
 
@@ -47,11 +45,12 @@ public:
     bool addArrayNull();
     bool addArrayObjectId(const std::string& objectId);
     bool addArrayDateTime(int64_t timestamp);
-    bool addArrayBinary(bson_subtype_t subtype, const uint8_t* data, size_t size);
+    bool addArrayBinary(bson_subtype_t subtype, const uint8_t* data,
+                        size_t size);
     bool addArrayDocument(const CBsonType& subdoc);
 
     std::vector<uint8_t> getDocument() const;
-    bson_t*              getBsonHandle() const;
+    bson_t* getBsonHandle() const;
 
     bool parseDocument(const std::vector<uint8_t>& data);
     bool parseDocument(const uint8_t* data, size_t size);
@@ -59,8 +58,8 @@ public:
     bool isValidBson(const std::vector<uint8_t>& data) const;
     bool isValidBson(const uint8_t* data, size_t size) const;
 
-    std::string toJson() const;           // canonical extended JSON
-    std::string toJsonExtended() const;   // relaxed extended JSON
+    std::string toJson() const;         // canonical extended JSON
+    std::string toJsonExtended() const; // relaxed extended JSON
 
     size_t getDocumentSize() const;
 
@@ -68,10 +67,10 @@ public:
     bool isEmpty() const;
 
     std::string getLastError() const;
-    void        clearErrors();
-    bool        hasErrors() const;
+    void clearErrors();
+    bool hasErrors() const;
 
-private:
+  private:
     // one-level array builder
     std::string nextArrayIndexKey();
 
@@ -79,15 +78,15 @@ private:
 
     void setError(const std::string& error) const;
 
-private:
+  private:
     bson_t* bsonDoc_;
     bson_t* bsonArray_;
 
     mutable std::string lastError_;
-    mutable bool        hasErrors_;
-    bool                inArray_;
-    std::string         currentArrayKey_;
-    size_t              currentArrayIndex_;
+    mutable bool hasErrors_;
+    bool inArray_;
+    std::string currentArrayKey_;
+    size_t currentArrayIndex_;
 };
 
 } // namespace FauxDB

@@ -1,11 +1,12 @@
 /* MongoDB Command Interface */
 #pragma once
 
-#include <string>
-#include <vector>
-#include <memory>
 #include "../database/CPGConnectionPooler.hpp"
 #include "CBsonType.hpp"
+
+#include <memory>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -17,9 +18,9 @@ namespace FauxDB
  */
 class ICommand
 {
-public:
+  public:
     virtual ~ICommand() = default;
-    
+
     /**
      * @brief Execute the MongoDB command
      * @param collection Collection name
@@ -28,19 +29,17 @@ public:
      * @param connectionPooler PostgreSQL connection pooler
      * @return BSON response as vector of bytes
      */
-    virtual vector<uint8_t> execute(
-        const string& collection,
-        const vector<uint8_t>& buffer,
-        ssize_t bytesRead,
-        shared_ptr<CPGConnectionPooler> connectionPooler
-    ) = 0;
-    
+    virtual vector<uint8_t>
+    execute(const string& collection, const vector<uint8_t>& buffer,
+            ssize_t bytesRead,
+            shared_ptr<CPGConnectionPooler> connectionPooler) = 0;
+
     /**
      * @brief Get command name
      * @return Command name
      */
     virtual string getCommandName() const = 0;
-    
+
     /**
      * @brief Check if command requires PostgreSQL connection
      * @return true if requires connection, false otherwise

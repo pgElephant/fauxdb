@@ -12,6 +12,7 @@
 
 #include "CBsonType.hpp"
 #include "database/CPGConnectionPooler.hpp"
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -19,9 +20,9 @@
 namespace FauxDB
 {
 
+using std::shared_ptr;
 using std::string;
 using std::vector;
-using std::shared_ptr;
 
 struct CommandContext
 {
@@ -35,9 +36,9 @@ struct CommandContext
 
 class IDocumentCommand
 {
-public:
+  public:
     virtual ~IDocumentCommand() = default;
-    
+
     virtual string getCommandName() const = 0;
     virtual vector<uint8_t> execute(const CommandContext& context) = 0;
     virtual bool requiresDatabase() const = 0;

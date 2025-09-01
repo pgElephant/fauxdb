@@ -32,22 +32,26 @@ struct CollectionStats
 
 class CCollStatsCommand : public CBaseCommand
 {
-public:
+  public:
     CCollStatsCommand();
     virtual ~CCollStatsCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
-    CollectionStats collectCollectionStats(const CommandContext& context, const string& collection);
-    int64_t getCollectionSize(const CommandContext& context, const string& collection);
-    int64_t getCollectionCount(const CommandContext& context, const string& collection);
-    int64_t getTableSize(const CommandContext& context, const string& collection);
+
+    CollectionStats collectCollectionStats(const CommandContext& context,
+                                           const string& collection);
+    int64_t getCollectionSize(const CommandContext& context,
+                              const string& collection);
+    int64_t getCollectionCount(const CommandContext& context,
+                               const string& collection);
+    int64_t getTableSize(const CommandContext& context,
+                         const string& collection);
     double extractScale(const vector<uint8_t>& buffer, ssize_t bufferSize);
     CBsonType createStatsResponse(const CollectionStats& stats);
 };

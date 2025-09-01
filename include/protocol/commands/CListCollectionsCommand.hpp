@@ -17,20 +17,21 @@ namespace FauxDB
 
 class CListCollectionsCommand : public CBaseCommand
 {
-public:
+  public:
     CListCollectionsCommand();
     virtual ~CListCollectionsCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
+
     string buildListTablesSQL();
-    CBsonType createCollectionInfo(const string& collectionName, const string& collectionType);
+    CBsonType createCollectionInfo(const string& collectionName,
+                                   const string& collectionType);
     bool extractFilter(const vector<uint8_t>& buffer, ssize_t bufferSize);
 };
 

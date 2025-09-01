@@ -18,7 +18,7 @@ namespace FauxDB
 struct IndexSpec
 {
     string name;
-    string keyPattern;  /* JSON representation of key fields */
+    string keyPattern; /* JSON representation of key fields */
     bool unique;
     bool sparse;
     bool background;
@@ -28,23 +28,25 @@ struct IndexSpec
 
 class CCreateIndexesCommand : public CBaseCommand
 {
-public:
+  public:
     CCreateIndexesCommand();
     virtual ~CCreateIndexesCommand() = default;
-    
+
     string getCommandName() const override;
     vector<uint8_t> execute(const CommandContext& context) override;
     bool requiresDatabase() const override;
 
-private:
+  private:
     vector<uint8_t> executeWithDatabase(const CommandContext& context);
     vector<uint8_t> executeWithoutDatabase(const CommandContext& context);
-    
-    vector<IndexSpec> extractIndexSpecs(const vector<uint8_t>& buffer, ssize_t bufferSize);
+
+    vector<IndexSpec> extractIndexSpecs(const vector<uint8_t>& buffer,
+                                        ssize_t bufferSize);
     string buildCreateIndexSQL(const string& collection, const IndexSpec& spec);
     string convertKeyPatternToSQL(const string& keyPattern);
     string generateIndexName(const string& collection, const IndexSpec& spec);
-    bool indexExists(const CommandContext& context, const string& collection, const string& indexName);
+    bool indexExists(const CommandContext& context, const string& collection,
+                     const string& indexName);
 };
 
 } // namespace FauxDB

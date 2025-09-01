@@ -9,27 +9,23 @@
  */
 
 #include "commands/CListDatabasesCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
 
 namespace FauxDB
 {
-
 
 CListDatabasesCommand::CListDatabasesCommand()
 {
     /* Constructor */
 }
 
-
-string
-CListDatabasesCommand::getCommandName() const
+string CListDatabasesCommand::getCommandName() const
 {
     return "listDatabases";
 }
 
-
-vector<uint8_t>
-CListDatabasesCommand::execute(const CommandContext& context)
+vector<uint8_t> CListDatabasesCommand::execute(const CommandContext& context)
 {
     if (context.connectionPooler && requiresDatabase())
     {
@@ -41,13 +37,10 @@ CListDatabasesCommand::execute(const CommandContext& context)
     }
 }
 
-
-bool
-CListDatabasesCommand::requiresDatabase() const
+bool CListDatabasesCommand::requiresDatabase() const
 {
     return true;
 }
-
 
 vector<uint8_t>
 CListDatabasesCommand::executeWithDatabase(const CommandContext& context)
@@ -56,15 +49,15 @@ CListDatabasesCommand::executeWithDatabase(const CommandContext& context)
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
+
     try
     {
         vector<DatabaseInfo> databases = getDatabaseList(context);
-        bool nameOnly = extractNameOnly(context.requestBuffer, context.requestSize);
-        
-        /* Create databases array */
+        bool nameOnly =
+            extractNameOnly(context.requestBuffer, context.requestSize);
+
         bson.beginArray("databases");
-        
+
         int64_t totalSize = 0;
         for (const auto& db : databases)
         {
@@ -72,25 +65,25 @@ CListDatabasesCommand::executeWithDatabase(const CommandContext& context)
             dbInfo.initialize();
             dbInfo.beginDocument();
             dbInfo.addString("name", db.name);
-            
+
             if (!nameOnly)
             {
                 dbInfo.addInt64("sizeOnDisk", db.sizeOnDisk);
                 dbInfo.addBool("empty", db.empty);
                 totalSize += db.sizeOnDisk;
             }
-            
+
             dbInfo.endDocument();
             bson.addArrayDocument(dbInfo);
         }
-        
-        bson.endArray(); /* End databases array */
-        
+
+        bson.endArray();
+
         if (!nameOnly)
         {
             bson.addInt64("totalSize", totalSize);
         }
-        
+
         bson.addDouble("ok", 1.0);
     }
     catch (const std::exception& e)
@@ -98,11 +91,10 @@ CListDatabasesCommand::executeWithDatabase(const CommandContext& context)
         bson.addDouble("ok", 0.0);
         bson.addString("errmsg", "listDatabases operation failed");
     }
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<uint8_t>
 CListDatabasesCommand::executeWithoutDatabase(const CommandContext& context)
@@ -111,66 +103,63 @@ CListDatabasesCommand::executeWithoutDatabase(const CommandContext& context)
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
-    
-    /* Create mock databases array */
+
     bson.beginArray("databases");
-    
-    /* Add current database */
+
     CBsonType currentDb;
     currentDb.initialize();
     currentDb.beginDocument();
     currentDb.addString("name", context.databaseName);
-    currentDb.addInt64("sizeOnDisk", 1048576); /* 1MB */
+    currentDb.addInt64("sizeOnDisk", 1048576);
     currentDb.addBool("empty", false);
     currentDb.endDocument();
     bson.addArrayDocument(currentDb);
-    
-    /* Add admin database */
+
     CBsonType adminDb;
     adminDb.initialize();
     adminDb.beginDocument();
     adminDb.addString("name", "admin");
-    adminDb.addInt64("sizeOnDisk", 32768); /* 32KB */
+    adminDb.addInt64("sizeOnDisk", 32768);
     adminDb.addBool("empty", false);
     adminDb.endDocument();
     bson.addArrayDocument(adminDb);
-    
-    /* Add local database */
+
     CBsonType localDb;
     localDb.initialize();
     localDb.beginDocument();
     localDb.addString("name", "local");
-    localDb.addInt64("sizeOnDisk", 65536); /* 64KB */
+    localDb.addInt64("sizeOnDisk", 65536);
     localDb.addBool("empty", false);
     localDb.endDocument();
     bson.addArrayDocument(localDb);
-    
-    bson.endArray(); /* End databases array */
-    
-    bson.addInt64("totalSize", 1146880); /* Sum of all sizes */
+
+    bson.endArray();
+
+    bson.addInt64("totalSize", 1146880);
     bson.addDouble("ok", 1.0);
-    
+
     bson.endDocument();
     return bson.getDocument();
 }
-
 
 vector<DatabaseInfo>
 CListDatabasesCommand::getDatabaseList(const CommandContext& context)
 {
     vector<DatabaseInfo> databases;
-    
+
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             /* Query PostgreSQL for available databases */
-            string sql = "SELECT datname FROM pg_database WHERE datistemplate = false AND datallowconn = true ORDER BY datname";
+            string sql = "SELECT datname FROM pg_database WHERE datistemplate "
+                         "= false AND datallowconn = true ORDER BY datname";
             auto result = connection->database->executeQuery(sql);
-            
+
             if (result.success)
             {
                 for (const auto& row : result.rows)
@@ -179,13 +168,14 @@ CListDatabasesCommand::getDatabaseList(const CommandContext& context)
                     {
                         DatabaseInfo dbInfo;
                         dbInfo.name = row[0];
-                        dbInfo.sizeOnDisk = getDatabaseSize(context, dbInfo.name);
+                        dbInfo.sizeOnDisk =
+                            getDatabaseSize(context, dbInfo.name);
                         dbInfo.empty = isDatabaseEmpty(context, dbInfo.name);
                         databases.push_back(dbInfo);
                     }
                 }
             }
-            
+
             context.connectionPooler->returnConnection(voidConnection);
         }
     }
@@ -198,41 +188,42 @@ CListDatabasesCommand::getDatabaseList(const CommandContext& context)
         dbInfo.empty = false;
         databases.push_back(dbInfo);
     }
-    
+
     /* Always include system databases */
     DatabaseInfo adminDb;
     adminDb.name = "admin";
     adminDb.sizeOnDisk = 32768;
     adminDb.empty = false;
     databases.push_back(adminDb);
-    
+
     DatabaseInfo localDb;
     localDb.name = "local";
     localDb.sizeOnDisk = 65536;
     localDb.empty = false;
     databases.push_back(localDb);
-    
+
     return databases;
 }
 
-
-int64_t
-CListDatabasesCommand::getDatabaseSize(const CommandContext& context, const string& dbName)
+int64_t CListDatabasesCommand::getDatabaseSize(const CommandContext& context,
+                                               const string& dbName)
 {
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             /* Get database size */
             string sql = "SELECT pg_database_size('" + dbName + "')";
             auto result = connection->database->executeQuery(sql);
-            
+
             context.connectionPooler->returnConnection(voidConnection);
-            
-            if (result.success && !result.rows.empty() && !result.rows[0].empty())
+
+            if (result.success && !result.rows.empty() &&
+                !result.rows[0].empty())
             {
                 return std::stoll(result.rows[0][0]);
             }
@@ -242,28 +233,31 @@ CListDatabasesCommand::getDatabaseSize(const CommandContext& context, const stri
     {
         /* Fallback on error */
     }
-    
+
     return 1048576; /* Default 1MB */
 }
 
-
-bool
-CListDatabasesCommand::isDatabaseEmpty(const CommandContext& context, const string& dbName)
+bool CListDatabasesCommand::isDatabaseEmpty(const CommandContext& context,
+                                            const string& dbName)
 {
     try
     {
         auto voidConnection = context.connectionPooler->getConnection();
         if (voidConnection)
         {
-            auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
-            
+            auto connection =
+                std::static_pointer_cast<PGConnection>(voidConnection);
+
             /* Check if database has any user tables */
-            string sql = "SELECT COUNT(*) FROM information_schema.tables WHERE table_catalog = '" + dbName + "' AND table_schema = 'public'";
+            string sql = "SELECT COUNT(*) FROM information_schema.tables WHERE "
+                         "table_catalog = '" +
+                         dbName + "' AND table_schema = 'public'";
             auto result = connection->database->executeQuery(sql);
-            
+
             context.connectionPooler->returnConnection(voidConnection);
-            
-            if (result.success && !result.rows.empty() && !result.rows[0].empty())
+
+            if (result.success && !result.rows.empty() &&
+                !result.rows[0].empty())
             {
                 return std::stoll(result.rows[0][0]) == 0;
             }
@@ -273,26 +267,24 @@ CListDatabasesCommand::isDatabaseEmpty(const CommandContext& context, const stri
     {
         /* Fallback on error */
     }
-    
+
     return false; /* Assume not empty by default */
 }
 
-
-bool
-CListDatabasesCommand::extractNameOnly(const vector<uint8_t>& buffer, ssize_t bufferSize)
+bool CListDatabasesCommand::extractNameOnly(const vector<uint8_t>& buffer,
+                                            ssize_t bufferSize)
 {
     /* Simple nameOnly field extraction - placeholder implementation */
     return false; /* Default to full information */
 }
 
-
-CBsonType
-CListDatabasesCommand::createDatabasesResponse(const vector<DatabaseInfo>& databases)
+CBsonType CListDatabasesCommand::createDatabasesResponse(
+    const vector<DatabaseInfo>& databases)
 {
     CBsonType response;
     response.initialize();
     response.beginDocument();
-    
+
     response.beginArray("databases");
     for (const auto& db : databases)
     {
@@ -306,7 +298,7 @@ CListDatabasesCommand::createDatabasesResponse(const vector<DatabaseInfo>& datab
         response.addArrayDocument(dbInfo);
     }
     response.endArray();
-    
+
     response.endDocument();
     return response;
 }

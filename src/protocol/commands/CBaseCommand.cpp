@@ -9,14 +9,13 @@
  */
 
 #include "commands/CBaseCommand.hpp"
+
 #include <cstring>
 
 namespace FauxDB
 {
 
-
-vector<uint8_t>
-CBaseCommand::createSuccessResponse(double okValue)
+vector<uint8_t> CBaseCommand::createSuccessResponse(double okValue)
 {
     CBsonType bson;
     bson.initialize();
@@ -26,9 +25,8 @@ CBaseCommand::createSuccessResponse(double okValue)
     return bson.getDocument();
 }
 
-
-vector<uint8_t>
-CBaseCommand::createErrorResponse(int errorCode, const string& errorMessage)
+vector<uint8_t> CBaseCommand::createErrorResponse(int errorCode,
+                                                  const string& errorMessage)
 {
     CBsonType bson;
     bson.initialize();
@@ -40,32 +38,29 @@ CBaseCommand::createErrorResponse(int errorCode, const string& errorMessage)
     return bson.getDocument();
 }
 
-
-string
-CBaseCommand::extractStringField(const vector<uint8_t>& buffer, ssize_t bufferSize, const string& fieldName)
+string CBaseCommand::extractStringField(const vector<uint8_t>& buffer,
+                                        ssize_t bufferSize,
+                                        const string& fieldName)
 {
     /* Simple BSON field extraction - placeholder implementation */
     return "";
 }
 
-
-int32_t
-CBaseCommand::extractInt32Field(const vector<uint8_t>& buffer, ssize_t bufferSize, const string& fieldName)
+int32_t CBaseCommand::extractInt32Field(const vector<uint8_t>& buffer,
+                                        ssize_t bufferSize,
+                                        const string& fieldName)
 {
     /* Simple BSON field extraction - placeholder implementation */
     return 0;
 }
 
-
-string
-CBaseCommand::getCollectionFromContext(const CommandContext& context)
+string CBaseCommand::getCollectionFromContext(const CommandContext& context)
 {
     return context.collectionName.empty() ? "test" : context.collectionName;
 }
 
-
-void
-CBaseCommand::addInferredType(CBsonType& bson, const string& fieldName, const string& value)
+void CBaseCommand::addInferredType(CBsonType& bson, const string& fieldName,
+                                   const string& value)
 {
     /* Simple type inference for PostgreSQL result conversion */
     if (value == "true" || value == "false")

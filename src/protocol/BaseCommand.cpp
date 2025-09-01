@@ -1,13 +1,14 @@
 /* Base MongoDB Command Implementation */
 #include "protocol/BaseCommand.hpp"
+
 #include "database/CPGConnectionPooler.hpp"
+
 #include <sstream>
 
 namespace FauxDB
 {
 
-CBsonType
-BaseCommand::createBaseResponse(bool success)
+CBsonType BaseCommand::createBaseResponse(bool success)
 {
     CBsonType bson;
     bson.initialize();
@@ -16,7 +17,6 @@ BaseCommand::createBaseResponse(bool success)
     return bson;
 }
 
-
 shared_ptr<CPostgresDatabase>
 BaseCommand::getConnection(shared_ptr<CPGConnectionPooler> connectionPooler)
 {
@@ -24,7 +24,7 @@ BaseCommand::getConnection(shared_ptr<CPGConnectionPooler> connectionPooler)
     {
         return nullptr;
     }
-    
+
     try
     {
         auto voidConnection = connectionPooler->getConnection();
@@ -32,8 +32,9 @@ BaseCommand::getConnection(shared_ptr<CPGConnectionPooler> connectionPooler)
         {
             return nullptr;
         }
-        
-        auto connection = std::static_pointer_cast<PGConnection>(voidConnection);
+
+        auto connection =
+            std::static_pointer_cast<PGConnection>(voidConnection);
         if (connection && connection->database)
         {
             return connection->database;
@@ -43,13 +44,11 @@ BaseCommand::getConnection(shared_ptr<CPGConnectionPooler> connectionPooler)
     {
         /* Connection failed */
     }
-    
+
     return nullptr;
 }
 
-
-void
-BaseCommand::releaseConnection(
+void BaseCommand::releaseConnection(
     shared_ptr<CPGConnectionPooler> connectionPooler,
     shared_ptr<void> voidConnection)
 {
@@ -59,22 +58,19 @@ BaseCommand::releaseConnection(
     }
 }
 
-
-CBsonType
-BaseCommand::rowToBsonDocument(
-    const vector<string>& row,
-    const vector<string>& columnNames)
+CBsonType BaseCommand::rowToBsonDocument(const vector<string>& row,
+                                         const vector<string>& columnNames)
 {
     CBsonType document;
     document.initialize();
     document.beginDocument();
     bool hasId = false;
-    
+
     for (size_t j = 0; j < columnNames.size() && j < row.size(); ++j)
     {
         const string& colName = columnNames[j];
         const string& value = row[j];
-        
+
         if (colName == "_id" || colName == "id")
         {
             document.addString("_id", value);
@@ -85,20 +81,19 @@ BaseCommand::rowToBsonDocument(
             addInferredType(document, colName, value);
         }
     }
-    
+
     /* Add generated _id if not present */
     if (!hasId)
     {
         document.addString("_id", "pg_generated_id");
     }
-    
+
     document.endDocument();
     return document;
 }
 
-
-void
-BaseCommand::addInferredType(CBsonType& bson, const string& fieldName, const string& value)
+void BaseCommand::addInferredType(CBsonType& bson, const string& fieldName,
+                                  const string& value)
 {
     /* Simple type inference */
     if (value == "true" || value == "false")

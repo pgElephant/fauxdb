@@ -37,8 +37,8 @@ struct ScramCredentials
     std::string storedKey;
     std::string serverKey;
     ScramMechanism mechanism;
-    std::string pgUsername; // Maps to PostgreSQL user
-    std::string pgPassword; // PostgreSQL password (if needed)
+    std::string pgUsername;
+    std::string pgPassword;
 };
 
 struct ScramSession
@@ -60,22 +60,22 @@ class CScramAuth
     CScramAuth(std::shared_ptr<CPostgresDatabase> database);
     ~CScramAuth() = default;
 
-    // User management - maps MongoDB users to PostgreSQL users
-    bool createUser(const std::string& mongoUsername,
-                    const std::string& mongoPassword,
+
+    bool createUser(const std::string& username,
+                    const std::string& password,
                     const std::string& pgUsername,
                     const std::string& pgPassword = "",
                     ScramMechanism mechanism = ScramMechanism::SCRAM_SHA_256);
-    bool deleteUser(const std::string& mongoUsername);
+    bool deleteUser(const std::string& username);
     bool updateUserPassword(
-        const std::string& mongoUsername, const std::string& newPassword,
+        const std::string& username, const std::string& newPassword,
         ScramMechanism mechanism = ScramMechanism::SCRAM_SHA_256);
-    bool userExists(const std::string& mongoUsername);
+    bool userExists(const std::string& username);
     bool validatePostgreSQLUser(const std::string& pgUsername,
                                 const std::string& pgPassword);
-    std::string getPostgreSQLUsername(const std::string& mongoUsername);
+    std::string getPostgreSQLUsername(const std::string& username);
 
-    // Authentication process
+
     std::string startAuthentication(const std::string& username,
                                     const std::string& clientFirstMessage,
                                     ScramMechanism mechanism);
@@ -84,7 +84,7 @@ class CScramAuth
     bool isAuthenticated(const std::string& sessionId);
     void clearSession(const std::string& sessionId);
 
-    // SCRAM utilities
+
     static std::string generateNonce();
     static std::string generateSalt();
     static std::vector<uint8_t> pbkdf2(const std::string& password,

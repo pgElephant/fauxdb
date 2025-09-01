@@ -33,12 +33,12 @@ CScramAuth::CScramAuth(shared_ptr<CPostgresDatabase> database)
     initializeAuthTables();
 }
 
-bool CScramAuth::createUser(const string& mongoUsername,
-                            const string& mongoPassword,
+bool CScramAuth::createUser(const string& username,
+                            const string& password,
                             const string& pgUsername, const string& pgPassword,
                             ScramMechanism mechanism)
 {
-    if (!database_ || userExists(mongoUsername))
+    if (!database_ || userExists(username))
     {
         return false;
     }
@@ -50,7 +50,7 @@ bool CScramAuth::createUser(const string& mongoUsername,
     }
 
     ScramCredentials credentials;
-    credentials.username = mongoUsername;
+    credentials.username = username;
     credentials.pgUsername = pgUsername;
     credentials.pgPassword =
         pgPassword; // Store if needed for connection pooling
@@ -61,7 +61,7 @@ bool CScramAuth::createUser(const string& mongoUsername,
     // Generate SCRAM keys
     int keyLength = (mechanism == ScramMechanism::SCRAM_SHA_256) ? 32 : 20;
     auto saltedPassword =
-        pbkdf2(mongoPassword, credentials.salt, credentials.iterationCount,
+        pbkdf2(password, credentials.salt, credentials.iterationCount,
                keyLength, mechanism);
 
     string clientKeyStr = "Client Key";
@@ -86,15 +86,15 @@ bool CScramAuth::createUser(const string& mongoUsername,
     return storeUserCredentials(credentials);
 }
 
-bool CScramAuth::deleteUser(const string& mongoUsername)
+bool CScramAuth::deleteUser(const string& username)
 {
     if (!database_)
     {
         return false;
     }
 
-    string sql = "DELETE FROM fauxdb_users WHERE mongo_username = $1";
-    vector<string> params = {mongoUsername};
+    string sql = "DELETE FROM fauxdb_users WHERE username = $1";
+    vector<string> params = {username};
 
     try
     {
@@ -127,15 +127,15 @@ bool CScramAuth::updateUserPassword(const string& username,
     return createUser(username, newPassword, pgUsername, "", mechanism);
 }
 
-bool CScramAuth::userExists(const string& mongoUsername)
+bool CScramAuth::userExists(const string& username)
 {
     if (!database_)
     {
         return false;
     }
 
-    string sql = "SELECT COUNT(*) FROM fauxdb_users WHERE mongo_username = $1";
-    vector<string> params = {mongoUsername};
+    string sql = "SELECT COUNT(*) FROM fauxdb_users WHERE username = $1";
+    vector<string> params = {username};
 
     try
     {
@@ -188,7 +188,7 @@ bool CScramAuth::validatePostgreSQLUser(const string& pgUsername,
     }
 }
 
-string CScramAuth::getPostgreSQLUsername(const string& mongoUsername)
+string CScramAuth::getPostgreSQLUsername(const string& username)
 {
     if (!database_)
     {
@@ -196,8 +196,8 @@ string CScramAuth::getPostgreSQLUsername(const string& mongoUsername)
     }
 
     string sql =
-        "SELECT pg_username FROM fauxdb_users WHERE mongo_username = $1";
-    vector<string> params = {mongoUsername};
+        "SELECT pg_username FROM fauxdb_users WHERE username = $1";
+    vector<string> params = {username};
 
     try
     {
@@ -408,8 +408,8 @@ ScramCredentials CScramAuth::loadUserCredentials(const string& username)
     }
 
     string sql =
-        "SELECT mongo_username, salt, iteration_count, stored_key, server_key, "
-        "mechanism, pg_username FROM fauxdb_users WHERE mongo_username = $1";
+        "SELECT username, salt, iteration_count, stored_key, server_key, "
+        "mechanism, pg_username FROM fauxdb_users WHERE username = $1";
     vector<string> params = {username};
 
     try
@@ -450,7 +450,7 @@ bool CScramAuth::storeUserCredentials(const ScramCredentials& credentials)
             : "SCRAM-SHA-1";
 
     string sql =
-        "INSERT INTO fauxdb_users (mongo_username, salt, iteration_count, "
+        "INSERT INTO fauxdb_users (username, salt, iteration_count, "
         "stored_key, server_key, mechanism, pg_username, pg_password) "
         "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
     vector<string> params = {credentials.username,
@@ -630,7 +630,7 @@ void CScramAuth::initializeAuthTables()
 
     string sql = "CREATE TABLE IF NOT EXISTS fauxdb_users ("
                  "id SERIAL PRIMARY KEY, "
-                 "mongo_username VARCHAR(255) UNIQUE NOT NULL, "
+                 "username VARCHAR(255) UNIQUE NOT NULL, "
                  "pg_username VARCHAR(255) NOT NULL, "
                  "pg_password TEXT, "
                  "salt TEXT NOT NULL, "
@@ -640,7 +640,7 @@ void CScramAuth::initializeAuthTables()
                  "mechanism VARCHAR(20) NOT NULL, "
                  "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
                  "last_login TIMESTAMP, "
-                 "UNIQUE(mongo_username), "
+                 "UNIQUE(username), "
                  "FOREIGN KEY (pg_username) REFERENCES pg_user(usename) ON "
                  "DELETE CASCADE"
                  ")";

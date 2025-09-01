@@ -79,7 +79,8 @@ FindOneCommand::execute(const string& collection, const vector<uint8_t>& buffer,
         response.addNull("_id");
     }
 
-    // Original implementation was here but commented out for testing
+    /* Original implementation was here but commented out for testing */
+    return response.getDocument();
 }
 
 } /* namespace FauxDB */

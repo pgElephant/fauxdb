@@ -673,8 +673,7 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(
     }
     else if (commandName == "findOne")
     {
-        // Simple implementation - always use test collection for now
-        string collectionName = "test";
+        string collectionName = extractCollectionName(buffer, bytesRead);
 
         bson.addDouble("ok", 1.0);
 
@@ -798,8 +797,7 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(
     }
     else if (commandName == "countDocuments" || commandName == "count")
     {
-        // Simple implementation - always use test collection for now
-        string collectionName = "test";
+        string collectionName = extractCollectionName(buffer, bytesRead);
 
         bson.addDouble("ok", 1.0);
 
@@ -871,8 +869,7 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(
     }
     else if (commandName == "estimatedDocumentCount")
     {
-        // Simple implementation - always use test collection for now
-        string collectionName = "test";
+        string collectionName = extractCollectionName(buffer, bytesRead);
 
         bson.addDouble("ok", 1.0);
 

@@ -281,6 +281,9 @@ set(SOURCES
     src/protocol/commands/CBuildInfoCommand.cpp
     src/protocol/commands/CIsMasterCommand.cpp
     src/protocol/commands/CWhatsMyUriCommand.cpp
+
+    src/auth/CScramAuth.cpp
+
     src/parsing/CParser.cpp
     src/parsing/CMessageParser.cpp
 )
@@ -302,6 +305,8 @@ if(POSTGRESQL_FOUND)
     target_link_libraries(fauxdb 
         ${MONGOC_LIBRARIES}
         ${POSTGRESQL_LIBRARY}
+        OpenSSL::SSL
+        OpenSSL::Crypto
         nlohmann_json::nlohmann_json
         yaml-cpp
         Threads::Threads
@@ -380,6 +385,8 @@ if(POSTGRESQL_FOUND)
 else()
     target_link_libraries(fauxdb 
         ${MONGOC_LIBRARIES}
+        OpenSSL::SSL
+        OpenSSL::Crypto
         nlohmann_json::nlohmann_json
         yaml-cpp
         Threads::Threads

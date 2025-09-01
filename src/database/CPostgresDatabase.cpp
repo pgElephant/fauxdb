@@ -437,42 +437,204 @@ CDatabaseTransactionStatus CPostgresDatabase::getTransactionStatus() const
 bool CPostgresDatabase::createTable(const std::string& tableName,
                                     const std::vector<std::string>& columns)
 {
-    /* TODO: Implement actual table creation */
-    return false;
+    if (!isConnected())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "CREATE TABLE IF NOT EXISTS \"" << tableName << "\" (";
+
+    if (columns.empty())
+    {
+        /* Default MongoDB-style table with JSONB document storage */
+        sql << "_id VARCHAR(24) PRIMARY KEY, "
+            << "document JSONB NOT NULL, "
+            << "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+            << "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+    }
+    else
+    {
+        for (size_t i = 0; i < columns.size(); ++i)
+        {
+            if (i > 0)
+                sql << ", ";
+            sql << "\"" << columns[i] << "\" TEXT";
+        }
+    }
+
+    sql << ")";
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::dropTable(const std::string& tableName)
 {
-    /* TODO: Implement actual table dropping */
-    return false;
+    if (!isConnected())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "DROP TABLE IF EXISTS \"" << tableName << "\"";
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::alterTable(const std::string& tableName,
                                    const std::string& operation)
 {
-    /* TODO: Implement actual table alteration */
-    return false;
+    if (!isConnected())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "ALTER TABLE \"" << tableName << "\" " << operation;
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 std::vector<std::string> CPostgresDatabase::getTableNames()
 {
-    /* TODO: Implement actual table listing */
-    return {};
+    if (!isConnected())
+    {
+        return {};
+    }
+
+    std::vector<std::string> tables;
+    std::string sql =
+        "SELECT tablename FROM pg_tables WHERE schemaname = 'public'";
+
+    try
+    {
+        auto result = executeQuery(sql);
+        if (result.success)
+        {
+            for (const auto& row : result.rows)
+            {
+                if (!row.empty())
+                {
+                    tables.push_back(row[0]);
+                }
+            }
+        }
+    }
+    catch (const std::exception&)
+    {
+        /* Return empty vector on error */
+    }
+
+    return tables;
 }
 
 std::vector<std::string>
 CPostgresDatabase::getColumnNames(const std::string& tableName)
 {
-    /* TODO: Implement actual column listing */
-    return {};
+    if (!isConnected())
+    {
+        return {};
+    }
+
+    std::vector<std::string> columns;
+    std::stringstream sql;
+    sql << "SELECT column_name FROM information_schema.columns "
+        << "WHERE table_name = '" << tableName << "' "
+        << "AND table_schema = 'public' "
+        << "ORDER BY ordinal_position";
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        if (result.success)
+        {
+            for (const auto& row : result.rows)
+            {
+                if (!row.empty())
+                {
+                    columns.push_back(row[0]);
+                }
+            }
+        }
+    }
+    catch (const std::exception&)
+    {
+        /* Return empty vector on error */
+    }
+
+    return columns;
 }
 
 bool CPostgresDatabase::insertData(
     const std::string& tableName, const std::vector<std::string>& columns,
     const std::vector<std::vector<std::string>>& values)
 {
-    /* TODO: Implement actual data insertion */
-    return false;
+    if (!isConnected() || columns.empty() || values.empty())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "INSERT INTO \"" << tableName << "\" (";
+
+    for (size_t i = 0; i < columns.size(); ++i)
+    {
+        if (i > 0)
+            sql << ", ";
+        sql << "\"" << columns[i] << "\"";
+    }
+
+    sql << ") VALUES ";
+
+    for (size_t i = 0; i < values.size(); ++i)
+    {
+        if (i > 0)
+            sql << ", ";
+        sql << "(";
+
+        for (size_t j = 0; j < values[i].size() && j < columns.size(); ++j)
+        {
+            if (j > 0)
+                sql << ", ";
+            sql << "'" << values[i][j] << "'";
+        }
+
+        sql << ")";
+    }
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::updateData(const std::string& tableName,
@@ -480,29 +642,117 @@ bool CPostgresDatabase::updateData(const std::string& tableName,
                                    const std::vector<std::string>& setValues,
                                    const std::string& whereClause)
 {
-    // TODO: Implement actual data update
-    return false;
+    if (!isConnected() || setColumns.empty() || setValues.empty() ||
+        setColumns.size() != setValues.size())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "UPDATE \"" << tableName << "\" SET ";
+
+    for (size_t i = 0; i < setColumns.size(); ++i)
+    {
+        if (i > 0)
+            sql << ", ";
+        sql << "\"" << setColumns[i] << "\" = '" << setValues[i] << "'";
+    }
+
+    if (!whereClause.empty())
+    {
+        sql << " WHERE " << whereClause;
+    }
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::deleteData(const std::string& tableName,
                                    const std::string& whereClause)
 {
-    // TODO: Implement actual data deletion
-    return false;
+    if (!isConnected())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "DELETE FROM \"" << tableName << "\"";
+
+    if (!whereClause.empty())
+    {
+        sql << " WHERE " << whereClause;
+    }
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::createIndex(const std::string& tableName,
                                     const std::string& indexName,
                                     const std::vector<std::string>& columns)
 {
-    // TODO: Implement actual index creation
-    return false;
+    if (!isConnected() || columns.empty())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "CREATE INDEX IF NOT EXISTS \"" << indexName << "\" ON \""
+        << tableName << "\" (";
+
+    for (size_t i = 0; i < columns.size(); ++i)
+    {
+        if (i > 0)
+            sql << ", ";
+        sql << "\"" << columns[i] << "\"";
+    }
+
+    sql << ")";
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::dropIndex(const std::string& indexName)
 {
-    // TODO: Implement actual index dropping
-    return false;
+    if (!isConnected())
+    {
+        return false;
+    }
+
+    std::stringstream sql;
+    sql << "DROP INDEX IF EXISTS \"" << indexName << "\"";
+
+    try
+    {
+        auto result = executeQuery(sql.str());
+        return result.success;
+    }
+    catch (const std::exception&)
+    {
+        return false;
+    }
 }
 
 bool CPostgresDatabase::vacuumDatabase()

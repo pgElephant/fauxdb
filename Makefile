@@ -318,6 +318,30 @@ src/CSignal.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CSignal.cpp.s
 .PHONY : src/CSignal.cpp.s
 
+src/auth/CScramAuth.o: src/auth/CScramAuth.cpp.o
+.PHONY : src/auth/CScramAuth.o
+
+# target to build an object file
+src/auth/CScramAuth.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.o
+.PHONY : src/auth/CScramAuth.cpp.o
+
+src/auth/CScramAuth.i: src/auth/CScramAuth.cpp.i
+.PHONY : src/auth/CScramAuth.i
+
+# target to preprocess a source file
+src/auth/CScramAuth.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.i
+.PHONY : src/auth/CScramAuth.cpp.i
+
+src/auth/CScramAuth.s: src/auth/CScramAuth.cpp.s
+.PHONY : src/auth/CScramAuth.s
+
+# target to generate assembly for a file
+src/auth/CScramAuth.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.s
+.PHONY : src/auth/CScramAuth.cpp.s
+
 src/database/CConnectionPooler.o: src/database/CConnectionPooler.cpp.o
 .PHONY : src/database/CConnectionPooler.o
 
@@ -1477,6 +1501,9 @@ help:
 	@echo "... src/CSignal.o"
 	@echo "... src/CSignal.i"
 	@echo "... src/CSignal.s"
+	@echo "... src/auth/CScramAuth.o"
+	@echo "... src/auth/CScramAuth.i"
+	@echo "... src/auth/CScramAuth.s"
 	@echo "... src/database/CConnectionPooler.o"
 	@echo "... src/database/CConnectionPooler.i"
 	@echo "... src/database/CConnectionPooler.s"

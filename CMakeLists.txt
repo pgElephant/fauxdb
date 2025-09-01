@@ -259,6 +259,28 @@ set(SOURCES
     src/protocol/FindCommand.cpp
     src/protocol/FindOneCommand.cpp
     src/protocol/CountCommand.cpp
+    src/protocol/commands/CBaseCommand.cpp
+    src/protocol/commands/CCommandRegistry.cpp
+    src/protocol/commands/CDistinctCommand.cpp
+    src/protocol/commands/CFindAndModifyCommand.cpp
+    src/protocol/commands/CDropCommand.cpp
+    src/protocol/commands/CCreateCommand.cpp
+    src/protocol/commands/CCountCommand.cpp
+    src/protocol/commands/CListCollectionsCommand.cpp
+    src/protocol/commands/CExplainCommand.cpp
+    src/protocol/commands/CAggregateCommand.cpp
+    src/protocol/commands/CDbStatsCommand.cpp
+    src/protocol/commands/CCollStatsCommand.cpp
+    src/protocol/commands/CListDatabasesCommand.cpp
+    src/protocol/commands/CServerStatusCommand.cpp
+    src/protocol/commands/CCreateIndexesCommand.cpp
+    src/protocol/commands/CListIndexesCommand.cpp
+    src/protocol/commands/CDropIndexesCommand.cpp
+    src/protocol/commands/CPingCommand.cpp
+    src/protocol/commands/CHelloCommand.cpp
+    src/protocol/commands/CBuildInfoCommand.cpp
+    src/protocol/commands/CIsMasterCommand.cpp
+    src/protocol/commands/CWhatsMyUriCommand.cpp
     src/parsing/CParser.cpp
     src/parsing/CMessageParser.cpp
 )

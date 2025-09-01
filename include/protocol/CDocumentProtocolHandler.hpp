@@ -15,8 +15,7 @@
 #include "CResponseBuilder.hpp"
 #include "CBsonType.hpp"
 #include "../database/CPGConnectionPooler.hpp"
-/* #include "CommandRegistry.hpp"
-#include "CollectionNameParser.hpp" */
+#include "commands/CCommandRegistry.hpp"
 
 #include <functional>
 #include <memory>
@@ -103,7 +102,7 @@ private:
 	unique_ptr<CQueryTranslator> queryTranslator_;
 	unique_ptr<CResponseBuilder> responseBuilder_;
 	shared_ptr<CPGConnectionPooler> connectionPooler_;
-	/* unique_ptr<CommandRegistry> commandRegistry_; */
+	unique_ptr<CCommandRegistry> commandRegistry_;
 
 	bool parseMessage(const vector<uint8_t>& messageData,
 					 CDocumentWireMessage& message);

@@ -6887,3 +6887,1210 @@
 [2025-09-02 02:13:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
 [2025-09-02 02:13:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
 [2025-09-02 02:14:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:14:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:15:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:15:28] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:15:28] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5317355928
+[2025-09-02 02:15:28] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5317355928
+[2025-09-02 02:15:29] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:15:29] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5317355928
+[2025-09-02 02:15:29] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5317355928
+[2025-09-02 02:15:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:16:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:16:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:17:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:17:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:18:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:18:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:19:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:19:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:20:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:20:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:21:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:21:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:22:04] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:22:34] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:23:05] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:23:35] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:24:05] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:24:31] [DEBUG] Logger set on server
+[2025-09-02 02:24:31] [DEBUG] Test debug message from server logger
+[2025-09-02 02:24:31] [DEBUG] Starting server initialization
+[2025-09-02 02:24:31] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:24:31] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:24:31] [DEBUG] Starting component initialization
+[2025-09-02 02:24:31] [DEBUG] Starting network component initialization
+[2025-09-02 02:24:31] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:24:31] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:24:31] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:24:31] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:24:31] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:24:31] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:24:31] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:24:31] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:24:31] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:24:31] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:24:31] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:24:31] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:24:31] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:24:31] [DEBUG] Creating TCP server
+[2025-09-02 02:24:31] [DEBUG] About to initialize TCP server
+[2025-09-02 02:24:31] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:24:31] [DEBUG] TCP server stored successfully
+[2025-09-02 02:24:31] [DEBUG] Network component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Starting database component initialization
+[2025-09-02 02:24:31] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:24:31] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:24:31] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5274406424
+[2025-09-02 02:24:31] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:24:31] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5274406424
+[2025-09-02 02:24:31] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:24:31] [DEBUG] Database component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Query component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Response component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:24:31] [DEBUG] All components initialized successfully
+[2025-09-02 02:24:31] [DEBUG] Starting component startup process
+[2025-09-02 02:24:31] [DEBUG] Starting network component
+[2025-09-02 02:24:31] [DEBUG] About to start TCP server
+[2025-09-02 02:24:31] [DEBUG] TCP server started successfully
+[2025-09-02 02:24:31] [DEBUG] Network component started successfully
+[2025-09-02 02:24:31] [DEBUG] Protocol component started successfully
+[2025-09-02 02:24:31] [DEBUG] Parsing component started successfully
+[2025-09-02 02:24:31] [DEBUG] Query component started successfully
+[2025-09-02 02:24:31] [DEBUG] Response component started successfully
+[2025-09-02 02:24:31] [DEBUG] Logging component started successfully
+[2025-09-02 02:24:31] [DEBUG] Configuration component started successfully
+[2025-09-02 02:24:31] [DEBUG] All components started successfully
+[2025-09-02 02:24:31] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:24:31] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:24:31] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:24:31] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:24:31] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:25:01] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:25:32] [DEBUG] Logger set on server
+[2025-09-02 02:25:32] [DEBUG] Test debug message from server logger
+[2025-09-02 02:25:32] [DEBUG] Starting server initialization
+[2025-09-02 02:25:32] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:25:32] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:25:32] [DEBUG] Starting component initialization
+[2025-09-02 02:25:32] [DEBUG] Starting network component initialization
+[2025-09-02 02:25:32] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:25:32] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:25:32] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:25:32] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:25:32] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:25:32] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:25:32] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:25:32] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:25:32] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:25:32] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:25:32] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:25:32] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:25:32] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:25:32] [DEBUG] Creating TCP server
+[2025-09-02 02:25:32] [DEBUG] About to initialize TCP server
+[2025-09-02 02:25:32] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:25:32] [DEBUG] TCP server stored successfully
+[2025-09-02 02:25:32] [DEBUG] Network component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Starting database component initialization
+[2025-09-02 02:25:32] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:25:32] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:25:32] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5609901608
+[2025-09-02 02:25:32] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:25:32] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5609901608
+[2025-09-02 02:25:32] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:25:32] [DEBUG] Database component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Query component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Response component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:25:32] [DEBUG] All components initialized successfully
+[2025-09-02 02:25:32] [DEBUG] Starting component startup process
+[2025-09-02 02:25:32] [DEBUG] Starting network component
+[2025-09-02 02:25:32] [DEBUG] About to start TCP server
+[2025-09-02 02:25:32] [DEBUG] TCP server started successfully
+[2025-09-02 02:25:32] [DEBUG] Network component started successfully
+[2025-09-02 02:25:32] [DEBUG] Protocol component started successfully
+[2025-09-02 02:25:32] [DEBUG] Parsing component started successfully
+[2025-09-02 02:25:32] [DEBUG] Query component started successfully
+[2025-09-02 02:25:32] [DEBUG] Response component started successfully
+[2025-09-02 02:25:32] [DEBUG] Logging component started successfully
+[2025-09-02 02:25:32] [DEBUG] Configuration component started successfully
+[2025-09-02 02:25:32] [DEBUG] All components started successfully
+[2025-09-02 02:25:32] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:25:32] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:25:32] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:25:32] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:25:32] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:26:02] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:26:32] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:27:02] [DEBUG] Logger set on server
+[2025-09-02 02:27:02] [DEBUG] Test debug message from server logger
+[2025-09-02 02:27:02] [DEBUG] Starting server initialization
+[2025-09-02 02:27:02] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:27:02] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:27:02] [DEBUG] Starting component initialization
+[2025-09-02 02:27:02] [DEBUG] Starting network component initialization
+[2025-09-02 02:27:02] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:27:02] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:27:02] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:27:02] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:27:02] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:27:02] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:27:02] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:27:02] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:27:02] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:27:02] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:27:02] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:27:02] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:27:02] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:27:02] [DEBUG] Creating TCP server
+[2025-09-02 02:27:02] [DEBUG] About to initialize TCP server
+[2025-09-02 02:27:02] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:27:02] [DEBUG] TCP server stored successfully
+[2025-09-02 02:27:02] [DEBUG] Network component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Starting database component initialization
+[2025-09-02 02:27:02] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:27:02] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:27:02] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5721050552
+[2025-09-02 02:27:02] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:27:02] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5721050552
+[2025-09-02 02:27:02] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:27:02] [DEBUG] Database component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Query component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Response component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:27:02] [DEBUG] All components initialized successfully
+[2025-09-02 02:27:02] [DEBUG] Starting component startup process
+[2025-09-02 02:27:02] [DEBUG] Starting network component
+[2025-09-02 02:27:02] [DEBUG] About to start TCP server
+[2025-09-02 02:27:02] [DEBUG] TCP server started successfully
+[2025-09-02 02:27:02] [DEBUG] Network component started successfully
+[2025-09-02 02:27:02] [DEBUG] Protocol component started successfully
+[2025-09-02 02:27:02] [DEBUG] Parsing component started successfully
+[2025-09-02 02:27:02] [DEBUG] Query component started successfully
+[2025-09-02 02:27:02] [DEBUG] Response component started successfully
+[2025-09-02 02:27:02] [DEBUG] Logging component started successfully
+[2025-09-02 02:27:02] [DEBUG] Configuration component started successfully
+[2025-09-02 02:27:02] [DEBUG] All components started successfully
+[2025-09-02 02:27:02] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:27:02] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:27:02] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:27:02] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:27:02] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:27:21] [DEBUG] Logger set on server
+[2025-09-02 02:27:21] [DEBUG] Test debug message from server logger
+[2025-09-02 02:27:21] [DEBUG] Starting server initialization
+[2025-09-02 02:27:21] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:27:21] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:27:21] [DEBUG] Starting component initialization
+[2025-09-02 02:27:21] [DEBUG] Starting network component initialization
+[2025-09-02 02:27:21] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:27:21] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:27:21] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:27:21] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:27:21] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:27:21] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:27:21] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:27:21] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:27:21] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:27:21] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:27:21] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:27:21] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:27:21] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:27:21] [DEBUG] Creating TCP server
+[2025-09-02 02:27:21] [DEBUG] About to initialize TCP server
+[2025-09-02 02:27:21] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:27:21] [DEBUG] TCP server stored successfully
+[2025-09-02 02:27:21] [DEBUG] Network component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Starting database component initialization
+[2025-09-02 02:27:21] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:27:21] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:27:21] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 4839219960
+[2025-09-02 02:27:21] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:27:21] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 4839219960
+[2025-09-02 02:27:21] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:27:21] [DEBUG] Database component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Query component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Response component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:27:21] [DEBUG] All components initialized successfully
+[2025-09-02 02:27:21] [DEBUG] Starting component startup process
+[2025-09-02 02:27:21] [DEBUG] Starting network component
+[2025-09-02 02:27:21] [DEBUG] About to start TCP server
+[2025-09-02 02:27:21] [DEBUG] TCP server started successfully
+[2025-09-02 02:27:30] [DEBUG] Logger set on server
+[2025-09-02 02:27:30] [DEBUG] Test debug message from server logger
+[2025-09-02 02:27:30] [DEBUG] Starting server initialization
+[2025-09-02 02:27:30] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:27:30] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:27:30] [DEBUG] Starting component initialization
+[2025-09-02 02:27:30] [DEBUG] Starting network component initialization
+[2025-09-02 02:27:30] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:27:30] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:27:30] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:27:30] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:27:30] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:27:30] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:27:30] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:27:30] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:27:30] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:27:30] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:27:30] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:27:30] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:27:30] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:27:30] [DEBUG] Creating TCP server
+[2025-09-02 02:27:30] [DEBUG] About to initialize TCP server
+[2025-09-02 02:27:30] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:27:30] [DEBUG] TCP server stored successfully
+[2025-09-02 02:27:30] [DEBUG] Network component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Starting database component initialization
+[2025-09-02 02:27:30] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:27:30] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:27:30] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5032133128
+[2025-09-02 02:27:30] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:27:30] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5032133128
+[2025-09-02 02:27:30] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:27:30] [DEBUG] Database component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Query component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Response component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:27:30] [DEBUG] All components initialized successfully
+[2025-09-02 02:27:30] [DEBUG] Starting component startup process
+[2025-09-02 02:27:30] [DEBUG] Starting network component
+[2025-09-02 02:27:30] [DEBUG] About to start TCP server
+[2025-09-02 02:27:30] [DEBUG] TCP server started successfully
+[2025-09-02 02:27:30] [DEBUG] Network component started successfully
+[2025-09-02 02:27:30] [DEBUG] Protocol component started successfully
+[2025-09-02 02:27:30] [DEBUG] Parsing component started successfully
+[2025-09-02 02:27:30] [DEBUG] Query component started successfully
+[2025-09-02 02:27:30] [DEBUG] Response component started successfully
+[2025-09-02 02:27:30] [DEBUG] Logging component started successfully
+[2025-09-02 02:27:30] [DEBUG] Configuration component started successfully
+[2025-09-02 02:27:30] [DEBUG] All components started successfully
+[2025-09-02 02:27:30] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:27:30] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:27:30] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:27:30] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:27:30] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:28:00] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:28:24] [DEBUG] Logger set on server
+[2025-09-02 02:28:24] [DEBUG] Test debug message from server logger
+[2025-09-02 02:28:24] [DEBUG] Starting server initialization
+[2025-09-02 02:28:24] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:28:24] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:28:24] [DEBUG] Starting component initialization
+[2025-09-02 02:28:24] [DEBUG] Starting network component initialization
+[2025-09-02 02:28:24] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:28:24] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:28:24] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:28:24] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:28:24] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:28:24] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:28:24] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:28:24] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:28:24] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:28:24] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:28:24] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:28:24] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:28:24] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:28:24] [DEBUG] Creating TCP server
+[2025-09-02 02:28:24] [DEBUG] About to initialize TCP server
+[2025-09-02 02:28:24] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:28:24] [DEBUG] TCP server stored successfully
+[2025-09-02 02:28:24] [DEBUG] Network component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Starting database component initialization
+[2025-09-02 02:28:24] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:28:24] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:28:24] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5215658648
+[2025-09-02 02:28:24] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:28:24] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5215658648
+[2025-09-02 02:28:24] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:28:24] [DEBUG] Database component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Query component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Response component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:28:24] [DEBUG] All components initialized successfully
+[2025-09-02 02:28:24] [DEBUG] Starting component startup process
+[2025-09-02 02:28:24] [DEBUG] Starting network component
+[2025-09-02 02:28:24] [DEBUG] About to start TCP server
+[2025-09-02 02:28:24] [DEBUG] TCP server started successfully
+[2025-09-02 02:28:24] [DEBUG] Network component started successfully
+[2025-09-02 02:28:24] [DEBUG] Protocol component started successfully
+[2025-09-02 02:28:24] [DEBUG] Parsing component started successfully
+[2025-09-02 02:28:24] [DEBUG] Query component started successfully
+[2025-09-02 02:28:24] [DEBUG] Response component started successfully
+[2025-09-02 02:28:24] [DEBUG] Logging component started successfully
+[2025-09-02 02:28:24] [DEBUG] Configuration component started successfully
+[2025-09-02 02:28:24] [DEBUG] All components started successfully
+[2025-09-02 02:28:24] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:28:24] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:28:24] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:28:24] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:28:24] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:28:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:29:23] [DEBUG] Logger set on server
+[2025-09-02 02:29:23] [DEBUG] Test debug message from server logger
+[2025-09-02 02:29:23] [DEBUG] Starting server initialization
+[2025-09-02 02:29:23] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:29:23] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:29:23] [DEBUG] Starting component initialization
+[2025-09-02 02:29:23] [DEBUG] Starting network component initialization
+[2025-09-02 02:29:23] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:29:23] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:29:23] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:29:23] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:29:23] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:29:23] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:29:23] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:29:23] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:29:23] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:29:23] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:29:23] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:29:23] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:29:23] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:29:23] [DEBUG] Creating TCP server
+[2025-09-02 02:29:23] [DEBUG] About to initialize TCP server
+[2025-09-02 02:29:23] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:29:23] [DEBUG] TCP server stored successfully
+[2025-09-02 02:29:23] [DEBUG] Network component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Starting database component initialization
+[2025-09-02 02:29:23] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:29:23] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:29:23] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5602564968
+[2025-09-02 02:29:23] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:29:23] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5602564968
+[2025-09-02 02:29:23] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:29:23] [DEBUG] Database component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Query component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Response component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:29:23] [DEBUG] All components initialized successfully
+[2025-09-02 02:29:23] [DEBUG] Starting component startup process
+[2025-09-02 02:29:23] [DEBUG] Starting network component
+[2025-09-02 02:29:23] [DEBUG] About to start TCP server
+[2025-09-02 02:29:23] [DEBUG] TCP server started successfully
+[2025-09-02 02:29:23] [DEBUG] Network component started successfully
+[2025-09-02 02:29:23] [DEBUG] Protocol component started successfully
+[2025-09-02 02:29:23] [DEBUG] Parsing component started successfully
+[2025-09-02 02:29:23] [DEBUG] Query component started successfully
+[2025-09-02 02:29:23] [DEBUG] Response component started successfully
+[2025-09-02 02:29:23] [DEBUG] Logging component started successfully
+[2025-09-02 02:29:23] [DEBUG] Configuration component started successfully
+[2025-09-02 02:29:23] [DEBUG] All components started successfully
+[2025-09-02 02:29:23] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:29:23] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:29:23] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:29:23] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:29:23] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:29:36] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:29:36] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5602564968
+[2025-09-02 02:29:36] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5602564968
+[2025-09-02 02:29:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:30:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:30:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:31:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:31:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:32:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:32:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:33:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:33:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:34:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:34:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:35:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:35:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:36:23] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:36:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:37:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:37:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:38:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:38:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:39:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:39:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:40:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:40:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:41:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:41:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:42:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:42:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:43:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:43:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:44:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:44:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:45:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:45:54] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:46:24] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:46:55] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:47:25] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:47:55] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:48:16] [DEBUG] Logger set on server
+[2025-09-02 02:48:16] [DEBUG] Test debug message from server logger
+[2025-09-02 02:48:16] [DEBUG] Starting server initialization
+[2025-09-02 02:48:16] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:48:16] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:48:16] [DEBUG] Starting component initialization
+[2025-09-02 02:48:16] [DEBUG] Starting network component initialization
+[2025-09-02 02:48:16] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:48:16] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:48:16] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:48:16] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:48:16] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:48:16] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:48:16] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:48:16] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:48:16] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:48:16] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:48:16] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:48:16] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:48:16] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:48:16] [DEBUG] Creating TCP server
+[2025-09-02 02:48:16] [DEBUG] About to initialize TCP server
+[2025-09-02 02:48:16] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:48:16] [DEBUG] TCP server stored successfully
+[2025-09-02 02:48:16] [DEBUG] Network component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Starting database component initialization
+[2025-09-02 02:48:16] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:48:16] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:48:16] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5260722376
+[2025-09-02 02:48:16] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:48:16] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5260722376
+[2025-09-02 02:48:16] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:48:16] [DEBUG] Database component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Query component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Response component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:48:16] [DEBUG] All components initialized successfully
+[2025-09-02 02:48:16] [DEBUG] Starting component startup process
+[2025-09-02 02:48:16] [DEBUG] Starting network component
+[2025-09-02 02:48:16] [DEBUG] About to start TCP server
+[2025-09-02 02:48:16] [DEBUG] TCP server started successfully
+[2025-09-02 02:48:16] [DEBUG] Network component started successfully
+[2025-09-02 02:48:16] [DEBUG] Protocol component started successfully
+[2025-09-02 02:48:16] [DEBUG] Parsing component started successfully
+[2025-09-02 02:48:16] [DEBUG] Query component started successfully
+[2025-09-02 02:48:16] [DEBUG] Response component started successfully
+[2025-09-02 02:48:16] [DEBUG] Logging component started successfully
+[2025-09-02 02:48:16] [DEBUG] Configuration component started successfully
+[2025-09-02 02:48:16] [DEBUG] All components started successfully
+[2025-09-02 02:48:16] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:48:16] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:48:16] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:48:16] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:48:16] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:48:26] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:48:26] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5260722376
+[2025-09-02 02:48:26] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5260722376
+[2025-09-02 02:48:43] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:48:43] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5260722376
+[2025-09-02 02:48:43] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5260722376
+[2025-09-02 02:48:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:48:51] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:48:51] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5260722376
+[2025-09-02 02:48:51] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5260722376
+[2025-09-02 02:49:06] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:49:06] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5260722376
+[2025-09-02 02:49:06] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5260722376
+[2025-09-02 02:49:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:49:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:50:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:50:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:51:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:51:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:52:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:52:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:53:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:53:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:54:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:54:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:55:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:55:46] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:56:16] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:56:23] [DEBUG] Logger set on server
+[2025-09-02 02:56:23] [DEBUG] Test debug message from server logger
+[2025-09-02 02:56:23] [DEBUG] Starting server initialization
+[2025-09-02 02:56:23] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:56:23] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:56:23] [DEBUG] Starting component initialization
+[2025-09-02 02:56:23] [DEBUG] Starting network component initialization
+[2025-09-02 02:56:23] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:56:23] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:56:23] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:56:23] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:56:23] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:56:23] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:56:23] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:56:23] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:56:23] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:56:23] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:56:23] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:56:23] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:56:23] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:56:23] [DEBUG] Creating TCP server
+[2025-09-02 02:56:23] [DEBUG] About to initialize TCP server
+[2025-09-02 02:56:23] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:56:23] [DEBUG] TCP server stored successfully
+[2025-09-02 02:56:23] [DEBUG] Network component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Starting database component initialization
+[2025-09-02 02:56:23] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:56:23] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:56:23] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5229266120
+[2025-09-02 02:56:23] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:56:23] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5229266120
+[2025-09-02 02:56:23] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:56:23] [DEBUG] Database component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Query component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Response component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:56:23] [DEBUG] All components initialized successfully
+[2025-09-02 02:56:23] [DEBUG] Starting component startup process
+[2025-09-02 02:56:23] [DEBUG] Starting network component
+[2025-09-02 02:56:23] [DEBUG] About to start TCP server
+[2025-09-02 02:56:23] [DEBUG] TCP server started successfully
+[2025-09-02 02:56:23] [DEBUG] Network component started successfully
+[2025-09-02 02:56:23] [DEBUG] Protocol component started successfully
+[2025-09-02 02:56:23] [DEBUG] Parsing component started successfully
+[2025-09-02 02:56:23] [DEBUG] Query component started successfully
+[2025-09-02 02:56:23] [DEBUG] Response component started successfully
+[2025-09-02 02:56:23] [DEBUG] Logging component started successfully
+[2025-09-02 02:56:23] [DEBUG] Configuration component started successfully
+[2025-09-02 02:56:23] [DEBUG] All components started successfully
+[2025-09-02 02:56:23] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:56:23] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:56:23] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:56:23] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:56:23] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:56:53] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:56:57] [DEBUG] Logger set on server
+[2025-09-02 02:56:57] [DEBUG] Test debug message from server logger
+[2025-09-02 02:56:57] [DEBUG] Starting server initialization
+[2025-09-02 02:56:57] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 02:56:57] [DEBUG] Configuration validated, initializing components
+[2025-09-02 02:56:57] [DEBUG] Starting component initialization
+[2025-09-02 02:56:57] [DEBUG] Starting network component initialization
+[2025-09-02 02:56:57] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 02:56:57] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 02:56:57] [DEBUG] Shutting down existing TCP server
+[2025-09-02 02:56:57] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 02:56:57] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 02:56:57] [DEBUG] Creating initial connection 1/1
+[2025-09-02 02:56:57] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 02:56:57] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 02:56:57] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 02:56:57] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 02:56:57] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 02:56:57] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 02:56:57] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 02:56:57] [DEBUG] Creating TCP server
+[2025-09-02 02:56:57] [DEBUG] About to initialize TCP server
+[2025-09-02 02:56:57] [DEBUG] TCP server initialized successfully
+[2025-09-02 02:56:57] [DEBUG] TCP server stored successfully
+[2025-09-02 02:56:57] [DEBUG] Network component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Starting database component initialization
+[2025-09-02 02:56:57] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 02:56:57] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 02:56:57] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 4948247496
+[2025-09-02 02:56:57] [DEBUG] Test database connection acquired successfully
+[2025-09-02 02:56:57] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 4948247496
+[2025-09-02 02:56:57] [DEBUG] Test database connection returned to pool
+[2025-09-02 02:56:57] [DEBUG] Database component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Protocol component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Parsing component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Query component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Response component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Logging component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Configuration component initialized successfully
+[2025-09-02 02:56:57] [DEBUG] All components initialized successfully
+[2025-09-02 02:56:57] [DEBUG] Starting component startup process
+[2025-09-02 02:56:57] [DEBUG] Starting network component
+[2025-09-02 02:56:57] [DEBUG] About to start TCP server
+[2025-09-02 02:56:57] [DEBUG] TCP server started successfully
+[2025-09-02 02:56:57] [DEBUG] Network component started successfully
+[2025-09-02 02:56:57] [DEBUG] Protocol component started successfully
+[2025-09-02 02:56:57] [DEBUG] Parsing component started successfully
+[2025-09-02 02:56:57] [DEBUG] Query component started successfully
+[2025-09-02 02:56:57] [DEBUG] Response component started successfully
+[2025-09-02 02:56:57] [DEBUG] Logging component started successfully
+[2025-09-02 02:56:57] [DEBUG] Configuration component started successfully
+[2025-09-02 02:56:57] [DEBUG] All components started successfully
+[2025-09-02 02:56:57] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 02:56:57] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 02:56:57] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 02:56:57] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:56:57] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 02:57:27] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:57:57] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:58:27] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:58:57] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:59:27] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 02:59:57] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:00:27] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:00:48] [DEBUG] Logger set on server
+[2025-09-02 03:00:48] [DEBUG] Test debug message from server logger
+[2025-09-02 03:00:48] [DEBUG] Starting server initialization
+[2025-09-02 03:00:48] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 03:00:48] [DEBUG] Configuration validated, initializing components
+[2025-09-02 03:00:48] [DEBUG] Starting component initialization
+[2025-09-02 03:00:48] [DEBUG] Starting network component initialization
+[2025-09-02 03:00:48] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 03:00:48] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 03:00:48] [DEBUG] Shutting down existing TCP server
+[2025-09-02 03:00:48] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 03:00:48] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 03:00:48] [DEBUG] Creating initial connection 1/1
+[2025-09-02 03:00:48] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 03:00:48] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 03:00:48] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 03:00:48] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 03:00:48] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 03:00:48] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 03:00:48] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 03:00:48] [DEBUG] Creating TCP server
+[2025-09-02 03:00:48] [DEBUG] About to initialize TCP server
+[2025-09-02 03:00:48] [DEBUG] TCP server initialized successfully
+[2025-09-02 03:00:48] [DEBUG] TCP server stored successfully
+[2025-09-02 03:00:48] [DEBUG] Network component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Starting database component initialization
+[2025-09-02 03:00:48] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 03:00:48] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 03:00:48] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 4846586520
+[2025-09-02 03:00:48] [DEBUG] Test database connection acquired successfully
+[2025-09-02 03:00:48] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 4846586520
+[2025-09-02 03:00:48] [DEBUG] Test database connection returned to pool
+[2025-09-02 03:00:48] [DEBUG] Database component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Protocol component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Parsing component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Query component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Response component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Logging component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Configuration component initialized successfully
+[2025-09-02 03:00:48] [DEBUG] All components initialized successfully
+[2025-09-02 03:00:48] [DEBUG] Starting component startup process
+[2025-09-02 03:00:48] [DEBUG] Starting network component
+[2025-09-02 03:00:48] [DEBUG] About to start TCP server
+[2025-09-02 03:00:48] [DEBUG] TCP server started successfully
+[2025-09-02 03:00:48] [DEBUG] Network component started successfully
+[2025-09-02 03:00:48] [DEBUG] Protocol component started successfully
+[2025-09-02 03:00:48] [DEBUG] Parsing component started successfully
+[2025-09-02 03:00:48] [DEBUG] Query component started successfully
+[2025-09-02 03:00:48] [DEBUG] Response component started successfully
+[2025-09-02 03:00:48] [DEBUG] Logging component started successfully
+[2025-09-02 03:00:48] [DEBUG] Configuration component started successfully
+[2025-09-02 03:00:48] [DEBUG] All components started successfully
+[2025-09-02 03:00:48] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 03:00:48] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 03:00:48] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 03:00:48] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:00:48] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 03:01:18] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:01:48] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:02:18] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:02:48] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:03:18] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:03:48] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:04:18] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:04:48] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:05:18] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:05:28] [DEBUG] Logger set on server
+[2025-09-02 03:05:28] [DEBUG] Test debug message from server logger
+[2025-09-02 03:05:28] [DEBUG] Starting server initialization
+[2025-09-02 03:05:28] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 03:05:28] [DEBUG] Configuration validated, initializing components
+[2025-09-02 03:05:28] [DEBUG] Starting component initialization
+[2025-09-02 03:05:28] [DEBUG] Starting network component initialization
+[2025-09-02 03:05:28] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 03:05:28] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 03:05:28] [DEBUG] Shutting down existing TCP server
+[2025-09-02 03:05:28] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 03:05:28] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 03:05:28] [DEBUG] Creating initial connection 1/1
+[2025-09-02 03:05:28] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 03:05:28] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 03:05:28] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 03:05:28] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 03:05:28] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 03:05:28] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 03:05:28] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 03:05:28] [DEBUG] Creating TCP server
+[2025-09-02 03:05:28] [DEBUG] About to initialize TCP server
+[2025-09-02 03:05:28] [DEBUG] TCP server initialized successfully
+[2025-09-02 03:05:28] [DEBUG] TCP server stored successfully
+[2025-09-02 03:05:28] [DEBUG] Network component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Starting database component initialization
+[2025-09-02 03:05:28] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 03:05:28] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 03:05:28] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5479888488
+[2025-09-02 03:05:28] [DEBUG] Test database connection acquired successfully
+[2025-09-02 03:05:28] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5479888488
+[2025-09-02 03:05:28] [DEBUG] Test database connection returned to pool
+[2025-09-02 03:05:28] [DEBUG] Database component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Protocol component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Parsing component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Query component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Response component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Logging component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Configuration component initialized successfully
+[2025-09-02 03:05:28] [DEBUG] All components initialized successfully
+[2025-09-02 03:05:28] [DEBUG] Starting component startup process
+[2025-09-02 03:05:28] [DEBUG] Starting network component
+[2025-09-02 03:05:28] [DEBUG] About to start TCP server
+[2025-09-02 03:05:28] [DEBUG] TCP server started successfully
+[2025-09-02 03:05:28] [DEBUG] Network component started successfully
+[2025-09-02 03:05:28] [DEBUG] Protocol component started successfully
+[2025-09-02 03:05:28] [DEBUG] Parsing component started successfully
+[2025-09-02 03:05:28] [DEBUG] Query component started successfully
+[2025-09-02 03:05:28] [DEBUG] Response component started successfully
+[2025-09-02 03:05:28] [DEBUG] Logging component started successfully
+[2025-09-02 03:05:28] [DEBUG] Configuration component started successfully
+[2025-09-02 03:05:28] [DEBUG] All components started successfully
+[2025-09-02 03:05:28] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 03:05:28] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 03:05:28] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 03:05:28] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:05:28] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 03:05:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:06:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:06:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:07:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:07:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:08:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:08:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:09:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:09:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:10:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:10:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:11:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:11:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:12:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:12:58] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:13:28] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:13:59] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:14:29] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:14:42] [DEBUG] Logger set on server
+[2025-09-02 03:14:42] [DEBUG] Test debug message from server logger
+[2025-09-02 03:14:42] [DEBUG] Starting server initialization
+[2025-09-02 03:14:42] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 03:14:42] [DEBUG] Configuration validated, initializing components
+[2025-09-02 03:14:42] [DEBUG] Starting component initialization
+[2025-09-02 03:14:42] [DEBUG] Starting network component initialization
+[2025-09-02 03:14:42] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 03:14:42] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 03:14:42] [DEBUG] Shutting down existing TCP server
+[2025-09-02 03:14:42] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 03:14:42] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 03:14:42] [DEBUG] Creating initial connection 1/1
+[2025-09-02 03:14:42] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 03:14:42] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 03:14:42] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 03:14:42] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 03:14:42] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 03:14:42] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 03:14:42] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 03:14:42] [DEBUG] Creating TCP server
+[2025-09-02 03:14:42] [DEBUG] About to initialize TCP server
+[2025-09-02 03:14:42] [DEBUG] TCP server initialized successfully
+[2025-09-02 03:14:42] [DEBUG] TCP server stored successfully
+[2025-09-02 03:14:42] [DEBUG] Network component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Starting database component initialization
+[2025-09-02 03:14:42] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 03:14:42] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 03:14:42] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 4790997048
+[2025-09-02 03:14:42] [DEBUG] Test database connection acquired successfully
+[2025-09-02 03:14:42] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 4790997048
+[2025-09-02 03:14:42] [DEBUG] Test database connection returned to pool
+[2025-09-02 03:14:42] [DEBUG] Database component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Protocol component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Parsing component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Query component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Response component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Logging component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Configuration component initialized successfully
+[2025-09-02 03:14:42] [DEBUG] All components initialized successfully
+[2025-09-02 03:14:42] [DEBUG] Starting component startup process
+[2025-09-02 03:14:42] [DEBUG] Starting network component
+[2025-09-02 03:14:42] [DEBUG] About to start TCP server
+[2025-09-02 03:14:42] [DEBUG] TCP server started successfully
+[2025-09-02 03:14:42] [DEBUG] Network component started successfully
+[2025-09-02 03:14:42] [DEBUG] Protocol component started successfully
+[2025-09-02 03:14:42] [DEBUG] Parsing component started successfully
+[2025-09-02 03:14:42] [DEBUG] Query component started successfully
+[2025-09-02 03:14:42] [DEBUG] Response component started successfully
+[2025-09-02 03:14:42] [DEBUG] Logging component started successfully
+[2025-09-02 03:14:42] [DEBUG] Configuration component started successfully
+[2025-09-02 03:14:42] [DEBUG] All components started successfully
+[2025-09-02 03:14:42] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 03:14:42] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 03:14:42] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 03:14:42] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:14:42] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 03:15:12] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:15:42] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:16:12] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:16:42] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:17:12] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:17:42] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:18:12] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:18:42] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:19:13] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:19:44] [DEBUG] Logger set on server
+[2025-09-02 03:19:44] [DEBUG] Test debug message from server logger
+[2025-09-02 03:19:44] [DEBUG] Starting server initialization
+[2025-09-02 03:19:44] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 03:19:44] [DEBUG] Configuration validated, initializing components
+[2025-09-02 03:19:44] [DEBUG] Starting component initialization
+[2025-09-02 03:19:44] [DEBUG] Starting network component initialization
+[2025-09-02 03:19:44] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 03:19:44] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 03:19:44] [DEBUG] Shutting down existing TCP server
+[2025-09-02 03:19:44] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 03:19:44] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 03:19:44] [DEBUG] Creating initial connection 1/1
+[2025-09-02 03:19:44] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 03:19:44] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 03:19:44] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 03:19:44] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 03:19:44] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 03:19:44] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 03:19:44] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 03:19:44] [DEBUG] Creating TCP server
+[2025-09-02 03:19:44] [DEBUG] About to initialize TCP server
+[2025-09-02 03:19:44] [DEBUG] TCP server initialized successfully
+[2025-09-02 03:19:44] [DEBUG] TCP server stored successfully
+[2025-09-02 03:19:44] [DEBUG] Network component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Starting database component initialization
+[2025-09-02 03:19:44] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 03:19:44] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 03:19:44] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5711616664
+[2025-09-02 03:19:44] [DEBUG] Test database connection acquired successfully
+[2025-09-02 03:19:44] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5711616664
+[2025-09-02 03:19:44] [DEBUG] Test database connection returned to pool
+[2025-09-02 03:19:44] [DEBUG] Database component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Protocol component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Parsing component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Query component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Response component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Logging component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Configuration component initialized successfully
+[2025-09-02 03:19:44] [DEBUG] All components initialized successfully
+[2025-09-02 03:19:44] [DEBUG] Starting component startup process
+[2025-09-02 03:19:44] [DEBUG] Starting network component
+[2025-09-02 03:19:44] [DEBUG] About to start TCP server
+[2025-09-02 03:19:44] [DEBUG] TCP server started successfully
+[2025-09-02 03:19:44] [DEBUG] Network component started successfully
+[2025-09-02 03:19:44] [DEBUG] Protocol component started successfully
+[2025-09-02 03:19:44] [DEBUG] Parsing component started successfully
+[2025-09-02 03:19:44] [DEBUG] Query component started successfully
+[2025-09-02 03:19:44] [DEBUG] Response component started successfully
+[2025-09-02 03:19:44] [DEBUG] Logging component started successfully
+[2025-09-02 03:19:44] [DEBUG] Configuration component started successfully
+[2025-09-02 03:19:44] [DEBUG] All components started successfully
+[2025-09-02 03:19:44] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 03:19:44] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 03:19:44] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 03:19:44] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:19:44] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 03:20:14] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:20:44] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:21:14] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:21:44] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:22:14] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:22:44] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:23:15] [DEBUG] Logger set on server
+[2025-09-02 03:23:15] [DEBUG] Test debug message from server logger
+[2025-09-02 03:23:15] [DEBUG] Starting server initialization
+[2025-09-02 03:23:15] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 03:23:15] [DEBUG] Configuration validated, initializing components
+[2025-09-02 03:23:15] [DEBUG] Starting component initialization
+[2025-09-02 03:23:15] [DEBUG] Starting network component initialization
+[2025-09-02 03:23:15] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 03:23:15] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 03:23:15] [DEBUG] Shutting down existing TCP server
+[2025-09-02 03:23:15] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 03:23:15] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 03:23:15] [DEBUG] Creating initial connection 1/1
+[2025-09-02 03:23:15] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 03:23:15] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 03:23:15] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 03:23:15] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 03:23:15] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 03:23:15] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 03:23:15] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 03:23:15] [DEBUG] Creating TCP server
+[2025-09-02 03:23:15] [DEBUG] About to initialize TCP server
+[2025-09-02 03:23:15] [DEBUG] TCP server initialized successfully
+[2025-09-02 03:23:15] [DEBUG] TCP server stored successfully
+[2025-09-02 03:23:15] [DEBUG] Network component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Starting database component initialization
+[2025-09-02 03:23:15] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 03:23:15] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 03:23:15] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5326797688
+[2025-09-02 03:23:15] [DEBUG] Test database connection acquired successfully
+[2025-09-02 03:23:15] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5326797688
+[2025-09-02 03:23:15] [DEBUG] Test database connection returned to pool
+[2025-09-02 03:23:15] [DEBUG] Database component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Protocol component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Parsing component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Query component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Response component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Logging component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Configuration component initialized successfully
+[2025-09-02 03:23:15] [DEBUG] All components initialized successfully
+[2025-09-02 03:23:15] [DEBUG] Starting component startup process
+[2025-09-02 03:23:15] [DEBUG] Starting network component
+[2025-09-02 03:23:15] [DEBUG] About to start TCP server
+[2025-09-02 03:23:15] [DEBUG] TCP server started successfully
+[2025-09-02 03:23:15] [DEBUG] Network component started successfully
+[2025-09-02 03:23:15] [DEBUG] Protocol component started successfully
+[2025-09-02 03:23:15] [DEBUG] Parsing component started successfully
+[2025-09-02 03:23:15] [DEBUG] Query component started successfully
+[2025-09-02 03:23:15] [DEBUG] Response component started successfully
+[2025-09-02 03:23:15] [DEBUG] Logging component started successfully
+[2025-09-02 03:23:15] [DEBUG] Configuration component started successfully
+[2025-09-02 03:23:15] [DEBUG] All components started successfully
+[2025-09-02 03:23:15] [INFO] FauxDB daemon started successfully. Listening on 0.0.0.0:27018, worker threads=4
+[2025-09-02 03:23:15] [INFO] Server Info: FauxDB Server v1.0.0
+[2025-09-02 03:23:15] [INFO] Database Status: Database: Total=0, Available=0, InUse=0, Broken=0
+[2025-09-02 03:23:15] [INFO] Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:23:15] [INFO] Initial Server Statistics: Server Statistics:
+  Status: 2
+  Running: Yes
+  Maintenance Mode: No
+  Database: Total=0, Available=0, InUse=0, Broken=0
+  Network: Running=Yes, Initialized=Yes
+  Connection Pool Stats:
+    Total Requests: 0
+    Successful Requests: 1
+    Failed Requests: 0
+    Average Response Time: 0ms
+
+[2025-09-02 03:23:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:24:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:24:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:25:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:25:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:26:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:26:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:27:11] [DEBUG] Logger set on server
+[2025-09-02 03:27:11] [DEBUG] Test debug message from server logger
+[2025-09-02 03:27:11] [DEBUG] Starting server initialization
+[2025-09-02 03:27:11] [DEBUG] Config set on server: port=27018, bind_address=0.0.0.0, max_connections=1000
+[2025-09-02 03:27:11] [DEBUG] Configuration validated, initializing components
+[2025-09-02 03:27:11] [DEBUG] Starting component initialization
+[2025-09-02 03:27:11] [DEBUG] Starting network component initialization
+[2025-09-02 03:27:11] [DEBUG] Checking if connection pooler exists: yes
+[2025-09-02 03:27:11] [DEBUG] Shutting down existing connection pooler
+[2025-09-02 03:27:11] [DEBUG] Shutting down existing TCP server
+[2025-09-02 03:27:11] [DEBUG] About to initialize PostgreSQL connection pooler
+[2025-09-02 03:27:11] [DEBUG] Initializing PostgreSQL connection pool with config: max_connections=5, min_connections=1, initial_connections=1
+[2025-09-02 03:27:11] [DEBUG] Creating initial connection 1/1
+[2025-09-02 03:27:11] [DEBUG] Creating new PostgreSQL connection. Current pool size: 0/5
+[2025-09-02 03:27:11] [DEBUG] Attempting to connect to PostgreSQL with config: host=localhost, port=5432, database=fauxdb, user=fauxdb
+[2025-09-02 03:27:11] [DEBUG] PostgreSQL connection created successfully
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: CONNECTION_CREATED - New PostgreSQL connection created successfully
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: CONNECTION_ADDED - New connection added to pool
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: INITIALIZATION_SUCCESS - Pool initialized with 1 connections
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: POOL_STARTED - Connection pool started successfully
+[2025-09-02 03:27:11] [DEBUG] Creating TCP server
+[2025-09-02 03:27:11] [DEBUG] About to initialize TCP server
+[2025-09-02 03:27:11] [DEBUG] TCP server initialized successfully
+[2025-09-02 03:27:11] [DEBUG] TCP server stored successfully
+[2025-09-02 03:27:11] [DEBUG] Network component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Starting database component initialization
+[2025-09-02 03:27:11] [DEBUG] Connection pooler found, testing database connectivity
+[2025-09-02 03:27:11] [DEBUG] Requesting PostgreSQL connection from pool. Available: 1, Total: 1
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: CONNECTION_ACQUIRED - Connection acquired from pool. Ptr: 5494562824
+[2025-09-02 03:27:11] [DEBUG] Test database connection acquired successfully
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: CONNECTION_RELEASED - Connection returned to pool. Ptr: 5494562824
+[2025-09-02 03:27:11] [DEBUG] Test database connection returned to pool
+[2025-09-02 03:27:11] [DEBUG] Database component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Protocol component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Parsing component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Query component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Response component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Logging component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Configuration component initialized successfully
+[2025-09-02 03:27:11] [DEBUG] All components initialized successfully
+[2025-09-02 03:27:11] [DEBUG] Starting component startup process
+[2025-09-02 03:27:11] [DEBUG] Starting network component
+[2025-09-02 03:27:11] [DEBUG] About to start TCP server
+[2025-09-02 03:27:11] [ERROR] Network component startup failed
+[2025-09-02 03:27:11] [ERROR] FauxDB daemon failed to start server process. Check network/database configuration and logs for details.
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: POOL_SHUTDOWN - Connection pool shutdown complete
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: POOL_SHUTDOWN - Connection pool shutdown complete
+[2025-09-02 03:27:11] [DEBUG] Connection pool event: POOL_SHUTDOWN - Connection pool shutdown complete
+[2025-09-02 03:27:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:27:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:28:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:28:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:29:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:29:45] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes
+[2025-09-02 03:30:15] [INFO] [Status] FauxDB daemon periodic update: Database Status: Database: Total=0, Available=0, InUse=0, Broken=0, Network Status: Network: Running=Yes, Initialized=Yes

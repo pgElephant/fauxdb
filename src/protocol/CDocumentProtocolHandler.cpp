@@ -3,6 +3,26 @@
 #include "CBsonType.hpp"
 #include "CLogger.hpp"
 #include "../database/CPGConnectionPooler.hpp"
+#include "commands/CDistinctCommand.hpp"
+#include "commands/CFindAndModifyCommand.hpp"
+#include "commands/CDropCommand.hpp"
+#include "commands/CCreateCommand.hpp"
+#include "commands/CCountCommand.hpp"
+#include "commands/CListCollectionsCommand.hpp"
+#include "commands/CExplainCommand.hpp"
+#include "commands/CAggregateCommand.hpp"
+#include "commands/CDbStatsCommand.hpp"
+#include "commands/CCollStatsCommand.hpp"
+#include "commands/CListDatabasesCommand.hpp"
+#include "commands/CServerStatusCommand.hpp"
+#include "commands/CCreateIndexesCommand.hpp"
+#include "commands/CListIndexesCommand.hpp"
+#include "commands/CDropIndexesCommand.hpp"
+#include "commands/CPingCommand.hpp"
+#include "commands/CHelloCommand.hpp"
+#include "commands/CBuildInfoCommand.hpp"
+#include "commands/CIsMasterCommand.hpp"
+#include "commands/CWhatsMyUriCommand.hpp"
 
 #include <algorithm>
 #include <cstring>
@@ -22,8 +42,8 @@ namespace FauxDB
 CDocumentProtocolHandler::CDocumentProtocolHandler()
 	: initialized_(false), isRunning_(false), maxBsonSize_(16777216),
 	  compressionEnabled_(false), checksumEnabled_(false), messageCount_(0),
-	  errorCount_(0), compressedMessageCount_(0), connectionPooler_(nullptr)
-	  /* commandRegistry_(std::make_unique<CommandRegistry>()) */
+	  errorCount_(0), compressedMessageCount_(0), connectionPooler_(nullptr),
+	  commandRegistry_(std::make_unique<CCommandRegistry>())
 {
 	initializeConfiguration();
 }
@@ -39,6 +59,32 @@ bool CDocumentProtocolHandler::initialize()
 		return true;
 	parser_ = make_unique<CDocumentWireParser>();
 	initializeDefaultCommandHandlers();
+	
+	/* Register modular commands */
+	if (commandRegistry_)
+	{
+		commandRegistry_->registerCommand(std::make_unique<CDistinctCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CFindAndModifyCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CDropCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CCreateCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CCountCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CListCollectionsCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CExplainCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CAggregateCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CDbStatsCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CCollStatsCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CListDatabasesCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CServerStatusCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CCreateIndexesCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CListIndexesCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CDropIndexesCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CPingCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CHelloCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CBuildInfoCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CIsMasterCommand>());
+		commandRegistry_->registerCommand(std::make_unique<CWhatsMyUriCommand>());
+	}
+	
 	initialized_ = true;
 	return true;
 }
@@ -188,6 +234,82 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
                             {
                                 commandName = "update";
                             }
+                            else if (fieldName == "distinct" && fieldType == 0x02)
+                            {
+                                commandName = "distinct";
+                            }
+                            else if (fieldName == "findAndModify" && fieldType == 0x02)
+                            {
+                                commandName = "findAndModify";
+                            }
+                            else if (fieldName == "drop" && fieldType == 0x02)
+                            {
+                                commandName = "drop";
+                            }
+                            else if (fieldName == "create" && fieldType == 0x02)
+                            {
+                                commandName = "create";
+                            }
+                            else if (fieldName == "count" && fieldType == 0x02)
+                            {
+                                commandName = "count";
+                            }
+                            else if (fieldName == "listCollections" && fieldType == 0x10)
+                            {
+                                commandName = "listCollections";
+                            }
+                            else if (fieldName == "explain" && fieldType == 0x03)
+                            {
+                                commandName = "explain";
+                            }
+                            else if (fieldName == "dbStats" && fieldType == 0x10)
+                            {
+                                commandName = "dbStats";
+                            }
+                            else if (fieldName == "collStats" && fieldType == 0x02)
+                            {
+                                commandName = "collStats";
+                            }
+                            else if (fieldName == "listDatabases" && fieldType == 0x10)
+                            {
+                                commandName = "listDatabases";
+                            }
+                            else if (fieldName == "serverStatus" && fieldType == 0x10)
+                            {
+                                commandName = "serverStatus";
+                            }
+                            else if (fieldName == "createIndexes" && fieldType == 0x02)
+                            {
+                                commandName = "createIndexes";
+                            }
+                            else if (fieldName == "listIndexes" && fieldType == 0x02)
+                            {
+                                commandName = "listIndexes";
+                            }
+                            else if (fieldName == "dropIndexes" && (fieldType == 0x02 || fieldType == 0x10))
+                            {
+                                commandName = "dropIndexes";
+                            }
+                            else if (fieldName == "ping" && fieldType == 0x10)
+                            {
+                                commandName = "ping";
+                            }
+                            else if (fieldName == "hello" && fieldType == 0x10)
+                            {
+                                commandName = "hello";
+                            }
+                            else if (fieldName == "buildInfo" && fieldType == 0x10)
+                            {
+                                commandName = "buildInfo";
+                            }
+                            else if (fieldName == "isMaster" && fieldType == 0x10)
+                            {
+                                commandName = "isMaster";
+                            }
+                            else if (fieldName == "whatsMyUri" && fieldType == 0x10)
+                            {
+                                commandName = "whatsMyUri";
+                            }
                             else if (fieldName == "delete" && fieldType == 0x02)
                             {
                                 commandName = "delete";
@@ -309,7 +431,21 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
         return createErrorBsonDocument(-6, "BSON init failed");
     }
 
-    if (commandName == "hello" || commandName == "isMaster")
+    /* Check modular command system first */
+    if (commandRegistry_ && commandRegistry_->hasCommand(commandName))
+    {
+        /* Use modular command system */
+        CommandContext context;
+        context.collectionName = extractCollectionName(buffer, bytesRead);
+        context.databaseName = "fauxdb";
+        context.requestBuffer = buffer;
+        context.requestSize = bytesRead;
+        context.requestID = requestID;
+        context.connectionPooler = connectionPooler_;
+        
+        return commandRegistry_->executeCommand(commandName, context);
+    }
+    else if (commandName == "hello" || commandName == "isMaster")
     {
         bson.addDouble("ok", 1.0);
         bson.addBool("isWritablePrimary", true);
@@ -713,6 +849,7 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(const string& co
         bson.addInt32("n", 1);
         /* Simplified implementation - just return success for now */
     }
+
     else if (commandName == "aggregate")
     {
         bson.addDouble("ok", 1.0);

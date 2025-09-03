@@ -11,6 +11,7 @@
 
 #include "CDatabase.hpp"
 #include "CLibpq.hpp"
+#include "auth/CBasicAuth.hpp"
 
 #include <memory>
 #include <string>
@@ -28,6 +29,7 @@ class CPostgresDatabase : public CDatabase
     bool initialize(const CDatabaseConfig& config) override;
     bool connect() override;
     bool connect(const CDatabaseConfig& config);
+    bool connect(const CDatabaseConfig& config, const AuthConfig& authConfig);
     void disconnect() override;
     bool isConnected() const override;
     CDatabaseStatus getStatus() const override;
@@ -76,7 +78,12 @@ class CPostgresDatabase : public CDatabase
     bool vacuumDatabase();
     bool analyzeDatabase();
     void setConfig(const CDatabaseConfig& config);
+    void setAuthConfig(const AuthConfig& authConfig);
     CDatabaseConfig getConfig() const;
+    AuthConfig getAuthConfig() const;
+    
+    bool authenticate(const std::string& username, const std::string& password);
+    bool isAuthenticationRequired() const;
     void setConnectionTimeout(std::chrono::milliseconds timeout);
     void setQueryTimeout(std::chrono::milliseconds timeout);
     std::string getDatabaseInfo() const;
@@ -120,7 +127,9 @@ class CPostgresDatabase : public CDatabase
 
   private:
     std::unique_ptr<CLibpq> libpq_;
+    std::unique_ptr<CBasicAuth> basicAuth_;
     CDatabaseConfig postgresConfig_;
+    AuthConfig authConfig_;
     bool connectionEstablished_;
     void initializePostgresDefaults();
     void setPostgresError();

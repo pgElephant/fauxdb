@@ -18,6 +18,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(MONGOC REQUIRED mongoc2)
 
 # Find Boost (required)
+cmake_policy(SET CMP0167 NEW)
 find_package(Boost REQUIRED COMPONENTS 
     thread 
     filesystem
@@ -82,26 +83,7 @@ find_package(spdlog REQUIRED)
 # find_package(azure-cosmos-cpp REQUIRED)  # Azure Cosmos DB - removed for compatibility
 # find_package(azure-event-hubs-cpp REQUIRED)  # Azure Event Hubs - removed for compatibility
 # find_package(azure-service-bus-cpp REQUIRED)  # Azure Service Bus - removed for compatibility
-# find_package(azure-storage-blobs-cpp REQUIRED)  # Azure Blob Storage - removed for compatibility
-# find_package(azure-storage-files-cpp REQUIRED)  # Azure File Storage - removed for compatibility
-# find_package(azure-storage-queues-cpp REQUIRED)  # Azure Queue Storage - removed for compatibility
-# find_package(azure-storage-tables-cpp REQUIRED)  # Azure Table Storage - removed for compatibility
-# find_package(azure-storage-common-cpp REQUIRED)  # Azure Storage Common - removed for compatibility
-# find_package(azure-storage-lite-cpp REQUIRED)  # Azure Storage Lite - removed for compatibility
-# find_package(azure-storage-cpp REQUIRED)  # Azure Storage - removed for compatibility
-# find_package(azure-storage-blobs-cpp REQUIRED)  # Azure Blob Storage - removed for compatibility
-# find_package(azure-storage-files-cpp REQUIRED)  # Azure File Storage - removed for compatibility
-# find_package(azure-storage-queues-cpp REQUIRED)  # Azure Queue Storage - removed for compatibility
-# find_package(azure-storage-tables-cpp REQUIRED)  # Azure Table Storage - removed for compatibility
-# find_package(azure-storage-common-cpp REQUIRED)  # Azure Storage Common - removed for compatibility
-# find_package(azure-storage-lite-cpp REQUIRED)  # Azure Storage Lite - removed for compatibility
-# find_package(azure-storage-cpp REQUIRED)  # Azure Storage - removed for compatibility
-# find_package(azure-storage-blobs-cpp REQUIRED)  # Azure Blob Storage - removed for compatibility
-# find_package(azure-storage-files-cpp REQUIRED)  # Azure File Storage - removed for compatibility
-# find_package(azure-storage-queues-cpp REQUIRED)  # Azure Queue Storage - removed for compatibility
-# find_package(azure-storage-tables-cpp REQUIRED)  # Azure Table Storage - removed for compatibility
-# find_package(azure-storage-common-cpp REQUIRED)  # Azure Storage Common - removed for compatibility
-# find_package(azure-storage-lite-cpp REQUIRED)  # Azure Storage Lite - removed for compatibility
+
 
 # Include directories - All header subdirectories
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -283,6 +265,9 @@ set(SOURCES
     src/protocol/commands/CWhatsMyUriCommand.cpp
 
     src/auth/CScramAuth.cpp
+    src/auth/CBasicAuth.cpp
+    src/auth/CScramMongoAuth.cpp
+    src/auth/CAuthRegistry.cpp
 
     src/parsing/CParser.cpp
     src/parsing/CMessageParser.cpp
@@ -308,7 +293,7 @@ if(POSTGRESQL_FOUND)
         OpenSSL::SSL
         OpenSSL::Crypto
         nlohmann_json::nlohmann_json
-        yaml-cpp
+        yaml-cpp::yaml-cpp
         Threads::Threads
         ${CMAKE_DL_LIBS}
         # Boost libraries
@@ -388,7 +373,7 @@ else()
         OpenSSL::SSL
         OpenSSL::Crypto
         nlohmann_json::nlohmann_json
-        yaml-cpp
+        yaml-cpp::yaml-cpp
         Threads::Threads
         ${CMAKE_DL_LIBS}
         # Boost libraries

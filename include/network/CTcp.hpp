@@ -5,7 +5,6 @@
 #include "../database/CPGConnectionPooler.hpp"
 #include "../protocol/CDocumentProtocolHandler.hpp"
 #include "../protocol/CDocumentWireProtocol.hpp"
-
 #include "../protocol/CResponseBuilder.hpp"
 #include "CNetwork.hpp"
 #include "CThread.hpp"

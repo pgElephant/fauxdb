@@ -7,8 +7,13 @@ namespace FauxDB
 {
 
 CBsonType::CBsonType()
-    : bsonDoc_(nullptr), bsonArray_(nullptr), lastError_(), hasErrors_(false),
-      inArray_(false), currentArrayKey_(), currentArrayIndex_(0)
+    : bsonDoc_(nullptr),
+      bsonArray_(nullptr),
+      lastError_(),
+      hasErrors_(false),
+      inArray_(false),
+      currentArrayKey_(),
+      currentArrayIndex_(0)
 {
     bsonDoc_ = bson_new();
     if (!bsonDoc_)
@@ -86,7 +91,10 @@ bool CBsonType::endArray()
     }
 
     // Append array to the document
-    if (!bson_append_array(bsonDoc_, currentArrayKey_.c_str(), -1, bsonArray_))
+    if (!bson_append_array(bsonDoc_,
+                           currentArrayKey_.c_str(),
+                           -1,
+                           bsonArray_))
     {
         setError("Failed to append array to document");
         return false;
@@ -212,8 +220,10 @@ bool CBsonType::addDateTime(const std::string& key, int64_t timestamp)
     return true;
 }
 
-bool CBsonType::addBinary(const std::string& key, bson_subtype_t subtype,
-                          const uint8_t* data, size_t size)
+bool CBsonType::addBinary(const std::string& key,
+                          bson_subtype_t subtype,
+                          const uint8_t* data,
+                          size_t size)
 {
     if (!checkBsonHandle())
         return false;
@@ -223,9 +233,143 @@ bool CBsonType::addBinary(const std::string& key, bson_subtype_t subtype,
         return false;
     }
 
-    if (!bson_append_binary(bsonDoc_, key.c_str(), -1, subtype, data, size))
+    if (!bson_append_binary(bsonDoc_,
+                            key.c_str(),
+                            -1,
+                            subtype,
+                            data,
+                            size))
     {
         setError("Failed to add binary");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addRegex(const std::string& key, const std::string& pattern, 
+                         const std::string& options)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_regex(bsonDoc_, key.c_str(), -1, pattern.c_str(), options.c_str()))
+    {
+        setError("Failed to add regex");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addJavaScript(const std::string& key, const std::string& code)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_code(bsonDoc_, key.c_str(), -1, code.c_str()))
+    {
+        setError("Failed to add JavaScript code");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addJavaScriptWithScope(const std::string& key, const std::string& code,
+                                       const CBsonType& scope)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    bson_t* scopeBson = scope.getBsonHandle();
+    if (!scopeBson)
+    {
+        setError("Invalid scope document");
+        return false;
+    }
+
+    if (!bson_append_code_with_scope(bsonDoc_, key.c_str(), -1, code.c_str(), scopeBson))
+    {
+        setError("Failed to add JavaScript code with scope");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addSymbol(const std::string& key, const std::string& symbol)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_symbol(bsonDoc_, key.c_str(), -1, symbol.c_str(), -1))
+    {
+        setError("Failed to add symbol");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addDbPointer(const std::string& key, const std::string& collection,
+                             const std::string& objectId)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    bson_oid_t oid;
+    if (!bson_oid_is_valid(objectId.c_str(), objectId.length()))
+    {
+        setError("Invalid ObjectId for DB pointer");
+        return false;
+    }
+    bson_oid_init_from_string(&oid, objectId.c_str());
+
+    if (!bson_append_dbpointer(bsonDoc_, key.c_str(), -1, collection.c_str(), &oid))
+    {
+        setError("Failed to add DB pointer");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addDecimal128(const std::string& key, const std::string& decimal)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    bson_decimal128_t dec;
+    if (!bson_decimal128_from_string(decimal.c_str(), &dec))
+    {
+        setError("Invalid decimal128 string");
+        return false;
+    }
+
+    if (!bson_append_decimal128(bsonDoc_, key.c_str(), -1, &dec))
+    {
+        setError("Failed to add decimal128");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addMinKey(const std::string& key)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_minkey(bsonDoc_, key.c_str(), -1))
+    {
+        setError("Failed to add MinKey");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addMaxKey(const std::string& key)
+{
+    if (!checkBsonHandle())
+        return false;
+
+    if (!bson_append_maxkey(bsonDoc_, key.c_str(), -1))
+    {
+        setError("Failed to add MaxKey");
         return false;
     }
     return true;
@@ -240,8 +384,7 @@ bool CBsonType::addDocument(const std::string& key, const CBsonType& subdoc)
         setError("Subdocument handle is null");
         return false;
     }
-    if (!bson_append_document(bsonDoc_, key.c_str(), -1,
-                              subdoc.getBsonHandle()))
+    if (!bson_append_document(bsonDoc_, key.c_str(), -1, subdoc.getBsonHandle()))
     {
         setError("Failed to add embedded document");
         return false;
@@ -395,7 +538,155 @@ bool CBsonType::addArrayDateTime(int64_t timestamp)
     return true;
 }
 
-bool CBsonType::addArrayBinary(bson_subtype_t subtype, const uint8_t* data,
+bool CBsonType::addArrayRegex(const std::string& pattern, const std::string& options)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayRegex used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_regex(bsonArray_, k.c_str(), -1, pattern.c_str(), options.c_str()))
+    {
+        setError("Failed to add array regex");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayJavaScript(const std::string& code)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayJavaScript used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_code(bsonArray_, k.c_str(), -1, code.c_str()))
+    {
+        setError("Failed to add array JavaScript code");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayJavaScriptWithScope(const std::string& code, const CBsonType& scope)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayJavaScriptWithScope used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    bson_t* scopeBson = scope.getBsonHandle();
+    if (!scopeBson)
+    {
+        setError("Invalid scope document for array");
+        return false;
+    }
+    if (!bson_append_code_with_scope(bsonArray_, k.c_str(), -1, code.c_str(), scopeBson))
+    {
+        setError("Failed to add array JavaScript code with scope");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArraySymbol(const std::string& symbol)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArraySymbol used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_symbol(bsonArray_, k.c_str(), -1, symbol.c_str(), -1))
+    {
+        setError("Failed to add array symbol");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayDbPointer(const std::string& collection, const std::string& objectId)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayDbPointer used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    bson_oid_t oid;
+    if (!bson_oid_is_valid(objectId.c_str(), objectId.length()))
+    {
+        setError("Invalid ObjectId for array DB pointer");
+        return false;
+    }
+    bson_oid_init_from_string(&oid, objectId.c_str());
+    if (!bson_append_dbpointer(bsonArray_, k.c_str(), -1, collection.c_str(), &oid))
+    {
+        setError("Failed to add array DB pointer");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayDecimal128(const std::string& decimal)
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayDecimal128 used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    bson_decimal128_t dec;
+    if (!bson_decimal128_from_string(decimal.c_str(), &dec))
+    {
+        setError("Invalid decimal128 string for array");
+        return false;
+    }
+    if (!bson_append_decimal128(bsonArray_, k.c_str(), -1, &dec))
+    {
+        setError("Failed to add array decimal128");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayMinKey()
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayMinKey used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_minkey(bsonArray_, k.c_str(), -1))
+    {
+        setError("Failed to add array MinKey");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayMaxKey()
+{
+    if (!inArray_ || !bsonArray_)
+    {
+        setError("addArrayMaxKey used outside array");
+        return false;
+    }
+    std::string k = nextArrayIndexKey();
+    if (!bson_append_maxkey(bsonArray_, k.c_str(), -1))
+    {
+        setError("Failed to add array MaxKey");
+        return false;
+    }
+    return true;
+}
+
+bool CBsonType::addArrayBinary(bson_subtype_t subtype,
+                               const uint8_t* data,
                                size_t size)
 {
     if (!inArray_ || !bsonArray_)
@@ -430,8 +721,7 @@ bool CBsonType::addArrayDocument(const CBsonType& subdoc)
         return false;
     }
     std::string k = nextArrayIndexKey();
-    if (!bson_append_document(bsonArray_, k.c_str(), -1,
-                              subdoc.getBsonHandle()))
+    if (!bson_append_document(bsonArray_, k.c_str(), -1, subdoc.getBsonHandle()))
     {
         setError("Failed to add array document");
         return false;

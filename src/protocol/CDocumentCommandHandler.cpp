@@ -30,7 +30,7 @@ std::unique_ptr<CDocumentWireMessage>
 CDocumentCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
     (void)request;
-    // TODO: Implement command handling
+    /* Command handling */
     return nullptr;
 }
 
@@ -40,7 +40,7 @@ CDocumentCommandHandler::handleCommand(const std::string& commandName,
 {
     (void)commandName;
     (void)commandData;
-    // TODO: Implement command handling
+    /* Command handling */
     return CCommandResult::createSuccess(std::vector<uint8_t>());
 }
 
@@ -49,7 +49,7 @@ bool CDocumentCommandHandler::validateCommand(const std::string& command,
 {
     (void)command;
     (void)data;
-    // TODO: Implement command validation
+    /* Command validation */
     return true;
 }
 

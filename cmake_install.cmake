@@ -43,7 +43,6 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/fauxdb")
     execute_process(COMMAND /usr/bin/install_name_tool
       -delete_rpath "/opt/homebrew/Cellar/mongo-c-driver/2.1.0/lib"
-      -delete_rpath "/opt/homebrew/lib"
       -delete_rpath "/usr/local/pgsql.17/lib"
       "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/fauxdb")
     if(CMAKE_INSTALL_DO_STRIP)

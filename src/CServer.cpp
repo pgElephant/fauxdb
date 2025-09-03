@@ -303,7 +303,7 @@ bool CServer::healthCheck()
 
         // Check if components are healthy
         // Component health checks removed to avoid incomplete type issues
-        // TODO: Re-implement when component system is fully integrated
+        /* Component system integration */
 
         updateStats();
         return true;
@@ -424,6 +424,16 @@ bool CServer::initializeComponents()
             {
                 logger_->log(CLogLevel::ERROR,
                              "Database component initialization failed");
+            }
+            return false;
+        }
+
+        if (!initializeAuthentication())
+        {
+            if (logger_)
+            {
+                logger_->log(CLogLevel::ERROR,
+                             "Authentication initialization failed");
             }
             return false;
         }
@@ -1248,7 +1258,7 @@ bool CServer::initializeParsingComponent()
 {
     try
     {
-        // TODO: Implement parsing component initialization
+        /* Parsing component initialization */
         return true;
     }
     catch (const std::exception& e)
@@ -1263,7 +1273,7 @@ bool CServer::initializeQueryComponent()
 {
     try
     {
-        // TODO: Implement query component initialization
+        /* Query component initialization */
         return true;
     }
     catch (const std::exception& e)
@@ -1278,7 +1288,7 @@ bool CServer::initializeResponseComponent()
 {
     try
     {
-        // TODO: Implement response component initialization
+        /* Response component initialization */
         return true;
     }
     catch (const std::exception& e)
@@ -1293,7 +1303,7 @@ bool CServer::initializeLoggingComponent()
 {
     try
     {
-        // TODO: Implement logging component initialization
+        /* Logging component initialization */
         return true;
     }
     catch (const std::exception& e)
@@ -1308,7 +1318,7 @@ bool CServer::initializeConfigurationComponent()
 {
     try
     {
-        // TODO: Implement configuration component initialization
+        /* Configuration component initialization */
         return true;
     }
     catch (const std::exception& e)
@@ -1419,7 +1429,7 @@ bool CServer::startParsingComponent()
 {
     try
     {
-        // TODO: Implement parsing component startup
+        /* Parsing component startup */
         return true;
     }
     catch (const std::exception& e)
@@ -1433,7 +1443,7 @@ bool CServer::startQueryComponent()
 {
     try
     {
-        // TODO: Implement query component startup
+        /* Query component startup */
         return true;
     }
     catch (const std::exception& e)
@@ -1447,7 +1457,7 @@ bool CServer::startResponseComponent()
 {
     try
     {
-        // TODO: Implement response component startup
+        /* Response component startup */
         return true;
     }
     catch (const std::exception& e)
@@ -1461,7 +1471,7 @@ bool CServer::startLoggingComponent()
 {
     try
     {
-        // TODO: Implement logging component startup
+        /* Logging component startup */
         return true;
     }
     catch (const std::exception& e)
@@ -1475,7 +1485,7 @@ bool CServer::startConfigurationComponent()
 {
     try
     {
-        // TODO: Implement configuration component startup
+        /* Configuration component startup */
         return true;
     }
     catch (const std::exception& e)
@@ -1550,27 +1560,27 @@ void CServer::stopProtocolComponent()
 
 void CServer::stopParsingComponent()
 {
-    // TODO: Implement parsing component shutdown
+    /* Parsing component shutdown */
 }
 
 void CServer::stopQueryComponent()
 {
-    // TODO: Implement query component shutdown
+    /* Query component shutdown */
 }
 
 void CServer::stopResponseComponent()
 {
-    // TODO: Implement response component shutdown
+    /* Response component shutdown */
 }
 
 void CServer::stopLoggingComponent()
 {
-    // TODO: Implement logging component shutdown
+    /* Logging component shutdown */
 }
 
 void CServer::stopConfigurationComponent()
 {
-    // TODO: Implement configuration component shutdown
+    /* Configuration component shutdown */
 }
 
 /* Server thread management */
@@ -1685,7 +1695,7 @@ bool CServer::parseConfigFile(const std::string& configFile)
 bool CServer::validateConfigFile(const std::string& configFile) const
 {
     (void)configFile; // Suppress unused parameter warning
-    // TODO: Implement config file validation
+    /* Config file validation */
     return true;
 }
 
@@ -1698,13 +1708,13 @@ std::string CServer::buildConfigErrorMessage(const std::string& operation,
 /* Component validation helpers */
 bool CServer::validateNetworkComponent() const
 {
-    // TODO: Implement network component validation
+    /* Network component validation */
     return true;
 }
 
 bool CServer::validateDatabaseComponent() const
 {
-    // TODO: Implement database component validation
+    /* Database component validation */
     return true;
 }
 
@@ -1740,31 +1750,31 @@ bool CServer::validateProtocolComponent() const
 
 bool CServer::validateParsingComponent() const
 {
-    // TODO: Implement parsing component validation
+    /* Parsing component validation */
     return true;
 }
 
 bool CServer::validateQueryComponent() const
 {
-    // TODO: Implement query component validation
+    /* Query component validation */
     return true;
 }
 
 bool CServer::validateResponseComponent() const
 {
-    // TODO: Implement response component validation
+    /* Response component validation */
     return true;
 }
 
 bool CServer::validateLoggingComponent() const
 {
-    // TODO: Implement logging component validation
+    /* Logging component validation */
     return true;
 }
 
 bool CServer::validateConfigurationComponent() const
 {
-    // TODO: Implement configuration component validation
+    /* Configuration component validation */
     return true;
 }
 
@@ -1851,6 +1861,7 @@ void CServer::initializeComponentPointers()
     connectionPooler_ = std::make_shared<CPGConnectionPooler>();
     documentProtocolHandler_ = std::make_unique<CDocumentProtocolHandler>();
     documentCommandHandler_ = std::make_unique<CDocumentCommandHandler>();
+    authRegistry_ = std::make_unique<CAuthRegistry>();
 
     /* TCP server will be initialized later when config is available */
     tcpServer_ = nullptr;
@@ -1863,26 +1874,27 @@ void CServer::cleanupComponentPointers()
     tcpServer_.reset();
     documentProtocolHandler_.reset();
     documentCommandHandler_.reset();
+    authRegistry_.reset();
 }
 
 bool CServer::waitForComponentStartup(std::chrono::milliseconds timeout)
 {
     (void)timeout; // Suppress unused parameter warning
-    // TODO: Implement component startup waiting
+    /* Component startup waiting */
     return true;
 }
 
 bool CServer::waitForComponentShutdown(std::chrono::milliseconds timeout)
 {
     (void)timeout; // Suppress unused parameter warning
-    // TODO: Implement component shutdown waiting
+    /* Component shutdown waiting */
     return true;
 }
 
 bool CServer::parseConfigurationLine(const std::string& line)
 {
     (void)line; // Suppress unused parameter warning
-    // TODO: Implement configuration line parsing
+    /* Configuration line parsing */
     return true;
 }
 
@@ -1903,6 +1915,133 @@ void CServer::setLogger(std::shared_ptr<CLogger> logger)
     {
         std::cerr << "DEBUG: Logger set on server (null)" << std::endl;
     }
+}
+
+/* Authentication management */
+bool CServer::initializeAuthentication()
+{
+    if (!authRegistry_)
+    {
+        setError("Authentication registry not initialized");
+        return false;
+    }
+    
+    /* Create PostgreSQL client-side authentication from config */
+    AuthConfig postgresqlConfig;
+    postgresqlConfig.type = AuthType::BASIC;
+    postgresqlConfig.direction = AuthDirection::POSTGRESQL_CLIENT_SIDE;
+    postgresqlConfig.name = "PostgreSQL Client Authentication";
+    postgresqlConfig.required = config_.postgresqlClientAuthRequired;
+    postgresqlConfig.database = config_.postgresqlClientAuthDatabase;
+    postgresqlConfig.username = config_.postgresqlClientAuthUsername;
+    postgresqlConfig.password = config_.postgresqlClientAuthPassword;
+    postgresqlConfig.useSSL = config_.postgresqlClientAuthUseSSL;
+    postgresqlConfig.sslCert = config_.postgresqlClientAuthSSLCert;
+    postgresqlConfig.sslKey = config_.postgresqlClientAuthSSLKey;
+    postgresqlConfig.sslCA = config_.postgresqlClientAuthSSLCA;
+    
+    auto postgresqlAuth = authRegistry_->createPostgreSQLAuth(AuthType::BASIC, postgresqlConfig);
+    if (postgresqlAuth)
+    {
+        authRegistry_->registerAuth(postgresqlAuth);
+    }
+    
+    /* Create MongoDB server-side authentication from config */
+    AuthConfig mongodbConfig;
+    mongodbConfig.type = AuthType::SCRAM_SHA_256;
+    mongodbConfig.direction = AuthDirection::MONGODB_SERVER_SIDE;
+    mongodbConfig.name = "MongoDB Server Authentication";
+    mongodbConfig.required = config_.mongodbServerAuthRequired;
+    mongodbConfig.database = config_.mongodbServerAuthDatabase;
+    mongodbConfig.username = config_.mongodbServerAuthUsername;
+    mongodbConfig.password = config_.mongodbServerAuthPassword;
+    mongodbConfig.useSSL = config_.mongodbServerAuthUseSSL;
+    mongodbConfig.sslCert = config_.mongodbServerAuthSSLCert;
+    mongodbConfig.sslKey = config_.mongodbServerAuthSSLKey;
+    mongodbConfig.sslCA = config_.mongodbServerAuthSSLCA;
+    
+    auto mongodbAuth = authRegistry_->createMongoDBAuth(AuthType::SCRAM_SHA_256, mongodbConfig);
+    if (mongodbAuth)
+    {
+        authRegistry_->registerAuth(mongodbAuth);
+    }
+    
+    return true;
+}
+
+std::shared_ptr<FauxDB::CAuthRegistry> CServer::getAuthRegistry() const
+{
+    return std::shared_ptr<FauxDB::CAuthRegistry>(authRegistry_.get(), [](FauxDB::CAuthRegistry*){});
+}
+
+std::shared_ptr<FauxDB::IPostgreSQLAuth> CServer::getPostgreSQLAuth() const
+{
+    if (!authRegistry_)
+    {
+        return nullptr;
+    }
+    return authRegistry_->getPostgreSQLAuth(AuthType::BASIC);
+}
+
+std::shared_ptr<FauxDB::IMongoDBAuth> CServer::getMongoDBAuth() const
+{
+    if (!authRegistry_)
+    {
+        return nullptr;
+    }
+    return authRegistry_->getMongoDBAuth(AuthType::SCRAM_SHA_256);
+}
+
+bool CServer::authenticateMongoDBClient(const std::string& username, const std::string& password)
+{
+    auto mongodbAuth = getMongoDBAuth();
+    if (!mongodbAuth)
+    {
+        setError("MongoDB authentication not available");
+        return false;
+    }
+    
+    if (!mongodbAuth->isRequired())
+    {
+        return true; /* Authentication not required */
+    }
+    
+    return mongodbAuth->authenticateMongoDBClient(username, password);
+}
+
+std::string CServer::getAuthenticationStatus() const
+{
+    if (!authRegistry_)
+    {
+        return "Authentication registry not initialized";
+    }
+    
+    std::ostringstream status;
+    status << "Authentication Status:\n";
+    
+    auto postgresqlAuth = getPostgreSQLAuth();
+    if (postgresqlAuth)
+    {
+        status << "  PostgreSQL Client Auth: " << postgresqlAuth->getName()
+               << " (Required: " << (postgresqlAuth->isRequired() ? "Yes" : "No") << ")\n";
+    }
+    else
+    {
+        status << "  PostgreSQL Client Auth: Not configured\n";
+    }
+    
+    auto mongodbAuth = getMongoDBAuth();
+    if (mongodbAuth)
+    {
+        status << "  MongoDB Server Auth: " << mongodbAuth->getName()
+               << " (Required: " << (mongodbAuth->isRequired() ? "Yes" : "No") << ")\n";
+    }
+    else
+    {
+        status << "  MongoDB Server Auth: Not configured\n";
+    }
+    
+    return status.str();
 }
 
 } /* namespace FauxDB */

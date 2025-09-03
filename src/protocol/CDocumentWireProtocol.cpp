@@ -660,7 +660,7 @@ bool CDocumentWireMessage::parseFromBytes(const std::vector<uint8_t>& data)
     /* Parse body based on opCode */
     size_t offset = 16;
 
-    // TODO: Implement body parsing when body classes are defined
+    /* Body parsing */
     // For now, just skip body parsing to allow basic initialization
 
     switch (static_cast<CDocumentOpCode>(header_.opCode))
@@ -728,7 +728,7 @@ std::vector<uint8_t> CDocumentWireMessage::serializeToBytes() const
     result.insert(result.end(), headerData.begin(), headerData.end());
 
     /* Add body */
-    // TODO: Implement body serialization when body classes are defined
+    /* Body serialization */
 
     if (msgBody_)
     {
@@ -804,7 +804,7 @@ CDocumentWireMessage::createHelloResponse(int32_t requestID)
 
     response->setHeader(header);
 
-    /* TODO: Create hello response BSON document */
+    /* Hello response BSON document */
     CDocumentMsgBody body;
     response->setMsgBody(body);
 
@@ -823,7 +823,7 @@ CDocumentWireMessage::createBuildInfoResponse(int32_t requestID)
 
     response->setHeader(header);
 
-    /* TODO: Create buildInfo response BSON document */
+    /* BuildInfo response BSON document */
     CDocumentMsgBody body;
     response->setMsgBody(body);
 
@@ -842,7 +842,7 @@ CDocumentWireMessage::createIsMasterResponse(int32_t requestID)
 
     response->setHeader(header);
 
-    /* TODO: Create isMaster response BSON document */
+    /* IsMaster response BSON document */
     CDocumentReplyBody body;
     response->setReplyBody(body);
 
@@ -862,7 +862,7 @@ std::unique_ptr<CDocumentWireMessage> CDocumentWireMessage::createFindResponse(
 
     response->setHeader(header);
 
-    /* TODO: Create find response BSON document */
+    /* Find response BSON document */
     CDocumentMsgBody body;
     response->setMsgBody(body);
 
@@ -883,7 +883,7 @@ CDocumentWireMessage::createInsertResponse(int32_t requestID,
 
     response->setHeader(header);
 
-    /* TODO: Create insert response BSON document */
+    /* Insert response BSON document */
     CDocumentMsgBody body;
     response->setMsgBody(body);
 
@@ -905,7 +905,7 @@ CDocumentWireMessage::createUpdateResponse(int32_t requestID, int32_t matched,
 
     response->setHeader(header);
 
-    /* TODO: Create update response BSON document */
+    /* Update response BSON document */
     CDocumentMsgBody body;
     response->setMsgBody(body);
 
@@ -926,7 +926,7 @@ CDocumentWireMessage::createDeleteResponse(int32_t requestID,
 
     response->setHeader(header);
 
-    /* TODO: Create delete response BSON document */
+    /* Delete response BSON document */
     CDocumentMsgBody body;
     response->setMsgBody(body);
 

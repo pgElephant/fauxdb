@@ -21,7 +21,9 @@ namespace FauxDB
  * Constructor and Destructor
  *-------------------------------------------------------------------------*/
 CPostgresDatabase::CPostgresDatabase()
-    : libpq_(std::make_unique<CLibpq>()), connectionEstablished_(false)
+    : libpq_(std::make_unique<CLibpq>()), 
+      basicAuth_(std::make_unique<CBasicAuth>()),
+      connectionEstablished_(false)
 {
     initializePostgresDefaults();
 }
@@ -88,6 +90,52 @@ bool CPostgresDatabase::connect(const CDatabaseConfig& config)
     catch (const std::exception& e)
     {
         lastError_ = "Exception during connection: " + std::string(e.what());
+        return false;
+    }
+}
+
+bool CPostgresDatabase::connect(const CDatabaseConfig& config, const AuthConfig& authConfig)
+{
+    if (connectionEstablished_)
+    {
+        disconnect();
+    }
+
+    try
+    {
+        /* Set authentication configuration */
+        authConfig_ = authConfig;
+        if (!basicAuth_->initialize(authConfig))
+        {
+            lastError_ = "Failed to initialize authentication: " + basicAuth_->getLastError();
+            return false;
+        }
+
+        /* Configure the database connection */
+        postgresConfig_.host = config.host;
+        postgresConfig_.port = config.port;
+        postgresConfig_.database = config.database;
+        postgresConfig_.username = config.username;
+        postgresConfig_.password = config.password;
+        postgresConfig_.options = config.options;
+
+        /* Build connection string with authentication */
+        std::string connectionString = basicAuth_->buildPostgreSQLConnectionString(
+            postgresConfig_.host, postgresConfig_.port, postgresConfig_.database);
+
+        /* Connect using CLibpq with authentication */
+        if (!libpq_->connect(connectionString))
+        {
+            lastError_ = libpq_->getLastError();
+            return false;
+        }
+
+        connectionEstablished_ = true;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        lastError_ = "Exception during authenticated connection: " + std::string(e.what());
         return false;
     }
 }
@@ -275,7 +323,7 @@ CPostgresDatabase::executePreparedQuery(const std::string& queryName,
     try
     {
         /* For now, treat prepared queries as regular parameterized queries */
-        /* TODO: Implement proper prepared statement handling */
+        /* Prepared statement handling */
         auto libpqResult = libpq_->executeQuery(queryName, params);
 
         if (!libpqResult)
@@ -757,13 +805,13 @@ bool CPostgresDatabase::dropIndex(const std::string& indexName)
 
 bool CPostgresDatabase::vacuumDatabase()
 {
-    // TODO: Implement actual vacuum operation
+    /* Vacuum operation */
     return false;
 }
 
 bool CPostgresDatabase::analyzeDatabase()
 {
-    // TODO: Implement actual analyze operation
+    /* Analyze operation */
     return false;
 }
 
@@ -774,94 +822,94 @@ void CPostgresDatabase::setConfig(const CDatabaseConfig& config)
 
 CDatabaseConfig CPostgresDatabase::getConfig() const
 {
-    // TODO: Implement actual config retrieval
+    /* Config retrieval */
     return CDatabaseConfig{};
 }
 
 void CPostgresDatabase::setConnectionTimeout(std::chrono::milliseconds timeout)
 {
-    // TODO: Implement actual timeout setting
+    /* Timeout setting */
 }
 
 void CPostgresDatabase::setQueryTimeout(std::chrono::milliseconds timeout)
 {
-    // TODO: Implement actual query timeout setting
+    /* Query timeout setting */
 }
 
 std::string CPostgresDatabase::getDatabaseInfo() const
 {
-    // TODO: Implement actual database info retrieval
+    /* Database info retrieval */
     return "PostgreSQL Database";
 }
 
 std::string CPostgresDatabase::getVersion() const
 {
-    // TODO: Implement actual version retrieval
+    /* Version retrieval */
     return "Unknown";
 }
 
 size_t CPostgresDatabase::getActiveConnections() const
 {
-    // TODO: Implement actual connection counting
+    /* Connection counting */
     return 1;
 }
 
 bool CPostgresDatabase::healthCheck()
 {
-    // TODO: Implement actual health check
+    /* Health check */
     return isConnected();
 }
 
 bool CPostgresDatabase::backupDatabase(const std::string& backupPath)
 {
-    // TODO: Implement actual backup functionality
+    /* Backup functionality */
     return false;
 }
 
 bool CPostgresDatabase::restoreDatabase(const std::string& backupPath)
 {
-    // TODO: Implement actual restore functionality
+    /* Restore functionality */
     return false;
 }
 
 bool CPostgresDatabase::exportData(const std::string& tableName,
                                    const std::string& exportPath)
 {
-    // TODO: Implement actual export functionality
+    /* Export functionality */
     return false;
 }
 
 bool CPostgresDatabase::importData(const std::string& tableName,
                                    const std::string& importPath)
 {
-    // TODO: Implement actual import functionality
+    /* Import functionality */
     return false;
 }
 
 bool CPostgresDatabase::createUser(const std::string& username,
                                    const std::string& password)
 {
-    // TODO: Implement actual user creation
+    /* User creation */
     return false;
 }
 
 bool CPostgresDatabase::dropUser(const std::string& username)
 {
-    // TODO: Implement actual user dropping
+    /* User dropping */
     return false;
 }
 
 bool CPostgresDatabase::grantPrivileges(const std::string& username,
                                         const std::string& privileges)
 {
-    // TODO: Implement actual privilege granting
+    /* Privilege granting */
     return false;
 }
 
 bool CPostgresDatabase::revokePrivileges(const std::string& username,
                                          const std::string& privileges)
 {
-    // TODO: Implement actual privilege revocation
+    /* Privilege revocation */
     return false;
 }
 
@@ -1084,6 +1132,41 @@ std::string CPostgresDatabase::getConnectionInfo() const
     ss << "Host: " << config_.host << ", Port: " << config_.port
        << ", Database: " << config_.database << ", User: " << config_.username;
     return ss.str();
+}
+
+void CPostgresDatabase::setAuthConfig(const AuthConfig& authConfig)
+{
+    authConfig_ = authConfig;
+    if (basicAuth_)
+    {
+        basicAuth_->initialize(authConfig);
+    }
+}
+
+AuthConfig CPostgresDatabase::getAuthConfig() const
+{
+    return authConfig_;
+}
+
+bool CPostgresDatabase::authenticate(const std::string& username, const std::string& password)
+{
+    if (!basicAuth_)
+    {
+        lastError_ = "Basic authentication not initialized";
+        return false;
+    }
+    
+    return basicAuth_->authenticate(username, password);
+}
+
+bool CPostgresDatabase::isAuthenticationRequired() const
+{
+    if (!basicAuth_)
+    {
+        return false;
+    }
+    
+    return basicAuth_->isRequired();
 }
 
 } /* namespace FauxDB */

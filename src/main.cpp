@@ -289,11 +289,61 @@ int main(int argc, char* argv[])
             config.daemonMode =
                 GetConfigValue<bool>(loader, "daemon_mode", false);
 
+            /* MongoDB server-side authentication (FauxDB as MongoDB server) */
+            config.mongodbServerAuthMethod = GetConfigString(loader, "mongodb_server_auth.method", 
+                                                           GetConfigString(loader, "mongodb_server_auth_method", "scram-sha-256"));
+            config.mongodbServerAuthRequired = GetConfigValue<bool>(loader, "mongodb_server_auth.required", 
+                                                                  GetConfigValue<bool>(loader, "mongodb_server_auth_required", false));
+            config.mongodbServerAuthDatabase = GetConfigString(loader, "mongodb_server_auth.database", 
+                                                             GetConfigString(loader, "mongodb_server_auth_database", "admin"));
+            config.mongodbServerAuthUsername = GetConfigString(loader, "mongodb_server_auth.username", 
+                                                             GetConfigString(loader, "mongodb_server_auth_username", ""));
+            config.mongodbServerAuthPassword = GetConfigString(loader, "mongodb_server_auth.password", 
+                                                             GetConfigString(loader, "mongodb_server_auth_password", ""));
+            config.mongodbServerAuthUseSSL = GetConfigValue<bool>(loader, "mongodb_server_auth.use_ssl", 
+                                                                GetConfigValue<bool>(loader, "mongodb_server_auth_use_ssl", false));
+            config.mongodbServerAuthSSLCert = GetConfigString(loader, "mongodb_server_auth.ssl_cert", 
+                                                            GetConfigString(loader, "mongodb_server_auth_ssl_cert", ""));
+            config.mongodbServerAuthSSLKey = GetConfigString(loader, "mongodb_server_auth.ssl_key", 
+                                                           GetConfigString(loader, "mongodb_server_auth_ssl_key", ""));
+            config.mongodbServerAuthSSLCA = GetConfigString(loader, "mongodb_server_auth.ssl_ca", 
+                                                          GetConfigString(loader, "mongodb_server_auth_ssl_ca", ""));
+            
+            /* PostgreSQL client-side authentication (FauxDB to PostgreSQL) */
+            config.postgresqlClientAuthMethod = GetConfigString(loader, "postgresql_client_auth.method", 
+                                                              GetConfigString(loader, "postgresql_client_auth_method", "basic"));
+            config.postgresqlClientAuthRequired = GetConfigValue<bool>(loader, "postgresql_client_auth.required", 
+                                                                     GetConfigValue<bool>(loader, "postgresql_client_auth_required", false));
+            config.postgresqlClientAuthDatabase = GetConfigString(loader, "postgresql_client_auth.database", 
+                                                                GetConfigString(loader, "postgresql_client_auth_database", "fauxdb"));
+            config.postgresqlClientAuthUsername = GetConfigString(loader, "postgresql_client_auth.username", 
+                                                                GetConfigString(loader, "postgresql_client_auth_username", ""));
+            config.postgresqlClientAuthPassword = GetConfigString(loader, "postgresql_client_auth.password", 
+                                                                GetConfigString(loader, "postgresql_client_auth_password", ""));
+            config.postgresqlClientAuthUseSSL = GetConfigValue<bool>(loader, "postgresql_client_auth.use_ssl", 
+                                                                   GetConfigValue<bool>(loader, "postgresql_client_auth_use_ssl", false));
+            config.postgresqlClientAuthSSLCert = GetConfigString(loader, "postgresql_client_auth.ssl_cert", 
+                                                               GetConfigString(loader, "postgresql_client_auth_ssl_cert", ""));
+            config.postgresqlClientAuthSSLKey = GetConfigString(loader, "postgresql_client_auth.ssl_key", 
+                                                              GetConfigString(loader, "postgresql_client_auth_ssl_key", ""));
+            config.postgresqlClientAuthSSLCA = GetConfigString(loader, "postgresql_client_auth.ssl_ca", 
+                                                             GetConfigString(loader, "postgresql_client_auth_ssl_ca", ""));
+
             /* Debug: Print loaded PostgreSQL configuration */
             std::cout << "DEBUG: Loaded PostgreSQL config - host: "
                       << config.pgHost << ", port: " << config.pgPort
                       << ", database: " << config.pgDatabase
                       << ", user: " << config.pgUser << std::endl;
+            
+            /* Debug: Print loaded authentication configuration */
+            std::cout << "DEBUG: Loaded MongoDB server auth config - method: "
+                      << config.mongodbServerAuthMethod << ", required: " 
+                      << (config.mongodbServerAuthRequired ? "true" : "false")
+                      << ", database: " << config.mongodbServerAuthDatabase << std::endl;
+            std::cout << "DEBUG: Loaded PostgreSQL client auth config - method: "
+                      << config.postgresqlClientAuthMethod << ", required: " 
+                      << (config.postgresqlClientAuthRequired ? "true" : "false")
+                      << ", database: " << config.postgresqlClientAuthDatabase << std::endl;
         }
         else
         {

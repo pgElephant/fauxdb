@@ -30,6 +30,17 @@ class CBsonType
     bool addNull(const std::string& key);
     bool addObjectId(const std::string& key, const std::string& objectId);
     bool addDateTime(const std::string& key, int64_t timestamp);
+    bool addRegex(const std::string& key, const std::string& pattern, 
+                  const std::string& options = "");
+    bool addJavaScript(const std::string& key, const std::string& code);
+    bool addJavaScriptWithScope(const std::string& key, const std::string& code,
+                                const CBsonType& scope);
+    bool addSymbol(const std::string& key, const std::string& symbol);
+    bool addDbPointer(const std::string& key, const std::string& collection,
+                      const std::string& objectId);
+    bool addDecimal128(const std::string& key, const std::string& decimal);
+    bool addMinKey(const std::string& key);
+    bool addMaxKey(const std::string& key);
 
     bool addBinary(const std::string& key, bson_subtype_t subtype,
                    const uint8_t* data, size_t size);
@@ -45,6 +56,14 @@ class CBsonType
     bool addArrayNull();
     bool addArrayObjectId(const std::string& objectId);
     bool addArrayDateTime(int64_t timestamp);
+    bool addArrayRegex(const std::string& pattern, const std::string& options = "");
+    bool addArrayJavaScript(const std::string& code);
+    bool addArrayJavaScriptWithScope(const std::string& code, const CBsonType& scope);
+    bool addArraySymbol(const std::string& symbol);
+    bool addArrayDbPointer(const std::string& collection, const std::string& objectId);
+    bool addArrayDecimal128(const std::string& decimal);
+    bool addArrayMinKey();
+    bool addArrayMaxKey();
     bool addArrayBinary(bson_subtype_t subtype, const uint8_t* data,
                         size_t size);
     bool addArrayDocument(const CBsonType& subdoc);

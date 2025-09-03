@@ -13,7 +13,6 @@
 #include "../database/CPGConnectionPooler.hpp"
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
-
 #include "CResponseBuilder.hpp"
 #include "commands/CCommandRegistry.hpp"
 

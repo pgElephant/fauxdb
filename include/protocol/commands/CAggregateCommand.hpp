@@ -48,4 +48,4 @@ class CAggregateCommand : public CBaseCommand
                                    const vector<string>& columnNames);
 };
 
-}
+} // namespace FauxDB

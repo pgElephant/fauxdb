@@ -33,8 +33,7 @@ CScramAuth::CScramAuth(shared_ptr<CPostgresDatabase> database)
     initializeAuthTables();
 }
 
-bool CScramAuth::createUser(const string& username,
-                            const string& password,
+bool CScramAuth::createUser(const string& username, const string& password,
                             const string& pgUsername, const string& pgPassword,
                             ScramMechanism mechanism)
 {
@@ -108,8 +107,8 @@ bool CScramAuth::deleteUser(const string& username)
 }
 
 bool CScramAuth::updateUserPassword(const string& username,
-                                     const string& newPassword,
-                                     ScramMechanism mechanism)
+                                    const string& newPassword,
+                                    ScramMechanism mechanism)
 {
     if (!userExists(username))
     {
@@ -195,8 +194,7 @@ string CScramAuth::getPostgreSQLUsername(const string& username)
         return "";
     }
 
-    string sql =
-        "SELECT pg_username FROM fauxdb_users WHERE username = $1";
+    string sql = "SELECT pg_username FROM fauxdb_users WHERE username = $1";
     vector<string> params = {username};
 
     try
@@ -449,10 +447,9 @@ bool CScramAuth::storeUserCredentials(const ScramCredentials& credentials)
             ? "SCRAM-SHA-256"
             : "SCRAM-SHA-1";
 
-    string sql =
-        "INSERT INTO fauxdb_users (username, salt, iteration_count, "
-        "stored_key, server_key, mechanism, pg_username, pg_password) "
-        "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
+    string sql = "INSERT INTO fauxdb_users (username, salt, iteration_count, "
+                 "stored_key, server_key, mechanism, pg_username, pg_password) "
+                 "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)";
     vector<string> params = {credentials.username,
                              credentials.salt,
                              to_string(credentials.iterationCount),

@@ -60,9 +60,7 @@ class CScramAuth
     CScramAuth(std::shared_ptr<CPostgresDatabase> database);
     ~CScramAuth() = default;
 
-
-    bool createUser(const std::string& username,
-                    const std::string& password,
+    bool createUser(const std::string& username, const std::string& password,
                     const std::string& pgUsername,
                     const std::string& pgPassword = "",
                     ScramMechanism mechanism = ScramMechanism::SCRAM_SHA_256);
@@ -75,7 +73,6 @@ class CScramAuth
                                 const std::string& pgPassword);
     std::string getPostgreSQLUsername(const std::string& username);
 
-
     std::string startAuthentication(const std::string& username,
                                     const std::string& clientFirstMessage,
                                     ScramMechanism mechanism);
@@ -83,7 +80,6 @@ class CScramAuth
                                        const std::string& clientFinalMessage);
     bool isAuthenticated(const std::string& sessionId);
     void clearSession(const std::string& sessionId);
-
 
     static std::string generateNonce();
     static std::string generateSalt();

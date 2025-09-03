@@ -16,6 +16,7 @@
 #include "network/CTcp.hpp"
 #include "protocol/CDocumentCommandHandler.hpp"
 #include "protocol/CDocumentProtocolHandler.hpp"
+#include "auth/CAuthRegistry.hpp"
 
 #include <atomic>
 #include <boost/system/error_code.hpp>
@@ -107,6 +108,14 @@ class CServer
     virtual bool isDatabaseHealthy() const;
     virtual bool isNetworkHealthy() const;
 
+    /* Authentication management */
+    virtual bool initializeAuthentication();
+    virtual std::shared_ptr<FauxDB::CAuthRegistry> getAuthRegistry() const;
+    virtual std::shared_ptr<FauxDB::IPostgreSQLAuth> getPostgreSQLAuth() const;
+    virtual std::shared_ptr<FauxDB::IMongoDBAuth> getMongoDBAuth() const;
+    virtual bool authenticateMongoDBClient(const std::string& username, const std::string& password);
+    virtual std::string getAuthenticationStatus() const;
+
     /* Server statistics */
     virtual std::string getServerStatistics() const;
 
@@ -133,6 +142,7 @@ class CServer
 
     /* Network components */
     std::shared_ptr<FauxDB::CPGConnectionPooler> connectionPooler_;
+    std::unique_ptr<FauxDB::CAuthRegistry> authRegistry_;
     std::unique_ptr<FauxDB::CTcp> tcpServer_;
 
     /* Protocol components */

@@ -472,23 +472,22 @@ vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(
     const string& commandName, int32_t requestID, const vector<uint8_t>& buffer,
     ssize_t bytesRead)
 {
-    /* TODO: Enable modular system after testing - temporarily disabled
     if (commandRegistry_->hasCommand(commandName))
     {
-        string collectionName =
-    CollectionNameParser::extractCollectionName(buffer, bytesRead, commandName);
+        string collectionName = extractCollectionName(buffer, bytesRead);
         if (collectionName.empty())
         {
             collectionName = "test";
         }
-        auto command = commandRegistry_->getCommand(commandName);
-        if (command)
-        {
-            return command->execute(collectionName, buffer, bytesRead,
-    connectionPooler_);
-        }
+
+        CommandContext context;
+        context.collectionName = collectionName;
+        context.requestBuffer = buffer;
+        context.requestSize = bytesRead;
+        context.connectionPooler = connectionPooler_;
+
+        return commandRegistry_->executeCommand(commandName, context);
     }
-    */
 
     CBsonType bson;
     if (!bson.initialize() || !bson.beginDocument())
@@ -1689,7 +1688,7 @@ CHelloCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
     (void)request;
     auto response = std::make_unique<CDocumentWireMessage>();
-    // TODO: Implement hello response
+    /* Hello response */
     return response;
 }
 
@@ -1727,7 +1726,7 @@ CBuildInfoCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
     (void)request;
     auto response = std::make_unique<CDocumentWireMessage>();
-    // TODO: Implement buildInfo response
+    /* BuildInfo response */
     return response;
 }
 
@@ -1766,7 +1765,7 @@ CIsMasterCommandHandler::handleCommand(const CDocumentWireMessage& request)
 {
     (void)request;
     auto response = std::make_unique<CDocumentWireMessage>();
-    // TODO: Implement isMaster response
+    /* IsMaster response */
     return response;
 }
 

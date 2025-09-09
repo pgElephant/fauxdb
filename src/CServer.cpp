@@ -1,13 +1,10 @@
 
-/*-------------------------------------------------------------------------
- *
+/*
  * CServer.cpp
- *      Main server implementation for FauxDB.
- *      Handles server lifecycle, connections, and component management.
+ *		Main server implementation for FauxDB.
+ *		Handles server lifecycle, connections, and component management.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
- *
- *-------------------------------------------------------------------------
  */
 
 // System headers
@@ -36,10 +33,6 @@ using namespace std;
 
 namespace FauxDB
 {
-
-/*-------------------------------------------------------------------------
- * CServer implementation
- *-------------------------------------------------------------------------*/
 
 CServer::CServer()
     : status_(CServerStatus::Stopped), running_(false), maintenanceMode_(false),
@@ -704,6 +697,9 @@ std::vector<std::string> CServer::getComponentInfo() const
 
 std::string CServer::getDatabaseStatus() const
 {
+	CConnectionPoolStats			stats;
+	std::string						status;
+
     if (!connectionPooler_)
     {
         return "Database: Not Initialized";
@@ -711,8 +707,8 @@ std::string CServer::getDatabaseStatus() const
 
     try
     {
-        auto stats = connectionPooler_->getStats();
-        std::string status = "Database: ";
+        stats = connectionPooler_->getStats();
+        status = "Database: ";
         status += "Total=" + std::to_string(stats.totalConnections);
         status += ", Available=" + std::to_string(stats.availableConnections);
         status += ", InUse=" + std::to_string(stats.inUseConnections);
@@ -749,6 +745,8 @@ std::string CServer::getNetworkStatus() const
 
 bool CServer::isDatabaseHealthy() const
 {
+	CConnectionPoolStats			stats;
+
     if (!connectionPooler_)
     {
         return false;
@@ -756,7 +754,7 @@ bool CServer::isDatabaseHealthy() const
 
     try
     {
-        auto stats = connectionPooler_->getStats();
+        stats = connectionPooler_->getStats();
         return stats.brokenConnections == 0 && stats.availableConnections > 0;
     }
     catch (...)
@@ -784,7 +782,9 @@ bool CServer::isNetworkHealthy() const
 
 std::string CServer::getServerStatistics() const
 {
-    std::string stats = "Server Statistics:\n";
+	std::string				stats = "Server Statistics:\n";
+	CConnectionPoolStats	poolStats;
+
     stats +=
         "  Status: " + std::to_string(static_cast<int>(status_.load())) + "\n";
     stats += "  Running: " + std::string(running_ ? "Yes" : "No") + "\n";
@@ -798,7 +798,7 @@ std::string CServer::getServerStatistics() const
     {
         try
         {
-            auto poolStats = connectionPooler_->getStats();
+            poolStats = connectionPooler_->getStats();
             stats += "  Connection Pool Stats:\n";
             stats += "    Total Requests: " +
                      std::to_string(poolStats.totalRequests) + "\n";

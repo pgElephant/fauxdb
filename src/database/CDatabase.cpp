@@ -1,11 +1,8 @@
-/*-------------------------------------------------------------------------
- *
+/*
  * CDatabase.cpp
- *      Implementation of database interface for FauxDB.
+ *		Implementation of database interface for FauxDB.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
- *
- *-------------------------------------------------------------------------
  */
 #include "CDatabase.hpp"
 
@@ -18,9 +15,6 @@
 namespace FauxDB
 {
 
-/*-------------------------------------------------------------------------
- * CDatabase implementation
- *-------------------------------------------------------------------------*/
 CDatabase::CDatabase()
     : status_(CDatabaseStatus::DISCONNECTED),
       transactionStatus_(CDatabaseTransactionStatus::NO_TRANSACTION),
@@ -52,13 +46,11 @@ void CDatabase::updateLastActivity()
 void CDatabase::logDatabaseEvent(const std::string& event,
                                  const std::string& details)
 {
-    /* Log database events using the error callback if available */
     if (errorCallback_)
     {
         errorCallback_(event, details);
     }
 
-    /* Store event information for debugging */
     lastError_ = "Event: " + event + " - Details: " + details;
     lastErrorTime_ = std::chrono::steady_clock::now();
 }
@@ -74,7 +66,6 @@ CDatabaseQueryResult CDatabase::processQuery(const std::string& query)
         return result;
     }
 
-    /* Base implementation - should be overridden by derived classes */
     result.success = false;
     result.message =
         "Base processQuery not implemented - override in derived class";

@@ -1,11 +1,8 @@
-/*-------------------------------------------------------------------------
- *
+/*
  * CNetwork.cpp
- *      Abstract network management base class for FauxDB server.
+ *		Abstract network management base class for FauxDB server.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
- *
- *-------------------------------------------------------------------------
  */
 
 #include "network/CNetwork.hpp"

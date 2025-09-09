@@ -1,12 +1,9 @@
-/*-------------------------------------------------------------------------
- *
+/*
  * CDocumentProtocolHandler.cpp
- *      MongoDB wire protocol handler for FauxDB.
- *      Implements OP_MSG and OP_QUERY protocol handling with PostgreSQL backend.
+ *		MongoDB wire protocol handler for FauxDB.
+ *		Implements OP_MSG and OP_QUERY protocol handling with PostgreSQL backend.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
- *
- *-------------------------------------------------------------------------
  */
 
 #include "CDocumentProtocolHandler.hpp"
@@ -154,63 +151,62 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
     const vector<uint8_t>& buffer, ssize_t bytesRead,
     CResponseBuilder& responseBuilder)
 {
+	int32_t					messageLength;
+	int32_t					requestID;
+	int32_t					responseTo;
+	int32_t					opCode;
+	uint32_t				flagBits;
+	uint8_t					kind;
+	int32_t					docSize;
+	std::string				commandName;
+	std::string				collectionName;
+	size_t					offset;
+	size_t					collNameStart;
+	int32_t					queryDocSize;
+
     (void)responseBuilder;
 
-    // Sanity check: we must have exactly the full message
     if (buffer.empty() || bytesRead < 21)
     {
         return createErrorWireResponse(0);
     }
 
-    // Extract header (16 bytes)
-    int32_t messageLength, requestID, responseTo, opCode;
     std::memcpy(&messageLength, buffer.data(), 4);
     std::memcpy(&requestID, buffer.data() + 4, 4);
     std::memcpy(&responseTo, buffer.data() + 8, 4);
     std::memcpy(&opCode, buffer.data() + 12, 4);
 
-    // Sanity check: assert header.messageLength == bytes_read_total
     if (messageLength != bytesRead)
     {
         return createErrorWireResponse(requestID);
     }
 
-    // Handle both OP_MSG (2013) and OP_QUERY (2004)
     if (opCode == 2013)
     {
-        // OP_MSG format - our existing implementation
-        // Extract flagBits (4 bytes) and first section kind (1 byte)
-        uint32_t flagBits;
         std::memcpy(&flagBits, buffer.data() + 16, 4);
-        uint8_t kind = buffer[20];
+        kind = buffer[20];
 
-        // Assert body[0..3] are flagBits and zero for our use
         if (flagBits != 0)
         {
             return createErrorWireResponse(requestID);
         }
 
-        // Assert body[4] is 0x00 (section 0)
         if (kind != 0)
         {
             return createErrorWireResponse(requestID);
         }
 
-        // Parse BSON document starting at offset 21
         if (bytesRead < 25)
             return createErrorWireResponse(requestID);
 
-        int32_t docSize;
         std::memcpy(&docSize, buffer.data() + 21, 4);
 
-        // Assert the BSON document length fits inside the body
         if (21 + docSize > bytesRead)
         {
             return createErrorWireResponse(requestID);
         }
 
-        // Parse command name from first field in BSON
-        std::string commandName = parseCommandFromBSON(buffer, 25, docSize - 4);
+        commandName = parseCommandFromBSON(buffer, 25, docSize - 4);
 
         // Route to appropriate handler - ALWAYS echo the request's requestID
         if (commandName == "hello" || commandName == "isMaster")
@@ -227,8 +223,7 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         }
         else if (commandName == "find")
         {
-            // Extract collection name from the find command
-            std::string collectionName =
+            collectionName =
                 parseCollectionNameFromBSON(buffer, 25, docSize - 4);
             return createFindResponseFromPostgreSQL(collectionName, requestID);
         }
@@ -266,39 +261,32 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         if (bytesRead < 20)
             return createErrorWireResponse(requestID);
 
-        // Skip flags (4 bytes)
-        size_t offset = 20;
+        offset = 20;
 
-        // Find collection name (null-terminated string)
-        size_t collNameStart = offset;
+        collNameStart = offset;
         while (offset < (size_t)bytesRead && buffer[offset] != 0)
             offset++;
         if (offset >= (size_t)bytesRead)
             return createErrorWireResponse(requestID);
 
-        std::string collectionName(
+        collectionName = std::string(
             reinterpret_cast<const char*>(buffer.data() + collNameStart),
             offset - collNameStart);
-        offset++; // skip null terminator
+        offset++;
 
-        // Skip numberToSkip(4) + numberToReturn(4)
         offset += 8;
 
         if (offset + 4 >= (size_t)bytesRead)
             return createErrorWireResponse(requestID);
 
-        // Parse BSON query document
-        int32_t queryDocSize;
         std::memcpy(&queryDocSize, buffer.data() + offset, 4);
 
         if (offset + queryDocSize > (size_t)bytesRead)
             return createErrorWireResponse(requestID);
 
-        // Parse command from BSON query
-        std::string commandName =
+        commandName =
             parseCommandFromBSON(buffer, offset + 4, queryDocSize - 4);
 
-        // For OP_QUERY, we need to respond with OP_REPLY (1) instead of OP_MSG
         if (commandName == "hello" || commandName == "isMaster" ||
             commandName == "ismaster")
         {
@@ -310,8 +298,7 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         }
         else if (commandName == "find")
         {
-            // Extract collection name from the find command
-            std::string collectionName = parseCollectionNameFromBSON(
+            collectionName = parseCollectionNameFromBSON(
                 buffer, offset + 4, queryDocSize - 4);
             return createFindOpReplyResponseFromPostgreSQL(collectionName,
                                                            requestID);

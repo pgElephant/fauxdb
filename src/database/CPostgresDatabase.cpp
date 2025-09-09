@@ -1,12 +1,9 @@
-/*-------------------------------------------------------------------------
- *
+/*
  * CPostgresDatabase.cpp
- *      PostgreSQL database implementation for FauxDB.
- *      Implements PostgreSQL-specific database operations.
+ *		PostgreSQL database implementation for FauxDB.
+ *		Implements PostgreSQL-specific database operations.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
- *
- *-------------------------------------------------------------------------
  */
 #include "CPostgresDatabase.hpp"
 
@@ -19,9 +16,6 @@
 namespace FauxDB
 {
 
-/*-------------------------------------------------------------------------
- * Constructor and Destructor
- *-------------------------------------------------------------------------*/
 CPostgresDatabase::CPostgresDatabase()
     : libpq_(std::make_unique<CLibpq>()),
       basicAuth_(std::make_unique<CBasicAuth>()), connectionEstablished_(false)
@@ -1080,7 +1074,7 @@ bool CPostgresDatabase::connect()
 
 bool CPostgresDatabase::ping()
 {
-    // Always attempt a real query, even if isConnected() returns true
+
     try
     {
         auto result = executeQuery("SELECT 1");
@@ -1119,16 +1113,12 @@ std::string CPostgresDatabase::getServerVersion() const
 
     try
     {
-        // Note: This would need to be const-correct, but for now we'll use a
-        // workaround In a real implementation, you'd need to make executeQuery
-        // const or have a separate const method
+
         return "PostgreSQL (version query not implemented)";
     }
     catch (const std::exception& e)
     {
-        // Note: lastError_ is const in const methods, so we can't set it here
-        // In a real implementation, you'd need a different approach for error
-        // handling in const methods
+
     }
 
     return "";

@@ -104,6 +104,11 @@ class CSignal
     virtual bool ignoreSignal(CSignalType signalType);
     virtual bool resetSignal(CSignalType signalType);
 
+    /* Signal state queries */
+    virtual bool shouldExit() const;
+    virtual bool shouldReload() const;
+    virtual void clearReloadFlag();
+
     /* Signal sending */
     virtual bool sendSignal(int processId, CSignalType signalType);
     virtual bool sendSignalToSelf(CSignalType signalType);

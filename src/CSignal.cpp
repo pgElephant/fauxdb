@@ -1,17 +1,20 @@
 /*-------------------------------------------------------------------------
  *
  * CSignal.cpp
- *      Signal handling utilities for FauxDB server.
- *      Part of the FauxDB MongoDB-compatible database server.
+ *		  Signal handling utilities for FauxDB server
+ *
+ * Provides signal management, registration, and monitoring capabilities
+ * for proper server lifecycle management.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ * IDENTIFICATION
+ *		  src/CSignal.cpp
  *
  *-------------------------------------------------------------------------
  */
 
-
 #include "CSignal.hpp"
-
 #include "CLogger.hpp"
 
 #include <algorithm>
@@ -26,91 +29,151 @@ using namespace std;
 namespace FauxDB
 {
 
-std::unordered_map<int, CSignal*> CSignal::g_signalInstances;
+std::unordered_map<int, CSignal *> CSignal::g_signalInstances;
 std::mutex CSignal::g_signalMutex;
 
-CSignal::CSignal() : initialized_(false), monitoringEnabled_(false)
+/*
+ * CSignal constructor
+ *		Initialize signal handler with defaults
+ */
+CSignal::CSignal()
+	: initialized_(false),
+	  monitoringEnabled_(false)
 {
-    initializeDefaults();
+	initializeDefaults();
 }
 
+/*
+ * CSignal destructor
+ *		Clean up signal handling resources
+ */
 CSignal::~CSignal()
 {
-    shutdown();
+	shutdown();
 }
 
-void CSignal::initializeDefaults()
+/*
+ * initializeDefaults
+ *		Set up default configuration and clear state
+ */
+void
+CSignal::initializeDefaults()
 {
-    config_ = CSignalConfig{};
-    handlers_.clear();
-    defaultHandlers_.clear();
-    blockedSignals_.clear();
-    signalCounts_.clear();
-    lastError_.clear();
+	config_ = CSignalConfig{};
+	handlers_.clear();
+	defaultHandlers_.clear();
+	blockedSignals_.clear();
+	signalCounts_.clear();
+	lastError_.clear();
 }
 
-bool CSignal::initialize(const CSignalConfig& config)
+/*
+ * initialize
+ *		Set up signal handling with given configuration
+ */
+bool
+CSignal::initialize(const CSignalConfig& config)
 {
-    if (initialized_)
-    {
-        return true;
-    }
+	if (initialized_)
+		return true;
 
-    try
-    {
-        config_ = config;
-        initialized_ = true;
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        setError("Initialization failed: " + std::string(e.what()));
-        return false;
-    }
+	try
+	{
+		config_ = config;
+		initialized_ = true;
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		setError("Initialization failed: " + std::string(e.what()));
+		return false;
+	}
 }
 
-void CSignal::shutdown()
+/*
+ * shutdown
+ *		Clean up signal handling resources
+ */
+void
+CSignal::shutdown()
 {
-    if (!initialized_)
-    {
-        return;
-    }
+	if (!initialized_)
+		return;
 
-    try
-    {
-        handlers_.clear();
-        defaultHandlers_.clear();
-        blockedSignals_.clear();
-        initialized_ = false;
-    }
-    catch (const std::exception& e)
-    {
-        setError("Shutdown failed: " + std::string(e.what()));
-    }
+	try
+	{
+		handlers_.clear();
+		defaultHandlers_.clear();
+		blockedSignals_.clear();
+		initialized_ = false;
+	}
+	catch (const std::exception& e)
+	{
+		setError("Shutdown failed: " + std::string(e.what()));
+	}
 }
 
-bool CSignal::isInitialized() const
+/*
+ * shouldExit
+ *		Check if exit signal has been received
+ */
+bool
+CSignal::shouldExit() const
 {
-    return initialized_;
+	return getSignalCount(CSignalType::Interrupt) > 0 ||
+		   getSignalCount(CSignalType::Terminate) > 0;
 }
 
-bool CSignal::registerHandler(CSignalType signalType, CSignalHandler handler)
+/*
+ * shouldReload
+ *		Check if reload signal has been received
+ */
+bool
+CSignal::shouldReload() const
 {
-    if (!initialized_ || !validateSignalType(signalType))
-    {
-        return false;
-    }
+	return getSignalCount(CSignalType::User1) > 0;
+}
 
-    try
-    {
-        handlers_[signalType] = handler;
-        return true;
-    }
-    catch (const std::exception& e)
-    {
-        setError("Failed to register handler: " + std::string(e.what()));
-        return false;
-    }
+/*
+ * clearReloadFlag
+ *		Reset reload signal count
+ */
+void
+CSignal::clearReloadFlag()
+{
+	resetSignalCount(CSignalType::User1);
+}
+
+/*
+ * isInitialized
+ *		Return initialization status
+ */
+bool
+CSignal::isInitialized() const
+{
+	return initialized_;
+}
+
+/*
+ * registerHandler
+ *		Register signal handler for specific signal type
+ */
+bool
+CSignal::registerHandler(CSignalType signalType, CSignalHandler handler)
+{
+	if (!initialized_ || !validateSignalType(signalType))
+		return false;
+
+	try
+	{
+		handlers_[signalType] = handler;
+		return true;
+	}
+	catch (const std::exception& e)
+	{
+		setError("Failed to register handler: " + std::string(e.what()));
+		return false;
+	}
 }
 
 bool CSignal::unregisterHandler(CSignalType signalType)

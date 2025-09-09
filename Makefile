@@ -318,6 +318,54 @@ src/CSignal.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CSignal.cpp.s
 .PHONY : src/CSignal.cpp.s
 
+src/auth/CAuthRegistry.o: src/auth/CAuthRegistry.cpp.o
+.PHONY : src/auth/CAuthRegistry.o
+
+# target to build an object file
+src/auth/CAuthRegistry.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CAuthRegistry.cpp.o
+.PHONY : src/auth/CAuthRegistry.cpp.o
+
+src/auth/CAuthRegistry.i: src/auth/CAuthRegistry.cpp.i
+.PHONY : src/auth/CAuthRegistry.i
+
+# target to preprocess a source file
+src/auth/CAuthRegistry.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CAuthRegistry.cpp.i
+.PHONY : src/auth/CAuthRegistry.cpp.i
+
+src/auth/CAuthRegistry.s: src/auth/CAuthRegistry.cpp.s
+.PHONY : src/auth/CAuthRegistry.s
+
+# target to generate assembly for a file
+src/auth/CAuthRegistry.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CAuthRegistry.cpp.s
+.PHONY : src/auth/CAuthRegistry.cpp.s
+
+src/auth/CBasicAuth.o: src/auth/CBasicAuth.cpp.o
+.PHONY : src/auth/CBasicAuth.o
+
+# target to build an object file
+src/auth/CBasicAuth.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CBasicAuth.cpp.o
+.PHONY : src/auth/CBasicAuth.cpp.o
+
+src/auth/CBasicAuth.i: src/auth/CBasicAuth.cpp.i
+.PHONY : src/auth/CBasicAuth.i
+
+# target to preprocess a source file
+src/auth/CBasicAuth.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CBasicAuth.cpp.i
+.PHONY : src/auth/CBasicAuth.cpp.i
+
+src/auth/CBasicAuth.s: src/auth/CBasicAuth.cpp.s
+.PHONY : src/auth/CBasicAuth.s
+
+# target to generate assembly for a file
+src/auth/CBasicAuth.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CBasicAuth.cpp.s
+.PHONY : src/auth/CBasicAuth.cpp.s
+
 src/auth/CScramAuth.o: src/auth/CScramAuth.cpp.o
 .PHONY : src/auth/CScramAuth.o
 
@@ -341,6 +389,30 @@ src/auth/CScramAuth.s: src/auth/CScramAuth.cpp.s
 src/auth/CScramAuth.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.s
 .PHONY : src/auth/CScramAuth.cpp.s
+
+src/auth/CScramMongoAuth.o: src/auth/CScramMongoAuth.cpp.o
+.PHONY : src/auth/CScramMongoAuth.o
+
+# target to build an object file
+src/auth/CScramMongoAuth.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramMongoAuth.cpp.o
+.PHONY : src/auth/CScramMongoAuth.cpp.o
+
+src/auth/CScramMongoAuth.i: src/auth/CScramMongoAuth.cpp.i
+.PHONY : src/auth/CScramMongoAuth.i
+
+# target to preprocess a source file
+src/auth/CScramMongoAuth.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramMongoAuth.cpp.i
+.PHONY : src/auth/CScramMongoAuth.cpp.i
+
+src/auth/CScramMongoAuth.s: src/auth/CScramMongoAuth.cpp.s
+.PHONY : src/auth/CScramMongoAuth.s
+
+# target to generate assembly for a file
+src/auth/CScramMongoAuth.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramMongoAuth.cpp.s
+.PHONY : src/auth/CScramMongoAuth.cpp.s
 
 src/database/CConnectionPooler.o: src/database/CConnectionPooler.cpp.o
 .PHONY : src/database/CConnectionPooler.o
@@ -1501,9 +1573,18 @@ help:
 	@echo "... src/CSignal.o"
 	@echo "... src/CSignal.i"
 	@echo "... src/CSignal.s"
+	@echo "... src/auth/CAuthRegistry.o"
+	@echo "... src/auth/CAuthRegistry.i"
+	@echo "... src/auth/CAuthRegistry.s"
+	@echo "... src/auth/CBasicAuth.o"
+	@echo "... src/auth/CBasicAuth.i"
+	@echo "... src/auth/CBasicAuth.s"
 	@echo "... src/auth/CScramAuth.o"
 	@echo "... src/auth/CScramAuth.i"
 	@echo "... src/auth/CScramAuth.s"
+	@echo "... src/auth/CScramMongoAuth.o"
+	@echo "... src/auth/CScramMongoAuth.i"
+	@echo "... src/auth/CScramMongoAuth.s"
 	@echo "... src/database/CConnectionPooler.o"
 	@echo "... src/database/CConnectionPooler.i"
 	@echo "... src/database/CConnectionPooler.s"

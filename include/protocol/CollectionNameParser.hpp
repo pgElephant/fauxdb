@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CollectionNameParser.hpp
+ *      Collection name parsing utilities for MongoDB commands.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 /* Collection Name Parser Utility */
 #pragma once
 

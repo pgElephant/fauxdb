@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CMessageParser.hpp
+ *      Protocol message parser implementation.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 #include "../CTypes.hpp"
 #include "../IInterfaces.hpp"

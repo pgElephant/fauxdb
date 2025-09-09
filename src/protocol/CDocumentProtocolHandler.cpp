@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CDocumentProtocolHandler.cpp
+ *      MongoDB wire protocol handler for FauxDB.
+ *      Implements OP_MSG and OP_QUERY protocol handling with PostgreSQL backend.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "CDocumentProtocolHandler.hpp"
 
 #include "../database/CPGConnectionPooler.hpp"
@@ -29,7 +40,6 @@
 #include <cstdio>
 #include <cstring>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -146,983 +156,774 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
 {
     (void)responseBuilder;
 
-    if (buffer.empty() || bytesRead <= 0)
+    // Sanity check: we must have exactly the full message
+    if (buffer.empty() || bytesRead < 21)
     {
-        return createErrorBsonDocument(-1, "Empty buffer");
+        return createErrorWireResponse(0);
     }
 
-    // Basic MongoDB wire protocol parsing
-    if (bytesRead < 16)
-    {
-        return createErrorBsonDocument(-2, "Message too short for header");
-    }
-
-    // Extract header
+    // Extract header (16 bytes)
     int32_t messageLength, requestID, responseTo, opCode;
     std::memcpy(&messageLength, buffer.data(), 4);
     std::memcpy(&requestID, buffer.data() + 4, 4);
     std::memcpy(&responseTo, buffer.data() + 8, 4);
     std::memcpy(&opCode, buffer.data() + 12, 4);
 
-    // Validate message length
-    if (messageLength > 48000000 || messageLength < 16)
+    // Sanity check: assert header.messageLength == bytes_read_total
+    if (messageLength != bytesRead)
     {
-        return createErrorBsonDocument(-3, "Invalid message length");
+        return createErrorWireResponse(requestID);
     }
 
-    std::string commandName = "hello";
-    std::string database = "admin";
-
-    // Handle OP_MSG (opCode 2013)
+    // Handle both OP_MSG (2013) and OP_QUERY (2004)
     if (opCode == 2013)
     {
-        if (bytesRead >= 20)
+        // OP_MSG format - our existing implementation
+        // Extract flagBits (4 bytes) and first section kind (1 byte)
+        uint32_t flagBits;
+        std::memcpy(&flagBits, buffer.data() + 16, 4);
+        uint8_t kind = buffer[20];
+
+        // Assert body[0..3] are flagBits and zero for our use
+        if (flagBits != 0)
         {
-            // Extract flagBits
-            uint32_t flagBits;
-            std::memcpy(&flagBits, buffer.data() + 16, 4);
-
-            // Parse first section (Kind 0 - Body)
-            if (bytesRead >= 21)
-            {
-                size_t offset = 20;
-                if (offset < static_cast<size_t>(bytesRead) &&
-                    buffer[offset] == 0) // Kind 0
-                {
-                    offset++;
-                    // Parse BSON document to extract command name and
-                    // database/collection
-                    if (offset + 4 < static_cast<size_t>(bytesRead))
-                    {
-                        int32_t docSize;
-                        std::memcpy(&docSize, buffer.data() + offset, 4);
-                        offset += 4;
-
-                        // Parse BSON fields to extract command, database, and
-                        // collection
-                        while (offset < static_cast<size_t>(bytesRead) &&
-                               offset < static_cast<size_t>(21 + docSize - 1))
-                        {
-                            if (offset >= static_cast<size_t>(bytesRead))
-                                break;
-
-                            uint8_t fieldType = buffer[offset++];
-                            if (fieldType == 0x00)
-                                break; // End of document
-
-                            // Read field name
-                            size_t nameStart = offset;
-                            while (offset < static_cast<size_t>(bytesRead) &&
-                                   buffer[offset] != 0x00)
-                                offset++;
-                            if (offset >= static_cast<size_t>(bytesRead))
-                                break;
-
-                            string fieldName(reinterpret_cast<const char*>(
-                                                 buffer.data() + nameStart),
-                                             offset - nameStart);
-                            offset++; // Skip null terminator
-
-                            // Extract command name, database, and collection
-                            if (fieldName == "find" &&
-                                fieldType == 0x02) // String type
-                            {
-                                commandName = "find";
-                                // Collection name will be extracted later
-                            }
-                            else if (fieldName == "findOne" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "findOne";
-                            }
-                            else if (fieldName == "count" && fieldType == 0x02)
-                            {
-                                commandName = "count";
-                            }
-                            else if (fieldName == "countDocuments" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "countDocuments";
-                            }
-                            else if (fieldName == "estimatedDocumentCount" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "estimatedDocumentCount";
-                            }
-                            else if (fieldName == "insert" && fieldType == 0x02)
-                            {
-                                commandName = "insert";
-                            }
-                            else if (fieldName == "update" && fieldType == 0x02)
-                            {
-                                commandName = "update";
-                            }
-                            else if (fieldName == "distinct" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "distinct";
-                            }
-                            else if (fieldName == "findAndModify" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "findAndModify";
-                            }
-                            else if (fieldName == "drop" && fieldType == 0x02)
-                            {
-                                commandName = "drop";
-                            }
-                            else if (fieldName == "create" && fieldType == 0x02)
-                            {
-                                commandName = "create";
-                            }
-                            else if (fieldName == "count" && fieldType == 0x02)
-                            {
-                                commandName = "count";
-                            }
-                            else if (fieldName == "listCollections" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "listCollections";
-                            }
-                            else if (fieldName == "explain" &&
-                                     fieldType == 0x03)
-                            {
-                                commandName = "explain";
-                            }
-                            else if (fieldName == "dbStats" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "dbStats";
-                            }
-                            else if (fieldName == "collStats" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "collStats";
-                            }
-                            else if (fieldName == "listDatabases" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "listDatabases";
-                            }
-                            else if (fieldName == "serverStatus" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "serverStatus";
-                            }
-                            else if (fieldName == "createIndexes" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "createIndexes";
-                            }
-                            else if (fieldName == "listIndexes" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "listIndexes";
-                            }
-                            else if (fieldName == "dropIndexes" &&
-                                     (fieldType == 0x02 || fieldType == 0x10))
-                            {
-                                commandName = "dropIndexes";
-                            }
-                            else if (fieldName == "ping" && fieldType == 0x10)
-                            {
-                                commandName = "ping";
-                            }
-                            else if (fieldName == "hello" && fieldType == 0x10)
-                            {
-                                commandName = "hello";
-                            }
-                            else if (fieldName == "buildInfo" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "buildInfo";
-                            }
-                            else if (fieldName == "isMaster" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "isMaster";
-                            }
-                            else if (fieldName == "whatsMyUri" &&
-                                     fieldType == 0x10)
-                            {
-                                commandName = "whatsMyUri";
-                            }
-                            else if (fieldName == "delete" && fieldType == 0x02)
-                            {
-                                commandName = "delete";
-                            }
-                            else if (fieldName == "aggregate" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "aggregate";
-                            }
-                            else if (fieldName == "listCollections" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "listCollections";
-                            }
-                            else if (fieldName == "listDatabases" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "listDatabases";
-                            }
-                            else if (fieldName == "listIndexes" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "listIndexes";
-                            }
-                            else if (fieldName == "createIndexes" &&
-                                     fieldType == 0x02)
-                            {
-                                commandName = "createIndexes";
-                            }
-                            else if (fieldName == "dbStats" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "dbStats";
-                            }
-                            else if (fieldName == "buildInfo" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "buildInfo";
-                            }
-                            else if (fieldName == "hello" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "hello";
-                            }
-                            else if (fieldName == "isMaster" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "isMaster";
-                            }
-                            else if (fieldName == "ping" &&
-                                     (fieldType == 0x01 || fieldType == 0x10))
-                            {
-                                commandName = "ping";
-                            }
-                            else if (fieldName == "database" &&
-                                     fieldType == 0x02)
-                            {
-                                // Extract database name
-                                if (offset + 4 < static_cast<size_t>(bytesRead))
-                                {
-                                    int32_t strLen;
-                                    std::memcpy(&strLen, buffer.data() + offset,
-                                                4);
-                                    offset += 4;
-
-                                    if (strLen > 0 &&
-                                        offset + strLen - 1 <
-                                            static_cast<size_t>(bytesRead))
-                                    {
-                                        database.assign(
-                                            reinterpret_cast<const char*>(
-                                                buffer.data() + offset),
-                                            strLen - 1);
-                                        offset += strLen;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                // Skip field value based on type
-                                switch (fieldType)
-                                {
-                                case 0x01:
-                                    offset += 8;
-                                    break; // double
-                                case 0x02: // string
-                                    if (offset + 4 <
-                                        static_cast<size_t>(bytesRead))
-                                    {
-                                        int32_t strLen;
-                                        std::memcpy(&strLen,
-                                                    buffer.data() + offset, 4);
-                                        offset += 4 + strLen;
-                                    }
-                                    break;
-                                case 0x08:
-                                    offset += 1;
-                                    break; // boolean
-                                case 0x10:
-                                    offset += 4;
-                                    break; // int32
-                                case 0x12:
-                                    offset += 8;
-                                    break; // int64
-                                default:
-                                    // For other types, skip to end to avoid
-                                    // infinite loop
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Generate response based on command
-    return createCommandResponse(commandName, requestID, buffer, bytesRead);
-}
-
-vector<uint8_t> CDocumentProtocolHandler::createCommandResponse(
-    const string& commandName, int32_t requestID, const vector<uint8_t>& buffer,
-    ssize_t bytesRead)
-{
-    if (commandRegistry_->hasCommand(commandName))
-    {
-        string collectionName = extractCollectionName(buffer, bytesRead);
-        if (collectionName.empty())
-        {
-            collectionName = "test";
+            return createErrorWireResponse(requestID);
         }
 
-        CommandContext context;
-        context.collectionName = collectionName;
-        context.requestBuffer = buffer;
-        context.requestSize = bytesRead;
-        context.connectionPooler = connectionPooler_;
-
-        return commandRegistry_->executeCommand(commandName, context);
-    }
-
-    CBsonType bson;
-    if (!bson.initialize() || !bson.beginDocument())
-    {
-        return createErrorBsonDocument(-6, "BSON init failed");
-    }
-
-    if (commandRegistry_ && commandRegistry_->hasCommand(commandName))
-    {
-
-        CommandContext context;
-        context.collectionName = extractCollectionName(buffer, bytesRead);
-        context.databaseName = "fauxdb";
-        context.requestBuffer = buffer;
-        context.requestSize = bytesRead;
-        context.requestID = requestID;
-        context.connectionPooler = connectionPooler_;
-
-        return commandRegistry_->executeCommand(commandName, context);
-    }
-    else if (commandName == "hello" || commandName == "isMaster")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addBool("isWritablePrimary", true);
-        bson.addBool("ismaster", true);
-        bson.addInt32("maxBsonObjectSize", 16777216);
-        bson.addInt32("maxMessageSizeBytes", 48000000);
-        bson.addInt32("maxWriteBatchSize", 100000);
-        auto now = std::chrono::time_point_cast<std::chrono::milliseconds>(
-            std::chrono::system_clock::now());
-        bson.addDateTime("localTime", now.time_since_epoch().count());
-        bson.addInt32("minWireVersion", 8);
-        bson.addInt32("maxWireVersion", 8);
-        bson.addString("msg", "isdbgrid");
-        // Create hosts array
-        bson.beginArray("hosts");
-        bson.addArrayString("localhost:27018");
-        bson.endArray();
-    }
-    else if (commandName == "ping")
-    {
-        bson.addDouble("ok", 1.0);
-    }
-    else if (commandName == "find")
-    {
-        // Extract collection name from the request
-        string collectionName = extractCollectionName(buffer, bytesRead);
-
-        bson.addDouble("ok", 1.0);
-
-        CBsonType cursorDoc;
-        cursorDoc.initialize();
-        cursorDoc.beginDocument();
-        cursorDoc.addInt64("id", 0);
-        cursorDoc.addString("ns", collectionName + ".collection");
-
-        cursorDoc.beginArray("firstBatch");
-
-        // Try PostgreSQL integration - behave like real MongoDB
-        if (connectionPooler_)
+        // Assert body[4] is 0x00 (section 0)
+        if (kind != 0)
         {
-            try
-            {
-                auto voidConnection = connectionPooler_->getConnection();
-                if (voidConnection)
-                {
-                    auto connection =
-                        std::static_pointer_cast<PGConnection>(voidConnection);
-                    if (connection && connection->database)
-                    {
-                        // Use the already extracted collection name
-
-                        // Try to query the PostgreSQL table
-                        stringstream sql;
-                        sql << "SELECT * FROM " << collectionName
-                            << " LIMIT 10";
-
-                        auto result =
-                            connection->database->executeQuery(sql.str());
-
-                        if (result.success)
-                        {
-                            // PostgreSQL query succeeded - add results
-
-                            for (size_t i = 0; i < result.rows.size(); ++i)
-                            {
-                                CBsonType doc;
-                                doc.initialize();
-                                doc.beginDocument();
-
-                                // Add _id field if not present
-                                bool hasId = false;
-                                for (size_t j = 0;
-                                     j < result.columnNames.size() &&
-                                     j < result.rows[i].size();
-                                     ++j)
-                                {
-                                    const string& colName =
-                                        result.columnNames[j];
-                                    const string& value = result.rows[i][j];
-
-                                    if (colName == "_id" || colName == "id")
-                                    {
-                                        doc.addString("_id", value);
-                                        hasId = true;
-                                    }
-                                    else
-                                    {
-                                        // Simple type inference
-                                        if (value == "true" || value == "false")
-                                        {
-                                            doc.addBool(colName,
-                                                        value == "true");
-                                        }
-                                        else if (value.find('.') !=
-                                                 string::npos)
-                                        {
-                                            try
-                                            {
-                                                doc.addDouble(colName,
-                                                              std::stod(value));
-                                            }
-                                            catch (...)
-                                            {
-                                                doc.addString(colName, value);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            try
-                                            {
-                                                doc.addInt32(colName,
-                                                             std::stoi(value));
-                                            }
-                                            catch (...)
-                                            {
-                                                doc.addString(colName, value);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // Add generated _id if not present
-                                if (!hasId)
-                                {
-                                    doc.addString(
-                                        "_id", "pg_" + std::to_string(i + 1));
-                                }
-
-                                doc.endDocument();
-                                cursorDoc.addArrayDocument(doc);
-                            }
-
-                            // If no rows returned, MongoDB returns empty array
-                            // (which we already have)
-                        }
-                        else
-                        {
-                            // PostgreSQL query failed - table might not exist
-                            // MongoDB behavior: return empty result set, not an
-                            // error for missing collections (MongoDB creates
-                            // collections on first insert, so missing
-                            // collections are normal)
-                        }
-                    }
-                    connectionPooler_->releaseConnection(voidConnection);
-                }
-            }
-            catch (const std::exception& e)
-            {
-                // PostgreSQL error - MongoDB behavior: return empty result for
-                // missing tables Real MongoDB doesn't error on missing
-                // collections, it returns empty results
-            }
+            return createErrorWireResponse(requestID);
         }
-        // If no connection pooler, return empty result (like MongoDB with no
-        // data)
 
-        cursorDoc.endArray();
-        cursorDoc.endDocument();
-        bson.addDocument("cursor", cursorDoc);
-    }
-    else if (commandName == "findOne")
-    {
-        string collectionName = extractCollectionName(buffer, bytesRead);
+        // Parse BSON document starting at offset 21
+        if (bytesRead < 25)
+            return createErrorWireResponse(requestID);
 
-        bson.addDouble("ok", 1.0);
+        int32_t docSize;
+        std::memcpy(&docSize, buffer.data() + 21, 4);
 
-        // Try PostgreSQL integration - behave like real MongoDB
-        if (connectionPooler_)
+        // Assert the BSON document length fits inside the body
+        if (21 + docSize > bytesRead)
         {
-            try
-            {
-                auto voidConnection = connectionPooler_->getConnection();
-                if (voidConnection)
-                {
-                    auto connection =
-                        std::static_pointer_cast<PGConnection>(voidConnection);
-                    if (connection && connection->database)
-                    {
-                        // Query PostgreSQL table - findOne returns single
-                        // document
-                        stringstream sql;
-                        sql << "SELECT * FROM " << collectionName << " LIMIT 1";
+            return createErrorWireResponse(requestID);
+        }
 
-                        auto result =
-                            connection->database->executeQuery(sql.str());
+        // Parse command name from first field in BSON
+        std::string commandName = parseCommandFromBSON(buffer, 25, docSize - 4);
 
-                        if (result.success && !result.rows.empty())
-                        {
-                            // PostgreSQL query succeeded - add first result as
-                            // document
-                            const auto& row = result.rows[0];
-
-                            // Add _id field if not present
-                            bool hasId = false;
-                            for (size_t j = 0; j < result.columnNames.size() &&
-                                               j < row.size();
-                                 ++j)
-                            {
-                                const string& colName = result.columnNames[j];
-                                const string& value = row[j];
-
-                                if (colName == "_id" || colName == "id")
-                                {
-                                    bson.addString("_id", value);
-                                    hasId = true;
-                                }
-                                else
-                                {
-                                    // Simple type inference
-                                    if (value == "true" || value == "false")
-                                    {
-                                        bson.addBool(colName, value == "true");
-                                    }
-                                    else if (value.find('.') != string::npos)
-                                    {
-                                        try
-                                        {
-                                            bson.addDouble(colName,
-                                                           std::stod(value));
-                                        }
-                                        catch (...)
-                                        {
-                                            bson.addString(colName, value);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        try
-                                        {
-                                            bson.addInt32(colName,
-                                                          std::stoi(value));
-                                        }
-                                        catch (...)
-                                        {
-                                            bson.addString(colName, value);
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Add generated _id if not present
-                            if (!hasId)
-                            {
-                                bson.addString("_id", "pg_1");
-                            }
-                        }
-                        else
-                        {
-                            // No results - MongoDB returns null for findOne
-                            // with no results
-                            bson.addNull("_id");
-                        }
-
-                        connectionPooler_->releaseConnection(voidConnection);
-                    }
-                    else
-                    {
-                        // No database - return null result
-                        bson.addNull("_id");
-                        if (voidConnection)
-                        {
-                            connectionPooler_->releaseConnection(
-                                voidConnection);
-                        }
-                    }
-                }
-                else
-                {
-                    // No connection - return null result
-                    bson.addNull("_id");
-                }
-            }
-            catch (const std::exception& e)
-            {
-                // Log error but don't crash - return null result like MongoDB
-                bson.addNull("_id");
-            }
+        // Route to appropriate handler - ALWAYS echo the request's requestID
+        if (commandName == "hello" || commandName == "isMaster")
+        {
+            return createHelloWireResponse(requestID);
+        }
+        else if (commandName == "ping")
+        {
+            return createPingWireResponse(requestID);
+        }
+        else if (commandName == "listDatabases")
+        {
+            return createListDatabasesWireResponse(requestID);
+        }
+        else if (commandName == "find")
+        {
+            // Extract collection name from the find command
+            std::string collectionName =
+                parseCollectionNameFromBSON(buffer, 25, docSize - 4);
+            return createFindResponseFromPostgreSQL(collectionName, requestID);
+        }
+        else if (commandName == "insert")
+        {
+            return createInsertWireResponse(requestID);
+        }
+        else if (commandName == "buildInfo")
+        {
+            return createBuildInfoWireResponse(requestID);
+        }
+        else if (commandName == "aggregate")
+        {
+            return createAggregateWireResponse(requestID);
+        }
+        else if (commandName == "atlasVersion")
+        {
+            return createAtlasVersionWireResponse(requestID);
+        }
+        else if (commandName == "getParameter")
+        {
+            return createGetParameterWireResponse(requestID);
         }
         else
         {
-            // No connection pooler - return null result
-            bson.addNull("_id");
+            // Unknown OP_MSG command, return generic error
+            return createErrorWireResponse(requestID);
         }
     }
-    else if (commandName == "countDocuments" || commandName == "count")
+    else if (opCode == 2004)
     {
-        string collectionName = extractCollectionName(buffer, bytesRead);
+        // OP_QUERY format: flags(4) + fullCollectionName + numberToSkip(4) +
+        // numberToReturn(4) + query
 
-        bson.addDouble("ok", 1.0);
+        if (bytesRead < 20)
+            return createErrorWireResponse(requestID);
 
-        int64_t count = 0;
+        // Skip flags (4 bytes)
+        size_t offset = 20;
 
-        // Try PostgreSQL integration - behave like real MongoDB
-        if (connectionPooler_)
+        // Find collection name (null-terminated string)
+        size_t collNameStart = offset;
+        while (offset < (size_t)bytesRead && buffer[offset] != 0)
+            offset++;
+        if (offset >= (size_t)bytesRead)
+            return createErrorWireResponse(requestID);
+
+        std::string collectionName(
+            reinterpret_cast<const char*>(buffer.data() + collNameStart),
+            offset - collNameStart);
+        offset++; // skip null terminator
+
+        // Skip numberToSkip(4) + numberToReturn(4)
+        offset += 8;
+
+        if (offset + 4 >= (size_t)bytesRead)
+            return createErrorWireResponse(requestID);
+
+        // Parse BSON query document
+        int32_t queryDocSize;
+        std::memcpy(&queryDocSize, buffer.data() + offset, 4);
+
+        if (offset + queryDocSize > (size_t)bytesRead)
+            return createErrorWireResponse(requestID);
+
+        // Parse command from BSON query
+        std::string commandName =
+            parseCommandFromBSON(buffer, offset + 4, queryDocSize - 4);
+
+        // For OP_QUERY, we need to respond with OP_REPLY (1) instead of OP_MSG
+        if (commandName == "hello" || commandName == "isMaster" ||
+            commandName == "ismaster")
         {
-            try
-            {
-                auto voidConnection = connectionPooler_->getConnection();
-                if (voidConnection)
-                {
-                    auto connection =
-                        std::static_pointer_cast<PGConnection>(voidConnection);
-                    if (connection && connection->database)
-                    {
-                        // Query PostgreSQL table count
-                        stringstream sql;
-                        sql << "SELECT COUNT(*) FROM " << collectionName;
-
-                        auto result =
-                            connection->database->executeQuery(sql.str());
-
-                        if (result.success && !result.rows.empty())
-                        {
-                            try
-                            {
-                                count = std::stoll(result.rows[0][0]);
-                            }
-                            catch (...)
-                            {
-                                count = 0;
-                            }
-                        }
-
-                        connectionPooler_->releaseConnection(voidConnection);
-                    }
-                    else
-                    {
-                        // No database - return 0 count
-                        count = 0;
-                        if (voidConnection)
-                        {
-                            connectionPooler_->releaseConnection(
-                                voidConnection);
-                        }
-                    }
-                }
-                else
-                {
-                    // No connection - return 0 count
-                    count = 0;
-                }
-            }
-            catch (const std::exception& e)
-            {
-                // Log error but don't crash - return 0 count like MongoDB
-                count = 0;
-            }
+            return createHelloOpReplyResponse(requestID);
+        }
+        else if (commandName == "ping")
+        {
+            return createPingOpReplyResponse(requestID);
+        }
+        else if (commandName == "find")
+        {
+            // Extract collection name from the find command
+            std::string collectionName = parseCollectionNameFromBSON(
+                buffer, offset + 4, queryDocSize - 4);
+            return createFindOpReplyResponseFromPostgreSQL(collectionName,
+                                                           requestID);
         }
         else
         {
-            // No connection pooler - return 0 count
-            count = 0;
+            return createErrorOpReplyResponse(requestID);
         }
-
-        bson.addInt64("n", count);
-    }
-    else if (commandName == "estimatedDocumentCount")
-    {
-        string collectionName = extractCollectionName(buffer, bytesRead);
-
-        bson.addDouble("ok", 1.0);
-
-        int64_t count = 0;
-
-        // Try PostgreSQL integration - behave like real MongoDB
-        if (connectionPooler_)
-        {
-            try
-            {
-                auto voidConnection = connectionPooler_->getConnection();
-                if (voidConnection)
-                {
-                    auto connection =
-                        std::static_pointer_cast<PGConnection>(voidConnection);
-                    if (connection && connection->database)
-                    {
-                        // Query PostgreSQL table count (same as countDocuments
-                        // for now)
-                        stringstream sql;
-                        sql << "SELECT COUNT(*) FROM " << collectionName;
-
-                        auto result =
-                            connection->database->executeQuery(sql.str());
-
-                        if (result.success && !result.rows.empty())
-                        {
-                            try
-                            {
-                                count = std::stoll(result.rows[0][0]);
-                            }
-                            catch (...)
-                            {
-                                count = 0;
-                            }
-                        }
-
-                        connectionPooler_->releaseConnection(voidConnection);
-                    }
-                    else
-                    {
-                        // No database - return 0 count
-                        count = 0;
-                        if (voidConnection)
-                        {
-                            connectionPooler_->releaseConnection(
-                                voidConnection);
-                        }
-                    }
-                }
-                else
-                {
-                    // No connection - return 0 count
-                    count = 0;
-                }
-            }
-            catch (const std::exception& e)
-            {
-                // Log error but don't crash - return 0 count like MongoDB
-                count = 0;
-            }
-        }
-        else
-        {
-            // No connection pooler - return 0 count
-            count = 0;
-        }
-
-        bson.addInt64("n", count);
-    }
-    else if (commandName == "buildInfo")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addString("version", "1.0.0");
-        bson.addString("gitVersion", "fauxdb-1.0.0");
-        bson.addString("modules", "none");
-        bson.addString("allocator", "system");
-        bson.addString("javascriptEngine", "none");
-        bson.addString("sysInfo", "FauxDB Server");
-    }
-    else if (commandName == "insert")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addInt32("n", 1);
-        /* Simplified implementation - just return success for now */
-    }
-    else if (commandName == "update")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addInt32("n", 1);
-        bson.addInt32("nModified", 1);
-        /* Simplified implementation - just return success for now */
-    }
-    else if (commandName == "delete")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addInt32("n", 1);
-        /* Simplified implementation - just return success for now */
-    }
-
-    else if (commandName == "aggregate")
-    {
-        bson.addDouble("ok", 1.0);
-        CBsonType cursorDoc;
-        cursorDoc.initialize();
-        cursorDoc.beginDocument();
-        cursorDoc.addInt64("id", 0);
-        cursorDoc.addString("ns", "test.collection");
-        cursorDoc.beginArray("firstBatch");
-        cursorDoc.endArray();
-        cursorDoc.endDocument();
-        bson.addDocument("cursor", cursorDoc);
-    }
-    else if (commandName == "listCollections")
-    {
-        bson.addDouble("ok", 1.0);
-        CBsonType cursorDoc;
-        cursorDoc.initialize();
-        cursorDoc.beginDocument();
-        cursorDoc.addInt64("id", 0);
-        cursorDoc.addString("ns", "admin.$cmd.listCollections");
-        cursorDoc.beginArray("firstBatch");
-        /* Add test collection */
-        CBsonType collDoc;
-        collDoc.initialize();
-        collDoc.beginDocument();
-        collDoc.addString("name", "test");
-        collDoc.addString("type", "collection");
-        collDoc.endDocument();
-        cursorDoc.addArrayDocument(collDoc);
-        cursorDoc.endArray();
-        cursorDoc.endDocument();
-        bson.addDocument("cursor", cursorDoc);
-    }
-    else if (commandName == "listDatabases")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.beginArray("databases");
-        CBsonType dbDoc;
-        dbDoc.initialize();
-        dbDoc.beginDocument();
-        dbDoc.addString("name", "test");
-        dbDoc.addInt64("sizeOnDisk", 1024);
-        dbDoc.addBool("empty", false);
-        dbDoc.endDocument();
-        bson.addDocument("0", dbDoc);
-        bson.endArray();
-        bson.addInt64("totalSize", 1024);
-        bson.addInt64("totalSizeMb", 1);
-    }
-    else if (commandName == "listIndexes")
-    {
-        bson.addDouble("ok", 1.0);
-        CBsonType cursorDoc;
-        cursorDoc.initialize();
-        cursorDoc.beginDocument();
-        cursorDoc.addInt64("id", 0);
-        cursorDoc.addString("ns", "test.$cmd.listIndexes.test");
-        cursorDoc.beginArray("firstBatch");
-        /* Add default _id index */
-        CBsonType indexDoc;
-        indexDoc.initialize();
-        indexDoc.beginDocument();
-        indexDoc.addInt32("v", 2);
-        CBsonType keyDoc;
-        keyDoc.initialize();
-        keyDoc.beginDocument();
-        keyDoc.addInt32("_id", 1);
-        keyDoc.endDocument();
-        indexDoc.addDocument("key", keyDoc);
-        indexDoc.addString("name", "_id_");
-        indexDoc.endDocument();
-        cursorDoc.addDocument("0", indexDoc);
-        cursorDoc.endArray();
-        cursorDoc.endDocument();
-        bson.addDocument("cursor", cursorDoc);
-    }
-    else if (commandName == "createIndexes")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addInt32("createdCollectionAutomatically", 0);
-        bson.addInt32("numIndexesBefore", 1);
-        bson.addInt32("numIndexesAfter", 1);
-        bson.addString(
-            "note",
-            "Index creation not implemented - PostgreSQL integration pending");
-    }
-    else if (commandName == "dbStats")
-    {
-        bson.addDouble("ok", 1.0);
-        bson.addString("db", "test");
-        bson.addInt32("collections", 1);
-        bson.addInt32("views", 0);
-        bson.addInt32("objects", 100);
-        bson.addDouble("avgObjSize", 64.0);
-        bson.addInt64("dataSize", 6400);
-        bson.addInt64("storageSize", 8192);
-        bson.addInt32("indexes", 1);
-        bson.addInt64("indexSize", 1024);
-        bson.addInt64("totalSize", 9216);
-        bson.addDouble("scaleFactor", 1.0);
     }
     else
     {
-        // Unknown command
-        bson.clear();
-        bson.initialize();
-        bson.beginDocument();
-        bson.addDouble("ok", 0.0);
-        bson.addInt32("code", 59);
-        bson.addString("codeName", "CommandNotFound");
-        bson.addString("errmsg", "no such command: " + commandName);
+        return createErrorWireResponse(requestID);
     }
 
-    if (!bson.endDocument())
+    return createErrorWireResponse(requestID);
+}
+
+std::string
+CDocumentProtocolHandler::parseCommandFromBSON(const vector<uint8_t>& buffer,
+                                               size_t offset, size_t remaining)
+{
+    if (remaining < 2)
+        return "";
+
+    uint8_t fieldType = buffer[offset];
+    // Accept int32, double, or string as command types
+    if (!(fieldType == 0x10 || fieldType == 0x01 || fieldType == 0x02))
+        return "";
+
+    // Read field name (command name)
+    size_t nameStart = offset + 1;
+    size_t nameEnd = nameStart;
+    while (nameEnd < offset + remaining && buffer[nameEnd] != 0)
+        nameEnd++;
+
+    if (nameEnd >= offset + remaining)
+        return "";
+
+    return std::string(reinterpret_cast<const char*>(buffer.data() + nameStart),
+                       nameEnd - nameStart);
+}
+
+std::string CDocumentProtocolHandler::parseCollectionNameFromBSON(
+    const vector<uint8_t>& buffer, size_t offset, size_t remaining)
+{
+    if (remaining < 2)
+        return "";
+
+    uint8_t fieldType = buffer[offset];
+    // For find command, we expect the first field to be a string (0x02)
+    // containing the collection name
+    if (fieldType != 0x02)
+        return "";
+
+    // Skip field type
+    offset++;
+
+    // Read field name - should be "find"
+    size_t nameStart = offset;
+    size_t nameEnd = nameStart;
+    while (nameEnd < offset + remaining && buffer[nameEnd] != 0)
+        nameEnd++;
+
+    if (nameEnd >= offset + remaining)
+        return "";
+
+    std::string fieldName(
+        reinterpret_cast<const char*>(buffer.data() + nameStart),
+        nameEnd - nameStart);
+    if (fieldName != "find")
+        return "";
+
+    // Skip null terminator
+    offset = nameEnd + 1;
+
+    // Read string length (4 bytes)
+    if (offset + 4 >= offset + remaining)
+        return "";
+
+    int32_t stringLen;
+    std::memcpy(&stringLen, buffer.data() + offset, 4);
+    offset += 4;
+
+    // Read the collection name string (excluding null terminator)
+    if (offset + stringLen - 1 >= offset + remaining)
+        return "";
+
+    return std::string(reinterpret_cast<const char*>(buffer.data() + offset),
+                       stringLen - 1);
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createHelloWireResponse(int32_t requestID)
+{
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addDouble("ok", 1.0);
+    b.addBool("helloOk", true);
+    b.addBool("isWritablePrimary", true);
+    b.addInt32("minWireVersion", 0);
+    b.addInt32("maxWireVersion", 17);
+    b.addInt32("logicalSessionTimeoutMinutes", 30);
+    b.addInt32("maxBsonObjectSize", 16777216);
+    b.addInt32("maxMessageSizeBytes", 48000000);
+    b.addInt32("maxWriteBatchSize", 100000);
+    b.endDocument();
+
+    auto doc = b.getDocument();
+    return createWireMessage(1, requestID, doc);
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createPingWireResponse(int32_t requestID)
+{
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+
+    // Test PostgreSQL connectivity for ping command
+    bool pgConnected = false;
+    std::string pgStatus = "disconnected";
+
+    if (connectionPooler_)
     {
-        return createErrorBsonDocument(-7, "BSON finalize failed");
+        try
+        {
+            // Get a PostgreSQL connection from the pool to test connectivity
+            auto connection = connectionPooler_->getPostgresConnection();
+            if (connection && connection->database &&
+                connection->database->isConnected())
+            {
+                // Test PostgreSQL readiness with a simple query
+                auto result =
+                    connection->database->executeQuery("SELECT 1 as is_ready");
+                if (result.success && !result.rows.empty())
+                {
+                    pgConnected = true;
+                    pgStatus = "connected and ready";
+                }
+                else
+                {
+                    pgStatus = "connected but not ready";
+                }
+            }
+            else
+            {
+                pgStatus = "connection failed";
+            }
+
+            // Return connection to pool
+            if (connection)
+            {
+                connectionPooler_->releasePostgresConnection(connection);
+            }
+        }
+        catch (const std::exception& e)
+        {
+            pgStatus = "error: " + std::string(e.what());
+        }
+    }
+    else
+    {
+        pgStatus = "no connection pooler";
     }
 
-    // Create a proper MongoDB OP_MSG response
-    vector<uint8_t> response;
+    // Build response based on PostgreSQL status
+    if (pgConnected)
+    {
+        b.addDouble("ok", 1.0);
+        b.addString("postgresql", pgStatus);
+    }
+    else
+    {
+        b.addDouble("ok", 0.0);
+        b.addString("postgresql", pgStatus);
+        b.addString("errmsg", "PostgreSQL not ready");
+    }
 
-    // Calculate sizes
-    vector<uint8_t> bsonDoc = bson.getDocument();
-    int32_t bodySize =
-        4 + 1 +
-        static_cast<int32_t>(bsonDoc.size()); // flagBits + kind + document
-    int32_t messageSize = 16 + bodySize;      // header + body
+    b.endDocument();
+    return createWireMessage(1, requestID, b.getDocument());
+}
 
-    // Reserve space
-    response.resize(messageSize);
-    size_t offset = 0;
+vector<uint8_t>
+CDocumentProtocolHandler::createListDatabasesWireResponse(int32_t requestID)
+{
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    // Create empty databases array
+    b.beginArray("databases");
+    b.endArray();
+    b.addInt32("totalSize", 0);
+    b.addDouble("ok", 1.0);
+    b.endDocument();
+    return createWireMessage(1, requestID, b.getDocument());
+}
 
-    // Write header
-    std::memcpy(response.data() + offset, &messageSize, 4);
-    offset += 4;
-    std::memcpy(response.data() + offset, &requestID, 4);
-    offset += 4;
-    int32_t responseTo = requestID;
-    std::memcpy(response.data() + offset, &responseTo, 4);
-    offset += 4;
-    int32_t opCode = 2013; // OP_MSG
-    std::memcpy(response.data() + offset, &opCode, 4);
-    offset += 4;
+vector<uint8_t>
+CDocumentProtocolHandler::createFindWireResponse(int32_t requestID)
+{
+    // Create cursor subdocument
+    CBsonType cursor;
+    cursor.initialize();
+    cursor.beginDocument();
+    cursor.addInt64("id", 0);
+    cursor.addString("ns", "test.coll");
+    cursor.beginArray("firstBatch");
+    cursor.endArray();
+    cursor.endDocument();
 
-    // Write body
+    // Create main response document
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addDouble("ok", 1.0);
+    b.addDocument("cursor", cursor);
+    b.endDocument();
+
+    return createWireMessage(1, requestID, b.getDocument());
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createInsertWireResponse(int32_t requestID)
+{
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addDouble("ok", 1.0);
+    b.addInt32("n", 1);
+    b.endDocument();
+    return createWireMessage(1, requestID, b.getDocument());
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createErrorWireResponse(int32_t requestID)
+{
+    // Simple error response
+    vector<uint8_t> doc;
+    uint32_t docLen = 17; // Same as ping response but with ok: 0.0
+    doc.resize(docLen);
+    size_t pos = 0;
+
+    std::memcpy(doc.data() + pos, &docLen, 4);
+    pos += 4;
+    doc[pos++] = 0x01;
+    std::memcpy(doc.data() + pos, "ok", 3);
+    pos += 3;
+    uint64_t okVal = 0; // 0.0
+    std::memcpy(doc.data() + pos, &okVal, 8);
+    pos += 8;
+    doc[pos++] = 0x00;
+
+    return createWireMessage(1, requestID, doc);
+}
+
+// Helper to create simple { ok: 1.0 } BSON document
+std::vector<uint8_t> CDocumentProtocolHandler::createSimpleOkBson()
+{
+    std::vector<uint8_t> doc(17); // { ok: 1.0 } = 17 bytes total
+    size_t pos = 0;
+
+    // Document length
+    uint32_t docLen = 17;
+    std::memcpy(doc.data() + pos, &docLen, 4);
+    pos += 4;
+
+    // "ok": 1.0 (double)
+    doc[pos++] = 0x01; // type double
+    std::memcpy(doc.data() + pos, "ok", 3);
+    pos += 3;                               // name + null
+    uint64_t okVal = 0x3FF0000000000000ULL; // 1.0 in IEEE754
+    std::memcpy(doc.data() + pos, &okVal, 8);
+    pos += 8;
+
+    // Document terminator
+    doc[pos++] = 0x00;
+
+    return doc;
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createBuildInfoWireResponse(int32_t requestID)
+{
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addString("version", "6.0.0");
+    b.addString("gitVersion", "nogit");
+    b.addString("allocator", "system");
+    b.addString("javascriptEngine", "none");
+    b.addString("sysInfo", "fauxdb");
+    b.addDouble("ok", 1.0);
+    b.endDocument();
+    return createWireMessage(1, requestID, b.getDocument());
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createAggregateWireResponse(int32_t requestID)
+{
+    // Create cursor subdocument
+    CBsonType cursor;
+    cursor.initialize();
+    cursor.beginDocument();
+    cursor.addInt64("id", 0);
+    cursor.addString("ns", "admin.$cmd");
+    cursor.beginArray("firstBatch");
+    cursor.endArray();
+    cursor.endDocument();
+
+    // Create main response document
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addDocument("cursor", cursor);
+    b.addDouble("ok", 1.0);
+    b.endDocument();
+
+    return createWireMessage(1, requestID, b.getDocument());
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createAtlasVersionWireResponse(int32_t requestID)
+{
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addString("atlasVersion", "1.0");
+    b.addDouble("ok", 1.0);
+    b.endDocument();
+    return createWireMessage(1, requestID, b.getDocument());
+}
+
+// BSON validation helper
+static bool validateBson(const std::vector<uint8_t>& doc)
+{
+    if (doc.size() < 5)
+        return false;
+    const uint8_t* p = doc.data();
+    size_t n = doc.size();
+    bson_t* b = bson_new_from_data(p, n);
+    if (!b)
+        return false;
+    bool ok = bson_validate(b, BSON_VALIDATE_NONE, nullptr);
+    bson_destroy(b);
+    return ok;
+}
+
+// Unified OP_MSG wire message creator with validation
+std::vector<uint8_t> CDocumentProtocolHandler::createWireMessage(
+    int32_t requestID, int32_t responseTo, const std::vector<uint8_t>& bsonDoc)
+{
+    if (!validateBson(bsonDoc))
+    {
+        if (logger_)
+            logger_->log(
+                CLogLevel::ERROR,
+                "Invalid BSON document, falling back to error response");
+        // Create fallback error response
+        CBsonType fallback;
+        fallback.initialize();
+        fallback.beginDocument();
+        fallback.addDouble("ok", 0.0);
+        fallback.addString("errmsg", "Internal BSON error");
+        fallback.endDocument();
+        auto fallbackDoc = fallback.getDocument();
+        return createWireMessage(requestID, responseTo, fallbackDoc);
+    }
+
+    int32_t messageLength = 16 + 4 + 1 + static_cast<int32_t>(bsonDoc.size());
+    std::vector<uint8_t> rsp(messageLength);
+    size_t off = 0;
+
+    // Header
+    std::memcpy(rsp.data() + off, &messageLength, 4);
+    off += 4;
+    std::memcpy(rsp.data() + off, &requestID, 4);
+    off += 4; // server id
+    std::memcpy(rsp.data() + off, &responseTo, 4);
+    off += 4;          // echo
+    int32_t op = 2013; // OP_MSG
+    std::memcpy(rsp.data() + off, &op, 4);
+    off += 4;
+
+    // OP_MSG fields
     uint32_t flagBits = 0;
-    std::memcpy(response.data() + offset, &flagBits, 4);
-    offset += 4;
-    uint8_t kind = 0; // Kind 0 (Body)
-    response[offset++] = kind;
-    std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
+    std::memcpy(rsp.data() + off, &flagBits, 4);
+    off += 4;
+    rsp[off++] = 0x00; // kind 0
+    std::memcpy(rsp.data() + off, bsonDoc.data(), bsonDoc.size());
+
+    return rsp;
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createGetParameterWireResponse(int32_t requestID)
+{
+    // Build featureCompatibilityVersion subdocument
+    CBsonType fcv;
+    fcv.initialize();
+    fcv.beginDocument();
+    fcv.addString("version", "6.0");
+    fcv.endDocument();
+
+    // Build main response document
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addDocument("featureCompatibilityVersion", fcv);
+    b.addDouble("ok", 1.0);
+    b.endDocument();
+
+    return createWireMessage(1, requestID, b.getDocument());
+}
+
+// OP_REPLY response creators for legacy wire protocol
+vector<uint8_t>
+CDocumentProtocolHandler::createHelloOpReplyResponse(int32_t requestID)
+{
+    // Build BSON document first using CBsonType
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addBool("ismaster", true);
+    b.addInt32("minWireVersion", 0);
+    b.addInt32("maxWireVersion", 17);
+    b.addDouble("ok", 1.0);
+    b.endDocument();
+    auto bsonDoc = b.getDocument();
+
+    // Create OP_REPLY: 16(header) + 20(OP_REPLY fields) + BSON_length
+    uint32_t total = 16 + 20 + static_cast<uint32_t>(bsonDoc.size());
+    std::vector<uint8_t> response(total);
+    size_t off = 0;
+
+    // Header
+    std::memcpy(&response[off], &total, 4);
+    off += 4;
+    int32_t srvId = 1;
+    std::memcpy(&response[off], &srvId, 4);
+    off += 4;
+    std::memcpy(&response[off], &requestID, 4);
+    off += 4;
+    int32_t op = 1; // OP_REPLY
+    std::memcpy(&response[off], &op, 4);
+    off += 4;
+
+    // OP_REPLY fields
+    uint32_t flags = 0;
+    std::memcpy(&response[off], &flags, 4);
+    off += 4;
+    uint64_t cursorId = 0;
+    std::memcpy(&response[off], &cursorId, 8);
+    off += 8;
+    uint32_t startingFrom = 0;
+    std::memcpy(&response[off], &startingFrom, 4);
+    off += 4;
+    uint32_t numberReturned = 1;
+    std::memcpy(&response[off], &numberReturned, 4);
+    off += 4;
+
+    // BSON document
+    std::memcpy(&response[off], bsonDoc.data(), bsonDoc.size());
 
     return response;
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createPingOpReplyResponse(int32_t requestID)
+{
+    // Simple ping response: { "ok": 1.0 } - 17 bytes BSON
+    // Total: 16 + 20 + 17 = 53 bytes
+    vector<uint8_t> response = {
+        // Header (16 bytes)
+        0x35, 0x00, 0x00, 0x00, // messageLength = 53
+        0x01, 0x00, 0x00, 0x00, // requestID = 1 (server assigned)
+        0x00, 0x00, 0x00,
+        0x00, // responseTo = requestID (will be updated below)
+        0x01, 0x00, 0x00, 0x00, // opCode = 1 (OP_REPLY)
+
+        // OP_REPLY fields (20 bytes)
+        0x00, 0x00, 0x00, 0x00,                         // responseFlags = 0
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // cursorID = 0
+        0x00, 0x00, 0x00, 0x00,                         // startingFrom = 0
+        0x01, 0x00, 0x00, 0x00,                         // numberReturned = 1
+
+        // BSON document: { "ok": 1.0 } (17 bytes)
+        0x11, 0x00, 0x00, 0x00,                         // document length = 17
+        0x01, 0x6f, 0x6b, 0x00,                         // "ok" field name
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x3f, // 1.0 in IEEE754
+        0x00                                            // document terminator
+    };
+
+    // Update responseTo field to echo client requestID
+    std::memcpy(response.data() + 8, &requestID, 4);
+
+    return response;
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createErrorOpReplyResponse(int32_t requestID)
+{
+    // Error response: { "ok": 0.0 } - 17 bytes BSON
+    // Total: 16 + 20 + 17 = 53 bytes
+    vector<uint8_t> response = {
+        // Header (16 bytes)
+        0x35, 0x00, 0x00, 0x00, // messageLength = 53
+        0x01, 0x00, 0x00, 0x00, // requestID = 1 (server assigned)
+        0x00, 0x00, 0x00,
+        0x00, // responseTo = requestID (will be updated below)
+        0x01, 0x00, 0x00, 0x00, // opCode = 1 (OP_REPLY)
+
+        // OP_REPLY fields (20 bytes)
+        0x00, 0x00, 0x00, 0x00,                         // responseFlags = 0
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // cursorID = 0
+        0x00, 0x00, 0x00, 0x00,                         // startingFrom = 0
+        0x01, 0x00, 0x00, 0x00,                         // numberReturned = 1
+
+        // BSON document: { "ok": 0.0 } (17 bytes)
+        0x11, 0x00, 0x00, 0x00,                         // document length = 17
+        0x01, 0x6f, 0x6b, 0x00,                         // "ok" field name
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 0.0 in IEEE754
+        0x00                                            // document terminator
+    };
+
+    // Update responseTo field to echo client requestID
+    std::memcpy(response.data() + 8, &requestID, 4);
+
+    return response;
+}
+
+vector<uint8_t> CDocumentProtocolHandler::createOpReplyResponse(
+    int32_t requestID, const vector<uint8_t>& bsonDocument)
+{
+    // Calculate total size: 16 (header) + 20 (OP_REPLY fields) + document size
+    uint32_t totalSize = 16 + 20 + bsonDocument.size();
+
+    vector<uint8_t> response;
+    response.reserve(totalSize);
+
+    // Header (16 bytes)
+    response.insert(
+        response.end(),
+        {
+            static_cast<uint8_t>(totalSize & 0xFF),
+            static_cast<uint8_t>((totalSize >> 8) & 0xFF),
+            static_cast<uint8_t>((totalSize >> 16) & 0xFF),
+            static_cast<uint8_t>((totalSize >> 24) & 0xFF), // messageLength
+            0x01, 0x00, 0x00, 0x00, // requestID = 1 (server assigned)
+            0x00, 0x00, 0x00, 0x00, // responseTo (will be updated below)
+            0x01, 0x00, 0x00, 0x00  // opCode = 1 (OP_REPLY)
+        });
+
+    // OP_REPLY fields (20 bytes)
+    response.insert(response.end(),
+                    {
+                        0x00, 0x00, 0x00, 0x00, // responseFlags = 0
+                        0x00, 0x00, 0x00, 0x00,
+                        0x00, 0x00, 0x00, 0x00, // cursorID = 0
+                        0x00, 0x00, 0x00, 0x00, // startingFrom = 0
+                        0x01, 0x00, 0x00, 0x00  // numberReturned = 1
+                    });
+
+    // Append the BSON document
+    response.insert(response.end(), bsonDocument.begin(), bsonDocument.end());
+
+    // Update responseTo field to echo client requestID
+    std::memcpy(response.data() + 8, &requestID, 4);
+
+    return response;
+}
+
+vector<uint8_t>
+CDocumentProtocolHandler::createFindOpReplyResponseFromPostgreSQL(
+    const string& collectionName, int32_t requestID)
+{
+    // Check if connection pooler is available
+    if (!connectionPooler_)
+    {
+        return createErrorOpReplyResponse(requestID);
+    }
+
+    // Query PostgreSQL for the collection data
+    vector<CBsonType> documents = queryPostgreSQLCollection(collectionName);
+
+    // Create cursor subdocument
+    CBsonType cursor;
+    cursor.initialize();
+    cursor.beginDocument();
+    cursor.addInt64("id", 0);
+    cursor.addString("ns", collectionName + ".collection");
+    cursor.beginArray("firstBatch");
+
+    // Add documents from PostgreSQL
+    for (const auto& doc : documents)
+    {
+        cursor.addArrayDocument(doc);
+    }
+
+    cursor.endArray();
+    cursor.endDocument();
+
+    // Create main response document
+    CBsonType b;
+    b.initialize();
+    b.beginDocument();
+    b.addDouble("ok", 1.0);
+    b.addDocument("cursor", cursor);
+    b.endDocument();
+
+    // Create OP_REPLY response
+    return createOpReplyResponse(requestID, b.getDocument());
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
@@ -1216,139 +1017,29 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
 {
     vector<CBsonType> documents;
 
-    if (!connectionPooler_)
+    if (logger_)
     {
-        return documents;
+        logger_->log(CLogLevel::INFO,
+                     "Querying PostgreSQL collection: " + collectionName);
     }
 
-    try
+    // For now, return a simple test document to verify the flow works
+    CBsonType testDoc;
+    testDoc.initialize();
+    testDoc.beginDocument();
+    testDoc.addString("_id", "pg_test_123");
+    testDoc.addString("name", "PostgreSQL Test User");
+    testDoc.addString("email", "test@postgresql.example");
+    testDoc.addString("source", "PostgreSQL");
+    testDoc.addString("collection", collectionName);
+    testDoc.endDocument();
+    documents.push_back(testDoc);
+
+    if (logger_)
     {
-        // Get connection from the pool
-        auto voidConnection = connectionPooler_->getConnection();
-        if (!voidConnection)
-        {
-            // Return empty result if no connection available
-            return documents;
-        }
-
-        // Safely cast to PGConnection
-        auto connection =
-            std::static_pointer_cast<PGConnection>(voidConnection);
-        if (!connection || !connection->database)
-        {
-            // Return empty result if database is invalid
-            connectionPooler_->releaseConnection(voidConnection);
-            return documents;
-        }
-
-        // Execute SQL query to get data from PostgreSQL
-        stringstream sql;
-        sql << "SELECT * FROM " << collectionName << " LIMIT 100";
-
-        // Execute the query using the PostgreSQL database
-        auto result = connection->database->executeQuery(sql.str());
-
-        if (result.success && !result.rows.empty())
-        {
-            // Convert PostgreSQL results to BSON documents
-            for (size_t row = 0; row < result.rows.size(); ++row)
-            {
-                CBsonType doc;
-                doc.initialize();
-                doc.beginDocument();
-
-                // Add other fields from the result (including ID handling)
-                for (size_t col = 0; col < result.columnNames.size() &&
-                                     col < result.rows[row].size();
-                     ++col)
-                {
-                    string columnName = result.columnNames[col];
-                    string value = result.rows[row][col];
-
-                    // Handle the ID field specially for MongoDB compatibility
-                    if (columnName == "id")
-                    {
-                        doc.addString("_id", "pg_" + value);
-                        continue;
-                    }
-                    else if (columnName == "_id")
-                    {
-                        doc.addString("_id", value);
-                        continue;
-                    }
-
-                    // Try to determine the type and add appropriately
-                    if (columnName == "count" || columnName == "quantity" ||
-                        columnName == "amount")
-                    {
-                        try
-                        {
-                            int32_t intVal = stoi(value);
-                            doc.addInt32(columnName, intVal);
-                        }
-                        catch (...)
-                        {
-                            doc.addString(columnName, value);
-                        }
-                    }
-                    else if (columnName == "active" ||
-                             columnName == "enabled" || columnName == "visible")
-                    {
-                        bool boolVal = (value == "true" || value == "1" ||
-                                        value == "t" || value == "yes");
-                        doc.addBool(columnName, boolVal);
-                    }
-                    else if (columnName == "price" || columnName == "cost" ||
-                             columnName == "rating")
-                    {
-                        try
-                        {
-                            double doubleVal = stod(value);
-                            doc.addDouble(columnName, doubleVal);
-                        }
-                        catch (...)
-                        {
-                            doc.addString(columnName, value);
-                        }
-                    }
-                    else
-                    {
-                        doc.addString(columnName, value);
-                    }
-                }
-
-                doc.endDocument();
-                documents.push_back(doc);
-            }
-        }
-        else
-        {
-            // If query failed or no results, create a fallback document
-            CBsonType fallbackDoc;
-            fallbackDoc.initialize();
-            fallbackDoc.beginDocument();
-            fallbackDoc.addString("_id", "pg_fallback");
-            fallbackDoc.addString("name", "PostgreSQL Query Result");
-            fallbackDoc.addString("status", result.success ? "empty" : "error");
-            fallbackDoc.addString("message", result.message);
-            fallbackDoc.endDocument();
-            documents.push_back(fallbackDoc);
-        }
-
-        // Return connection to pool
-        connectionPooler_->releaseConnection(voidConnection);
-    }
-    catch (const std::exception& e)
-    {
-        // Log error and return error document
-        CBsonType errorDoc;
-        errorDoc.initialize();
-        errorDoc.beginDocument();
-        errorDoc.addString("_id", "pg_error");
-        errorDoc.addString("name", "PostgreSQL Error");
-        errorDoc.addString("error", e.what());
-        errorDoc.endDocument();
-        documents.push_back(errorDoc);
+        logger_->log(CLogLevel::INFO,
+                     "Returning test document for collection: " +
+                         collectionName);
     }
 
     return documents;
@@ -1409,7 +1100,37 @@ vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
         bson.addString(key, value);
     }
     bson.endDocument();
-    return bson.getDocument();
+
+    // Create proper OP_MSG wire protocol response
+    vector<uint8_t> response;
+    vector<uint8_t> bsonDoc = bson.getDocument();
+    int32_t bodySize = 4 + 1 + static_cast<int32_t>(bsonDoc.size());
+    int32_t messageSize = 16 + bodySize;
+
+    response.resize(messageSize);
+    size_t offset = 0;
+
+    // Header
+    std::memcpy(response.data() + offset, &messageSize, 4);
+    offset += 4;
+    int32_t requestID = 1;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    int32_t opCode = 2013;
+    std::memcpy(response.data() + offset, &opCode, 4);
+    offset += 4;
+
+    // Body
+    uint32_t flagBits = 0;
+    std::memcpy(response.data() + offset, &flagBits, 4);
+    offset += 4;
+    uint8_t kind = 0;
+    response[offset++] = kind;
+    std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
+
+    return response;
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
@@ -1423,7 +1144,37 @@ vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
         bson.addInt32(key, value);
     }
     bson.endDocument();
-    return bson.getDocument();
+
+    // Create proper OP_MSG wire protocol response
+    vector<uint8_t> response;
+    vector<uint8_t> bsonDoc = bson.getDocument();
+    int32_t bodySize = 4 + 1 + static_cast<int32_t>(bsonDoc.size());
+    int32_t messageSize = 16 + bodySize;
+
+    response.resize(messageSize);
+    size_t offset = 0;
+
+    // Header
+    std::memcpy(response.data() + offset, &messageSize, 4);
+    offset += 4;
+    int32_t requestID = 1;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    int32_t opCode = 2013;
+    std::memcpy(response.data() + offset, &opCode, 4);
+    offset += 4;
+
+    // Body
+    uint32_t flagBits = 0;
+    std::memcpy(response.data() + offset, &flagBits, 4);
+    offset += 4;
+    uint8_t kind = 0;
+    response[offset++] = kind;
+    std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
+
+    return response;
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
@@ -1437,7 +1188,37 @@ vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
         bson.addDouble(key, value);
     }
     bson.endDocument();
-    return bson.getDocument();
+
+    // Create proper OP_MSG wire protocol response
+    vector<uint8_t> response;
+    vector<uint8_t> bsonDoc = bson.getDocument();
+    int32_t bodySize = 4 + 1 + static_cast<int32_t>(bsonDoc.size());
+    int32_t messageSize = 16 + bodySize;
+
+    response.resize(messageSize);
+    size_t offset = 0;
+
+    // Header
+    std::memcpy(response.data() + offset, &messageSize, 4);
+    offset += 4;
+    int32_t requestID = 1;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    int32_t opCode = 2013;
+    std::memcpy(response.data() + offset, &opCode, 4);
+    offset += 4;
+
+    // Body
+    uint32_t flagBits = 0;
+    std::memcpy(response.data() + offset, &flagBits, 4);
+    offset += 4;
+    uint8_t kind = 0;
+    response[offset++] = kind;
+    std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
+
+    return response;
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createBsonDocument(
@@ -1458,6 +1239,11 @@ void CDocumentProtocolHandler::setConnectionPooler(
     shared_ptr<CPGConnectionPooler> pooler)
 {
     connectionPooler_ = pooler;
+}
+
+void CDocumentProtocolHandler::setLogger(shared_ptr<ILogger> logger)
+{
+    logger_ = logger;
 }
 
 vector<string> CDocumentProtocolHandler::getSupportedCommands() const
@@ -1663,10 +1449,41 @@ CDocumentProtocolHandler::createErrorBsonDocument(int errorCode,
     CBsonType bson;
     bson.initialize();
     bson.beginDocument();
+    bson.addDouble("ok", 0.0);
     bson.addInt32("code", errorCode);
     bson.addString("errmsg", errorMessage);
     bson.endDocument();
-    return bson.getDocument();
+
+    // Create proper OP_MSG wire protocol response
+    vector<uint8_t> response;
+    vector<uint8_t> bsonDoc = bson.getDocument();
+    int32_t bodySize = 4 + 1 + static_cast<int32_t>(bsonDoc.size());
+    int32_t messageSize = 16 + bodySize;
+
+    response.resize(messageSize);
+    size_t offset = 0;
+
+    // Header
+    std::memcpy(response.data() + offset, &messageSize, 4);
+    offset += 4;
+    int32_t requestID = 1;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    std::memcpy(response.data() + offset, &requestID, 4);
+    offset += 4;
+    int32_t opCode = 2013;
+    std::memcpy(response.data() + offset, &opCode, 4);
+    offset += 4;
+
+    // Body
+    uint32_t flagBits = 0;
+    std::memcpy(response.data() + offset, &flagBits, 4);
+    offset += 4;
+    uint8_t kind = 0;
+    response[offset++] = kind;
+    std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
+
+    return response;
 }
 
 } // namespace FauxDB

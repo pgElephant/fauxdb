@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * ICommand.hpp
+ *      Implementation for FauxDB.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 /* MongoDB Command Interface */
 #pragma once
 

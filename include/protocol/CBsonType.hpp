@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CBsonType.hpp
+ *      BSON data type handling for MongoDB wire protocol.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 
 #include <bson/bson.h>
@@ -30,7 +41,7 @@ class CBsonType
     bool addNull(const std::string& key);
     bool addObjectId(const std::string& key, const std::string& objectId);
     bool addDateTime(const std::string& key, int64_t timestamp);
-    bool addRegex(const std::string& key, const std::string& pattern, 
+    bool addRegex(const std::string& key, const std::string& pattern,
                   const std::string& options = "");
     bool addJavaScript(const std::string& key, const std::string& code);
     bool addJavaScriptWithScope(const std::string& key, const std::string& code,
@@ -56,11 +67,14 @@ class CBsonType
     bool addArrayNull();
     bool addArrayObjectId(const std::string& objectId);
     bool addArrayDateTime(int64_t timestamp);
-    bool addArrayRegex(const std::string& pattern, const std::string& options = "");
+    bool addArrayRegex(const std::string& pattern,
+                       const std::string& options = "");
     bool addArrayJavaScript(const std::string& code);
-    bool addArrayJavaScriptWithScope(const std::string& code, const CBsonType& scope);
+    bool addArrayJavaScriptWithScope(const std::string& code,
+                                     const CBsonType& scope);
     bool addArraySymbol(const std::string& symbol);
-    bool addArrayDbPointer(const std::string& collection, const std::string& objectId);
+    bool addArrayDbPointer(const std::string& collection,
+                           const std::string& objectId);
     bool addArrayDecimal128(const std::string& decimal);
     bool addArrayMinKey();
     bool addArrayMaxKey();

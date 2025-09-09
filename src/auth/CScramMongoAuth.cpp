@@ -8,17 +8,19 @@
  *-------------------------------------------------------------------------*/
 
 #include "auth/CScramMongoAuth.hpp"
-#include <sstream>
+
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <random>
-#include <iomanip>
+#include <sstream>
 
 namespace FauxDB
 {
 
 CScramMongoAuth::CScramMongoAuth()
-    : mechanism_(ScramMechanism::SCRAM_SHA_256), lastError_(""), initialized_(false)
+    : mechanism_(ScramMechanism::SCRAM_SHA_256), lastError_(""),
+      initialized_(false)
 {
     config_.type = AuthType::SCRAM_SHA_256;
     config_.direction = AuthDirection::MONGODB_SERVER_SIDE;
@@ -26,7 +28,8 @@ CScramMongoAuth::CScramMongoAuth()
 }
 
 CScramMongoAuth::CScramMongoAuth(const AuthConfig& config)
-    : config_(config), mechanism_(ScramMechanism::SCRAM_SHA_256), lastError_(""), initialized_(false)
+    : config_(config), mechanism_(ScramMechanism::SCRAM_SHA_256),
+      lastError_(""), initialized_(false)
 {
     initialize(config);
 }
@@ -37,7 +40,7 @@ bool CScramMongoAuth::initialize(const AuthConfig& config)
 {
     config_ = config;
     config_.direction = AuthDirection::MONGODB_SERVER_SIDE;
-    
+
     if (config_.type == AuthType::SCRAM_SHA_1)
     {
         mechanism_ = ScramMechanism::SCRAM_SHA_1;
@@ -49,37 +52,38 @@ bool CScramMongoAuth::initialize(const AuthConfig& config)
         config_.type = AuthType::SCRAM_SHA_256;
         config_.name = "SCRAM-SHA-256 MongoDB Server Authentication";
     }
-    
+
     lastError_.clear();
-    
+
     if (!validateConfig())
     {
         return false;
     }
-    
+
     initialized_ = true;
     return true;
 }
 
-bool CScramMongoAuth::authenticate(const std::string& username, const std::string& password)
+bool CScramMongoAuth::authenticate(const std::string& username,
+                                   const std::string& password)
 {
     if (!initialized_)
     {
         setError("SCRAM authentication not initialized");
         return false;
     }
-    
+
     if (!config_.required)
     {
         return true; /* Authentication not required */
     }
-    
+
     if (username.empty() || password.empty())
     {
         setError("Username and password are required for SCRAM authentication");
         return false;
     }
-    
+
     return authenticateMongoDBClient(username, password);
 }
 
@@ -103,11 +107,13 @@ std::string CScramMongoAuth::getLastError() const
     return lastError_;
 }
 
-std::string CScramMongoAuth::buildConnectionString(const std::string& host,
-                                                   const std::string& port,
-                                                   const std::string& database) const
+std::string
+CScramMongoAuth::buildConnectionString(const std::string& host,
+                                       const std::string& port,
+                                       const std::string& database) const
 {
-    /* For MongoDB server-side authentication, we don't build connection strings */
+    /* For MongoDB server-side authentication, we don't build connection strings
+     */
     return "";
 }
 
@@ -118,7 +124,7 @@ bool CScramMongoAuth::configureSSL()
         setError("SCRAM authentication not initialized");
         return false;
     }
-    
+
     /* SSL configuration is handled at the server level for MongoDB */
     return true;
 }
@@ -132,62 +138,63 @@ bool CScramMongoAuth::isSSLEnabled() const
 MongoAuthChallenge CScramMongoAuth::createChallenge(const std::string& username)
 {
     MongoAuthChallenge challenge;
-    
+
     if (!initialized_)
     {
         setError("SCRAM authentication not initialized");
         return challenge;
     }
-    
+
     if (!userExists(username))
     {
         setError("User does not exist: " + username);
         return challenge;
     }
-    
+
     challenge.nonce = generateNonce();
     challenge.salt = generateSalt();
     challenge.iterationCount = 4096; /* Standard SCRAM iteration count */
-    
+
     /* Store challenge in session for later validation */
     ScramSession session;
     session.username = username;
     session.nonce = challenge.nonce;
     session.mechanism = mechanism_;
     session.completed = false;
-    
+
     sessions_[username] = session;
-    
+
     return challenge;
 }
 
-MongoAuthResponse CScramMongoAuth::processResponse(const std::string& username,
-                                                   const std::string& password,
-                                                   const MongoAuthChallenge& challenge)
+MongoAuthResponse
+CScramMongoAuth::processResponse(const std::string& username,
+                                 const std::string& password,
+                                 const MongoAuthChallenge& challenge)
 {
     MongoAuthResponse response;
-    
+
     if (!initialized_)
     {
         response.success = false;
         response.message = "SCRAM authentication not initialized";
         return response;
     }
-    
+
     if (!userExists(username))
     {
         response.success = false;
         response.message = "User does not exist: " + username;
         return response;
     }
-    
+
     /* Validate the challenge response */
     if (validateClientProof(username, password, challenge))
     {
         response.success = true;
         response.message = "Authentication successful";
         response.proof = generateServerProof(username, password, challenge);
-        
+
         /* Mark session as completed */
         if (sessions_.find(username) != sessions_.end())
         {
@@ -199,7 +206,7 @@ MongoAuthResponse CScramMongoAuth::processResponse(const std::string& username,
         response.success = false;
         response.message = "Authentication failed";
     }
-    
+
     return response;
 }
 
@@ -209,63 +216,68 @@ bool CScramMongoAuth::validateClientProof(const std::string& username,
 {
     /* Simplified validation - in a real implementation, this would involve
      * proper SCRAM protocol validation with stored keys */
-    
+
     if (!userExists(username))
     {
         return false;
     }
-    
+
     /* For demonstration, we'll do a simple credential check */
     auto it = users_.find(username);
     if (it != users_.end())
     {
         return it->second.password == clientProof; /* Simplified */
     }
-    
+
     return false;
 }
 
-std::string CScramMongoAuth::generateServerProof(const std::string& username,
-                                                 const std::string& clientProof,
-                                                 const MongoAuthChallenge& challenge)
+std::string
+CScramMongoAuth::generateServerProof(const std::string& username,
+                                     const std::string& clientProof,
+                                     const MongoAuthChallenge& challenge)
 {
     /* Generate server proof for SCRAM authentication */
     std::ostringstream proof;
-    proof << "v=" << base64Encode("server_proof_" + username + "_" + challenge.nonce);
+    proof << "v="
+          << base64Encode("server_proof_" + username + "_" + challenge.nonce);
     return proof.str();
 }
 
-bool CScramMongoAuth::createUser(const std::string& username, const std::string& password)
+bool CScramMongoAuth::createUser(const std::string& username,
+                                 const std::string& password)
 {
     if (!initialized_)
     {
         setError("SCRAM authentication not initialized");
         return false;
     }
-    
+
     if (username.empty() || password.empty())
     {
         setError("Username and password are required");
         return false;
     }
-    
+
     if (userExists(username))
     {
         setError("User already exists: " + username);
         return false;
     }
-    
+
     ScramCredentials credentials;
     credentials.username = username;
     credentials.password = password;
     credentials.salt = generateSalt();
     credentials.iterationCount = 4096;
     credentials.mechanism = mechanism_;
-    
+
     /* Compute stored key and server key */
-    credentials.storedKey = computeStoredKey(password, credentials.salt, credentials.iterationCount);
-    credentials.serverKey = computeServerKey(password, credentials.salt, credentials.iterationCount);
-    
+    credentials.storedKey = computeStoredKey(password, credentials.salt,
+                                             credentials.iterationCount);
+    credentials.serverKey = computeServerKey(password, credentials.salt,
+                                             credentials.iterationCount);
+
     users_[username] = credentials;
     return true;
 }
@@ -277,48 +289,51 @@ bool CScramMongoAuth::deleteUser(const std::string& username)
         setError("SCRAM authentication not initialized");
         return false;
     }
-    
+
     auto it = users_.find(username);
     if (it != users_.end())
     {
         users_.erase(it);
         return true;
     }
-    
+
     setError("User not found: " + username);
     return false;
 }
 
-bool CScramMongoAuth::updateUserPassword(const std::string& username, const std::string& newPassword)
+bool CScramMongoAuth::updateUserPassword(const std::string& username,
+                                         const std::string& newPassword)
 {
     if (!initialized_)
     {
         setError("SCRAM authentication not initialized");
         return false;
     }
-    
+
     if (!userExists(username))
     {
         setError("User not found: " + username);
         return false;
     }
-    
+
     if (newPassword.empty())
     {
         setError("New password cannot be empty");
         return false;
     }
-    
+
     auto it = users_.find(username);
     if (it != users_.end())
     {
         it->second.password = newPassword;
         it->second.salt = generateSalt();
-        it->second.storedKey = computeStoredKey(newPassword, it->second.salt, it->second.iterationCount);
-        it->second.serverKey = computeServerKey(newPassword, it->second.salt, it->second.iterationCount);
+        it->second.storedKey = computeStoredKey(newPassword, it->second.salt,
+                                                it->second.iterationCount);
+        it->second.serverKey = computeServerKey(newPassword, it->second.salt,
+                                                it->second.iterationCount);
         return true;
     }
-    
+
     return false;
 }
 
@@ -327,37 +342,38 @@ bool CScramMongoAuth::userExists(const std::string& username)
     return users_.find(username) != users_.end();
 }
 
-bool CScramMongoAuth::authenticateMongoDBClient(const std::string& username, const std::string& password)
+bool CScramMongoAuth::authenticateMongoDBClient(const std::string& username,
+                                                const std::string& password)
 {
     if (!initialized_)
     {
         setError("SCRAM authentication not initialized");
         return false;
     }
-    
+
     if (!config_.required)
     {
         return true; /* Authentication not required */
     }
-    
+
     if (username.empty() || password.empty())
     {
         setError("Username and password are required");
         return false;
     }
-    
+
     if (!userExists(username))
     {
         setError("User does not exist: " + username);
         return false;
     }
-    
+
     auto it = users_.find(username);
     if (it != users_.end())
     {
         return it->second.password == password; /* Simplified validation */
     }
-    
+
     return false;
 }
 
@@ -385,13 +401,13 @@ std::string CScramMongoAuth::generateNonce() const
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 255);
-    
+
     std::string nonce;
     for (int i = 0; i < 16; ++i)
     {
         nonce += static_cast<char>(dis(gen));
     }
-    
+
     return base64Encode(nonce);
 }
 
@@ -400,17 +416,19 @@ std::string CScramMongoAuth::generateSalt() const
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, 255);
-    
+
     std::string salt;
     for (int i = 0; i < 16; ++i)
     {
         salt += static_cast<char>(dis(gen));
     }
-    
+
     return base64Encode(salt);
 }
 
-std::string CScramMongoAuth::computeStoredKey(const std::string& password, const std::string& salt, int iterations) const
+std::string CScramMongoAuth::computeStoredKey(const std::string& password,
+                                              const std::string& salt,
+                                              int iterations) const
 {
     /* Simplified implementation - in reality, this would use proper PBKDF2 */
     std::ostringstream key;
@@ -418,7 +436,9 @@ std::string CScramMongoAuth::computeStoredKey(const std::string& password, const
     return base64Encode(key.str());
 }
 
-std::string CScramMongoAuth::computeServerKey(const std::string& password, const std::string& salt, int iterations) const
+std::string CScramMongoAuth::computeServerKey(const std::string& password,
+                                              const std::string& salt,
+                                              int iterations) const
 {
     /* Simplified implementation - in reality, this would use proper PBKDF2 */
     std::ostringstream key;
@@ -428,38 +448,43 @@ std::string CScramMongoAuth::computeServerKey(const std::string& password, const
 
 bool CScramMongoAuth::validateConfig() const
 {
-    if (config_.type != AuthType::SCRAM_SHA_1 && config_.type != AuthType::SCRAM_SHA_256)
+    if (config_.type != AuthType::SCRAM_SHA_1 &&
+        config_.type != AuthType::SCRAM_SHA_256)
     {
         setError("Unsupported SCRAM authentication type");
         return false;
     }
-    
+
     if (config_.required)
     {
         if (config_.database.empty())
         {
-            setError("Authentication database is required when authentication is enabled");
+            setError("Authentication database is required when authentication "
+                     "is enabled");
             return false;
         }
     }
-    
+
     return true;
 }
 
 std::string CScramMongoAuth::base64Encode(const std::string& data) const
 {
-    /* Simplified base64 encoding - in production, use a proper base64 library */
+    /* Simplified base64 encoding - in production, use a proper base64 library
+     */
     std::ostringstream encoded;
     for (unsigned char c : data)
     {
-        encoded << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+        encoded << std::hex << std::setw(2) << std::setfill('0')
+                << static_cast<int>(c);
     }
     return encoded.str();
 }
 
 std::string CScramMongoAuth::base64Decode(const std::string& data) const
 {
-    /* Simplified base64 decoding - in production, use a proper base64 library */
+    /* Simplified base64 decoding - in production, use a proper base64 library
+     */
     std::string decoded;
     for (size_t i = 0; i < data.length(); i += 2)
     {

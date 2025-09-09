@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CNetwork.hpp
+ *      Network layer implementation for FauxDB.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 #include "../CLogger.hpp"
 #include "../CServerConfig.hpp"

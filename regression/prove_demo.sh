@@ -7,42 +7,42 @@ echo "# This output is compatible with Perl's 'prove' command"
 echo "1..10"
 
 # Test 1: Check if FauxDB binary exists
-if [ -f "/Users/ibrarahmed/pgelephant/pge/fauxdb/build/fauxdb" ]; then
+if [ -f "./build/fauxdb" ]; then
     echo "ok 1 - FauxDB binary exists"
 else
     echo "not ok 1 - FauxDB binary missing"
 fi
 
 # Test 2: Check if regression test executable exists
-if [ -f "/Users/ibrarahmed/pgelephant/pge/fauxdb/build/regression/mongo_regression_tests" ]; then
+if [ -f "./build/regression/mongo_regression_tests" ]; then
     echo "ok 2 - MongoDB regression test executable exists"
 else
     echo "not ok 2 - MongoDB regression test executable missing"
 fi
 
 # Test 3: Check JavaScript test file
-if [ -f "/Users/ibrarahmed/pgelephant/pge/fauxdb/regression/scripts/regression_tests.js" ]; then
+if [ -f "./regression/scripts/regression_tests.js" ]; then
     echo "ok 3 - JavaScript regression test file exists"
 else
     echo "not ok 3 - JavaScript regression test file missing"
 fi
 
 # Test 4: Check TAP test file
-if [ -f "/Users/ibrarahmed/pgelephant/pge/fauxdb/regression/scripts/tap_regression_tests.js" ]; then
+if [ -f "./regression/scripts/tap_regression_tests.js" ]; then
     echo "ok 4 - TAP regression test file exists"
 else
     echo "not ok 4 - TAP regression test file missing"
 fi
 
 # Test 5: Check expected results directory
-if [ -d "/Users/ibrarahmed/pgelephant/pge/fauxdb/regression/expected" ]; then
+if [ -d "./regression/expected" ]; then
     echo "ok 5 - Expected results directory exists"
 else
     echo "not ok 5 - Expected results directory missing"
 fi
 
 # Test 6: Count expected result files
-expected_count=$(ls -1 /Users/ibrarahmed/pgelephant/pge/fauxdb/regression/expected/*.json 2>/dev/null | wc -l)
+expected_count=$(ls -1 ./regression/expected/*.json 2>/dev/null | wc -l)
 if [ "$expected_count" -ge 8 ]; then
     echo "ok 6 - Expected result files present ($expected_count files)"
 else
@@ -58,7 +58,7 @@ fi
 
 # Test 8: Validate JSON in expected results
 json_valid=true
-for json_file in /Users/ibrarahmed/pgelephant/pge/fauxdb/regression/expected/*.json; do
+for json_file in ./regression/expected/*.json; do
     if [ -f "$json_file" ]; then
         if ! python3 -m json.tool < "$json_file" > /dev/null 2>&1; then
             json_valid=false
@@ -74,14 +74,14 @@ else
 fi
 
 # Test 9: Check CMake regression targets
-if grep -q "regression" /Users/ibrarahmed/pgelephant/pge/fauxdb/build/Makefile 2>/dev/null; then
+if grep -q "regression" ./build/Makefile 2>/dev/null; then
     echo "ok 9 - CMake regression targets are configured"
 else
     echo "not ok 9 - CMake regression targets missing"
 fi
 
 # Test 10: Framework completeness
-script_count=$(find /Users/ibrarahmed/pgelephant/pge/fauxdb/regression -name "*.sh" -o -name "*.js" | wc -l)
+script_count=$(find ./regression -name "*.sh" -o -name "*.js" | wc -l)
 if [ "$script_count" -ge 4 ]; then
     echo "ok 10 - Regression framework is complete ($script_count test scripts)"
 else

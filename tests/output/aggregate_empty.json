@@ -1,4 +1,0 @@
-{
-  ok: 1,
-  cursor: { id: Long('0'), ns: 'test.collection', firstBatch: [] }
-}

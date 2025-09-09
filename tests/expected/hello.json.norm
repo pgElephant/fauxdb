@@ -1,6 +1,0 @@
-{
-  "isWritablePrimary": true,
-  "ismaster": true,
-  "maxBsonObjectSize": 16777216,
-  "ok": 1
-}

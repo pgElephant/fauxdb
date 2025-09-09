@@ -1,9 +1,0 @@
-{
-  ok: 1,
-  version: '1.0.0',
-  gitVersion: 'fauxdb-1.0.0',
-  modules: 'none',
-  allocator: 'system',
-  javascriptEngine: 'none',
-  sysInfo: 'FauxDB Server'
-}

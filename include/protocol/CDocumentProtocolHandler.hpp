@@ -14,6 +14,7 @@
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
 #include "CResponseBuilder.hpp"
+#include "IInterfaces.hpp"
 #include "commands/CCommandRegistry.hpp"
 
 #include <functional>
@@ -59,6 +60,9 @@ class IDocumentCommandHandler
 
 class CDocumentProtocolHandler
 {
+    // Helper for lazy pooler initialization
+    void ensurePostgresPoolerInitialized();
+
   public:
     CDocumentProtocolHandler();
     ~CDocumentProtocolHandler();
@@ -87,6 +91,9 @@ class CDocumentProtocolHandler
     /* Set connection pooler for PostgreSQL access */
     void setConnectionPooler(shared_ptr<CPGConnectionPooler> pooler);
 
+    /* Set logger for debugging and error reporting */
+    void setLogger(shared_ptr<ILogger> logger);
+
   private:
     bool initialized_;
     bool isRunning_;
@@ -103,6 +110,7 @@ class CDocumentProtocolHandler
     unique_ptr<CResponseBuilder> responseBuilder_;
     shared_ptr<CPGConnectionPooler> connectionPooler_;
     unique_ptr<CCommandRegistry> commandRegistry_;
+    shared_ptr<ILogger> logger_;
 
     bool parseMessage(const vector<uint8_t>& messageData,
                       CDocumentWireMessage& message);
@@ -113,10 +121,6 @@ class CDocumentProtocolHandler
     void initializeDefaultCommandHandlers();
     vector<uint8_t> createErrorBsonDocument(int errorCode,
                                             const string& errorMessage);
-    vector<uint8_t> createCommandResponse(const string& commandName,
-                                          int32_t requestID,
-                                          const vector<uint8_t>& buffer,
-                                          ssize_t bytesRead);
     string extractCommandName(const CDocumentWireMessage& request);
     string extractCollectionName(const vector<uint8_t>& buffer,
                                  ssize_t bytesRead);
@@ -159,6 +163,41 @@ class CDocumentProtocolHandler
                               const string& updateJson);
     string convertDeleteToSQL(const string& collectionName,
                               const string& filterJson);
+
+    /* Wire protocol helper */
+    std::vector<uint8_t> createWireMessage(int32_t requestID,
+                                           int32_t responseTo,
+                                           const std::vector<uint8_t>& bsonDoc);
+    std::vector<uint8_t> createSimpleOkBson();
+
+    /* Command-specific response creators for OP_MSG */
+    std::vector<uint8_t> createHelloWireResponse(int32_t requestID);
+    std::vector<uint8_t> createPingWireResponse(int32_t requestID);
+    std::vector<uint8_t> createListDatabasesWireResponse(int32_t requestID);
+    std::vector<uint8_t> createFindWireResponse(int32_t requestID);
+    std::vector<uint8_t> createInsertWireResponse(int32_t requestID);
+    std::vector<uint8_t> createBuildInfoWireResponse(int32_t requestID);
+    std::vector<uint8_t> createAggregateWireResponse(int32_t requestID);
+    std::vector<uint8_t> createAtlasVersionWireResponse(int32_t requestID);
+    std::vector<uint8_t> createGetParameterWireResponse(int32_t requestID);
+    std::vector<uint8_t> createErrorWireResponse(int32_t requestID = 0);
+
+    /* Command-specific response creators for OP_REPLY (legacy) */
+    std::vector<uint8_t> createHelloOpReplyResponse(int32_t requestID);
+    std::vector<uint8_t> createPingOpReplyResponse(int32_t requestID);
+    std::vector<uint8_t> createErrorOpReplyResponse(int32_t requestID);
+    std::vector<uint8_t>
+    createFindOpReplyResponseFromPostgreSQL(const std::string& collectionName,
+                                            int32_t requestID);
+    std::vector<uint8_t>
+    createOpReplyResponse(int32_t requestID,
+                          const std::vector<uint8_t>& bsonDocument);
+
+    /* BSON parsing helper */
+    std::string parseCommandFromBSON(const std::vector<uint8_t>& buffer,
+                                     size_t offset, size_t remaining);
+    std::string parseCollectionNameFromBSON(const std::vector<uint8_t>& buffer,
+                                            size_t offset, size_t remaining);
 };
 
 class CHelloCommandHandler : public IDocumentCommandHandler

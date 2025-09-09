@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CLogger.cpp
+ *      Logging system implementation for FauxDB.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 
 
 #include "CLogger.hpp"
@@ -8,6 +19,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -171,8 +183,57 @@ void CLogger::writeToFile(CLogLevel /* level */, const std::string& message)
 std::string CLogger::formatMessage(CLogLevel level, const std::string& message)
 {
     std::stringstream ss;
-    ss << "[" << getTimestamp() << "] [" << getLevelString(level) << "] "
-       << message;
+    int pid = static_cast<int>(getpid());
+    const char* user = getenv("USER");
+    std::string username = user ? user : "unknown";
+    std::string timestamp = getTimestamp();
+    std::string component =
+        config_.serverName.empty() ? "fauxdb" : config_.serverName;
+
+    // ANSI color codes
+    const char* green = "\033[32m";
+    const char* red = "\033[31m";
+    const char* blue = "\033[34m";
+    const char* reset = "\033[0m";
+
+    std::string symbol;
+    const char* color = reset;
+    if (level == CLogLevel::ERROR || level == CLogLevel::FATAL)
+    {
+        symbol = "\u2717"; // ✗
+        color = red;
+    }
+    else if (level == CLogLevel::INFO)
+    {
+        symbol = "\u2713"; // ✓
+        color = green;
+    }
+    else if (level == CLogLevel::DEBUG)
+    {
+        symbol = "\u2139"; // ℹ️ (info symbol)
+        color = blue;
+    }
+    else
+    {
+        symbol = "\u2713";
+        color = reset;
+    }
+
+    // Only add component if not already present at start of message
+    std::string formattedMessage = message;
+    std::string prefix = component + ": ";
+    if (formattedMessage.rfind(prefix, 0) == 0)
+    {
+        // Message already starts with component name, don't add again
+        ss << color << symbol << " - " << pid << "  " << username << " "
+           << timestamp << " " << formattedMessage << reset;
+    }
+    else
+    {
+        ss << color << symbol << " - " << pid << "  " << username << " "
+           << timestamp << " " << component << ": " << formattedMessage
+           << reset;
+    }
     return ss.str();
 }
 

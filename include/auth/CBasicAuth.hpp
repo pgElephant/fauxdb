@@ -10,8 +10,9 @@
 #pragma once
 
 #include "IPostgreSQLAuth.hpp"
-#include <string>
+
 #include <memory>
+#include <string>
 
 namespace FauxDB
 {
@@ -25,14 +26,15 @@ class CBasicAuth : public IPostgreSQLAuth
 
     /* IAuthentication interface implementation */
     bool initialize(const AuthConfig& config) override;
-    bool authenticate(const std::string& username, const std::string& password) override;
+    bool authenticate(const std::string& username,
+                      const std::string& password) override;
     bool isRequired() const override;
     AuthType getType() const override;
     std::string getName() const override;
     std::string getLastError() const override;
-    std::string buildConnectionString(const std::string& host,
-                                      const std::string& port,
-                                      const std::string& database) const override;
+    std::string
+    buildConnectionString(const std::string& host, const std::string& port,
+                          const std::string& database) const override;
     bool configureSSL() override;
     bool isSSLEnabled() const override;
 
@@ -42,9 +44,10 @@ class CBasicAuth : public IPostgreSQLAuth
     std::string getPostgreSQLPassword() const override;
     bool testConnection() override;
     std::string getConnectionInfo() const override;
-    std::string buildPostgreSQLConnectionString(const std::string& host,
-                                                const std::string& port,
-                                                const std::string& database) const override;
+    std::string
+    buildPostgreSQLConnectionString(const std::string& host,
+                                    const std::string& port,
+                                    const std::string& database) const override;
 
   private:
     AuthConfig config_;
@@ -53,7 +56,7 @@ class CBasicAuth : public IPostgreSQLAuth
 
     bool validateConfig() const;
     bool validateCredentials(const std::string& username,
-                            const std::string& password) const;
+                             const std::string& password) const;
     std::string buildSSLConnectionString() const;
     void setError(const std::string& error) const;
 };

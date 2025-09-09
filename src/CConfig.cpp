@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CConfig.cpp
+ *      Implementation for FauxDB.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 
 // System headers
 #include <fstream>
@@ -113,7 +124,8 @@ std::error_code CConfig::loadFromJson(const std::string& jsonContent)
         if (logger_)
         {
             logger_->log(CLogLevel::ERROR,
-                         std::string("JSON parsing error: ") + e.what());
+                         std::string("JSON parsing error: '") + e.what() +
+                             "'.");
         }
         return std::make_error_code(std::errc::invalid_argument);
     }
@@ -122,7 +134,8 @@ std::error_code CConfig::loadFromJson(const std::string& jsonContent)
         if (logger_)
         {
             logger_->log(CLogLevel::ERROR,
-                         std::string("JSON loading error: ") + e.what());
+                         std::string("JSON loading error: '") + e.what() +
+                             "'.");
         }
         return std::make_error_code(std::errc::invalid_argument);
     }
@@ -200,7 +213,8 @@ std::error_code CConfig::loadFromYaml(const std::string& yamlContent)
         if (logger_)
         {
             logger_->log(CLogLevel::ERROR,
-                         std::string("YAML parsing error: ") + e.what());
+                         std::string("YAML parsing error: '") + e.what() +
+                             "'.");
         }
         return std::make_error_code(std::errc::invalid_argument);
     }
@@ -209,7 +223,8 @@ std::error_code CConfig::loadFromYaml(const std::string& yamlContent)
         if (logger_)
         {
             logger_->log(CLogLevel::ERROR,
-                         std::string("YAML loading error: ") + e.what());
+                         std::string("YAML loading error: '") + e.what() +
+                             "'.");
         }
         return std::make_error_code(std::errc::invalid_argument);
     }
@@ -575,7 +590,8 @@ void CConfig::set(const std::string& key, const ConfigValue& value)
 
     if (logger_)
     {
-        logger_->log(CLogLevel::INFO, "Configuration value set: " + key);
+        logger_->log(CLogLevel::INFO,
+                     "Configuration value set: '" + key + "'.");
     }
 }
 

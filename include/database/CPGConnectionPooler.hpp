@@ -1,5 +1,16 @@
 
 
+/*-------------------------------------------------------------------------
+ *
+ * CPGConnectionPooler.hpp
+ *      PostgreSQL connection pooler for FauxDB.
+ *      Manages pooled connections to PostgreSQL database.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 
 #include "CConnectionPooler.hpp"

@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CommandRegistry.hpp
+ *      Command registry and dispatcher for MongoDB commands.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 /* MongoDB Command Registry */
 #pragma once
 

@@ -1,6 +1,0 @@
-{
-  "ok": 0,
-  "code": 59,
-  "codeName": "CommandNotFound",
-  "errmsg": "no such command: unknownCommand"
-}

@@ -1,4 +1,15 @@
 
+/*-------------------------------------------------------------------------
+ *
+ * CConfig.hpp
+ *      Configuration management for FauxDB.
+ *      JSON-based configuration file parser and accessor.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 
 #include "CLogger.hpp"

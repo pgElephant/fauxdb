@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * FindOneCommand.hpp
+ *      MongoDB findOne command implementation.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 /* MongoDB FindOne Command */
 #pragma once
 

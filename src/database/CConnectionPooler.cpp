@@ -70,10 +70,10 @@ bool CConnectionPooler::shouldRemoveConnection() const
 void CConnectionPooler::logConnectionEvent(const std::string& event,
                                            const std::string& details)
 {
-    /* Log connection pool events for monitoring and debugging */
-    /* This base implementation can be overridden by derived classes */
+    // Log connection pool events for monitoring and debugging.
+    // This base implementation can be overridden by derived classes.
 
-    /* Store event information for statistics */
+    // Store event information for statistics.
     if (event == "connection_acquired")
     {
         stats_.successfulRequests++;
@@ -83,18 +83,22 @@ void CConnectionPooler::logConnectionEvent(const std::string& event,
         stats_.failedRequests++;
     }
 
-    /* Use logger if available */
+    // Use logger if available.
     if (logger_)
     {
-        logger_->log(CLogLevel::DEBUG,
-                     "Connection pool event: " + event + " - " + details);
-    }
-
-    /* Use details parameter for additional logging */
-    if (!details.empty())
-    {
-        /* Could log additional details to a file or monitoring system */
-        /* For now, we'll just acknowledge that details are available */
+        // Use INFO for normal pool events, ERROR for failure events.
+        if (event == "INITIALIZATION_FAILED" ||
+            event == "INITIALIZATION_ERROR" ||
+            event == "CONNECTION_CREATE_ERROR" ||
+            event == "CONNECTION_TIMEOUT" || event == "CONNECTION_ADD_ERROR" ||
+            event == "CONNECTION_REMOVE_ERROR")
+        {
+            logger_->log(CLogLevel::ERROR, details + ".");
+        }
+        else
+        {
+            logger_->log(CLogLevel::INFO, details + ".");
+        }
     }
 }
 

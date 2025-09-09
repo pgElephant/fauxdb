@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CSignal.cpp
+ *      Signal handling utilities for FauxDB server.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 
 #include "CSignal.hpp"
 

@@ -9,8 +9,8 @@
 
 #pragma once
 
-#include <string>
 #include <memory>
+#include <string>
 
 namespace FauxDB
 {
@@ -29,8 +29,10 @@ enum class AuthType
 
 enum class AuthDirection
 {
-    MONGODB_SERVER_SIDE = 0,  /* FauxDB as MongoDB server authenticating clients */
-    POSTGRESQL_CLIENT_SIDE = 1 /* FauxDB as client authenticating to PostgreSQL */
+    MONGODB_SERVER_SIDE =
+        0, /* FauxDB as MongoDB server authenticating clients */
+    POSTGRESQL_CLIENT_SIDE =
+        1 /* FauxDB as client authenticating to PostgreSQL */
 };
 
 struct AuthConfig
@@ -51,7 +53,8 @@ struct AuthConfig
     AuthConfig()
         : type(AuthType::BASIC), direction(AuthDirection::MONGODB_SERVER_SIDE),
           name(""), required(false), database(""), username(""), password(""),
-          useSSL(false), sslCert(""), sslKey(""), sslCA(""), additionalParams("")
+          useSSL(false), sslCert(""), sslKey(""), sslCA(""),
+          additionalParams("")
     {
     }
 };
@@ -62,15 +65,16 @@ class IAuthentication
     virtual ~IAuthentication() = default;
 
     virtual bool initialize(const AuthConfig& config) = 0;
-    virtual bool authenticate(const std::string& username, const std::string& password) = 0;
+    virtual bool authenticate(const std::string& username,
+                              const std::string& password) = 0;
     virtual bool isRequired() const = 0;
     virtual AuthType getType() const = 0;
     virtual AuthDirection getDirection() const = 0;
     virtual std::string getName() const = 0;
     virtual std::string getLastError() const = 0;
-    virtual std::string buildConnectionString(const std::string& host,
-                                              const std::string& port,
-                                              const std::string& database) const = 0;
+    virtual std::string
+    buildConnectionString(const std::string& host, const std::string& port,
+                          const std::string& database) const = 0;
     virtual bool configureSSL() = 0;
     virtual bool isSSLEnabled() const = 0;
 };

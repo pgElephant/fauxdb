@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CParser.cpp
+ *      Message parsing utilities for FauxDB.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 
 
 #include "CParser.hpp"

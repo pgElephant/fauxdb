@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CQueryTranslator.cpp
+ *      Query translation between MongoDB and PostgreSQL.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 
 #include "protocol/CQueryTranslator.hpp"
 

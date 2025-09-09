@@ -1,4 +1,15 @@
 
+/*-------------------------------------------------------------------------
+ *
+ * CConnectionPooler.hpp
+ *      Database connection pooler interface for FauxDB.
+ *      Abstract base class for database connection management.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 
 #include "CLogger.hpp"

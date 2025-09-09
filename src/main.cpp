@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * main.cpp
+ *      Main entry point for FauxDB server.
+ *      Handles server initialization, configuration, and daemon mode.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #include "CConfig.hpp"
 #include "CLogger.hpp"
 #include "CServer.hpp"
@@ -290,60 +301,89 @@ int main(int argc, char* argv[])
                 GetConfigValue<bool>(loader, "daemon_mode", false);
 
             /* MongoDB server-side authentication (FauxDB as MongoDB server) */
-            config.mongodbServerAuthMethod = GetConfigString(loader, "mongodb_server_auth.method", 
-                                                           GetConfigString(loader, "mongodb_server_auth_method", "scram-sha-256"));
-            config.mongodbServerAuthRequired = GetConfigValue<bool>(loader, "mongodb_server_auth.required", 
-                                                                  GetConfigValue<bool>(loader, "mongodb_server_auth_required", false));
-            config.mongodbServerAuthDatabase = GetConfigString(loader, "mongodb_server_auth.database", 
-                                                             GetConfigString(loader, "mongodb_server_auth_database", "admin"));
-            config.mongodbServerAuthUsername = GetConfigString(loader, "mongodb_server_auth.username", 
-                                                             GetConfigString(loader, "mongodb_server_auth_username", ""));
-            config.mongodbServerAuthPassword = GetConfigString(loader, "mongodb_server_auth.password", 
-                                                             GetConfigString(loader, "mongodb_server_auth_password", ""));
-            config.mongodbServerAuthUseSSL = GetConfigValue<bool>(loader, "mongodb_server_auth.use_ssl", 
-                                                                GetConfigValue<bool>(loader, "mongodb_server_auth_use_ssl", false));
-            config.mongodbServerAuthSSLCert = GetConfigString(loader, "mongodb_server_auth.ssl_cert", 
-                                                            GetConfigString(loader, "mongodb_server_auth_ssl_cert", ""));
-            config.mongodbServerAuthSSLKey = GetConfigString(loader, "mongodb_server_auth.ssl_key", 
-                                                           GetConfigString(loader, "mongodb_server_auth_ssl_key", ""));
-            config.mongodbServerAuthSSLCA = GetConfigString(loader, "mongodb_server_auth.ssl_ca", 
-                                                          GetConfigString(loader, "mongodb_server_auth_ssl_ca", ""));
-            
+            config.mongodbServerAuthMethod = GetConfigString(
+                loader, "mongodb_server_auth.method",
+                GetConfigString(loader, "mongodb_server_auth_method",
+                                "scram-sha-256"));
+            config.mongodbServerAuthRequired = GetConfigValue<bool>(
+                loader, "mongodb_server_auth.required",
+                GetConfigValue<bool>(loader, "mongodb_server_auth_required",
+                                     false));
+            config.mongodbServerAuthDatabase = GetConfigString(
+                loader, "mongodb_server_auth.database",
+                GetConfigString(loader, "mongodb_server_auth_database",
+                                "admin"));
+            config.mongodbServerAuthUsername = GetConfigString(
+                loader, "mongodb_server_auth.username",
+                GetConfigString(loader, "mongodb_server_auth_username", ""));
+            config.mongodbServerAuthPassword = GetConfigString(
+                loader, "mongodb_server_auth.password",
+                GetConfigString(loader, "mongodb_server_auth_password", ""));
+            config.mongodbServerAuthUseSSL = GetConfigValue<bool>(
+                loader, "mongodb_server_auth.use_ssl",
+                GetConfigValue<bool>(loader, "mongodb_server_auth_use_ssl",
+                                     false));
+            config.mongodbServerAuthSSLCert = GetConfigString(
+                loader, "mongodb_server_auth.ssl_cert",
+                GetConfigString(loader, "mongodb_server_auth_ssl_cert", ""));
+            config.mongodbServerAuthSSLKey = GetConfigString(
+                loader, "mongodb_server_auth.ssl_key",
+                GetConfigString(loader, "mongodb_server_auth_ssl_key", ""));
+            config.mongodbServerAuthSSLCA = GetConfigString(
+                loader, "mongodb_server_auth.ssl_ca",
+                GetConfigString(loader, "mongodb_server_auth_ssl_ca", ""));
+
             /* PostgreSQL client-side authentication (FauxDB to PostgreSQL) */
-            config.postgresqlClientAuthMethod = GetConfigString(loader, "postgresql_client_auth.method", 
-                                                              GetConfigString(loader, "postgresql_client_auth_method", "basic"));
-            config.postgresqlClientAuthRequired = GetConfigValue<bool>(loader, "postgresql_client_auth.required", 
-                                                                     GetConfigValue<bool>(loader, "postgresql_client_auth_required", false));
-            config.postgresqlClientAuthDatabase = GetConfigString(loader, "postgresql_client_auth.database", 
-                                                                GetConfigString(loader, "postgresql_client_auth_database", "fauxdb"));
-            config.postgresqlClientAuthUsername = GetConfigString(loader, "postgresql_client_auth.username", 
-                                                                GetConfigString(loader, "postgresql_client_auth_username", ""));
-            config.postgresqlClientAuthPassword = GetConfigString(loader, "postgresql_client_auth.password", 
-                                                                GetConfigString(loader, "postgresql_client_auth_password", ""));
-            config.postgresqlClientAuthUseSSL = GetConfigValue<bool>(loader, "postgresql_client_auth.use_ssl", 
-                                                                   GetConfigValue<bool>(loader, "postgresql_client_auth_use_ssl", false));
-            config.postgresqlClientAuthSSLCert = GetConfigString(loader, "postgresql_client_auth.ssl_cert", 
-                                                               GetConfigString(loader, "postgresql_client_auth_ssl_cert", ""));
-            config.postgresqlClientAuthSSLKey = GetConfigString(loader, "postgresql_client_auth.ssl_key", 
-                                                              GetConfigString(loader, "postgresql_client_auth_ssl_key", ""));
-            config.postgresqlClientAuthSSLCA = GetConfigString(loader, "postgresql_client_auth.ssl_ca", 
-                                                             GetConfigString(loader, "postgresql_client_auth_ssl_ca", ""));
+            config.postgresqlClientAuthMethod = GetConfigString(
+                loader, "postgresql_client_auth.method",
+                GetConfigString(loader, "postgresql_client_auth_method",
+                                "basic"));
+            config.postgresqlClientAuthRequired = GetConfigValue<bool>(
+                loader, "postgresql_client_auth.required",
+                GetConfigValue<bool>(loader, "postgresql_client_auth_required",
+                                     false));
+            config.postgresqlClientAuthDatabase = GetConfigString(
+                loader, "postgresql_client_auth.database",
+                GetConfigString(loader, "postgresql_client_auth_database",
+                                "fauxdb"));
+            config.postgresqlClientAuthUsername = GetConfigString(
+                loader, "postgresql_client_auth.username",
+                GetConfigString(loader, "postgresql_client_auth_username", ""));
+            config.postgresqlClientAuthPassword = GetConfigString(
+                loader, "postgresql_client_auth.password",
+                GetConfigString(loader, "postgresql_client_auth_password", ""));
+            config.postgresqlClientAuthUseSSL = GetConfigValue<bool>(
+                loader, "postgresql_client_auth.use_ssl",
+                GetConfigValue<bool>(loader, "postgresql_client_auth_use_ssl",
+                                     false));
+            config.postgresqlClientAuthSSLCert = GetConfigString(
+                loader, "postgresql_client_auth.ssl_cert",
+                GetConfigString(loader, "postgresql_client_auth_ssl_cert", ""));
+            config.postgresqlClientAuthSSLKey = GetConfigString(
+                loader, "postgresql_client_auth.ssl_key",
+                GetConfigString(loader, "postgresql_client_auth_ssl_key", ""));
+            config.postgresqlClientAuthSSLCA = GetConfigString(
+                loader, "postgresql_client_auth.ssl_ca",
+                GetConfigString(loader, "postgresql_client_auth_ssl_ca", ""));
 
             /* Debug: Print loaded PostgreSQL configuration */
             std::cout << "DEBUG: Loaded PostgreSQL config - host: "
                       << config.pgHost << ", port: " << config.pgPort
                       << ", database: " << config.pgDatabase
                       << ", user: " << config.pgUser << std::endl;
-            
+
             /* Debug: Print loaded authentication configuration */
             std::cout << "DEBUG: Loaded MongoDB server auth config - method: "
-                      << config.mongodbServerAuthMethod << ", required: " 
+                      << config.mongodbServerAuthMethod << ", required: "
                       << (config.mongodbServerAuthRequired ? "true" : "false")
-                      << ", database: " << config.mongodbServerAuthDatabase << std::endl;
-            std::cout << "DEBUG: Loaded PostgreSQL client auth config - method: "
-                      << config.postgresqlClientAuthMethod << ", required: " 
-                      << (config.postgresqlClientAuthRequired ? "true" : "false")
-                      << ", database: " << config.postgresqlClientAuthDatabase << std::endl;
+                      << ", database: " << config.mongodbServerAuthDatabase
+                      << std::endl;
+            std::cout
+                << "DEBUG: Loaded PostgreSQL client auth config - method: "
+                << config.postgresqlClientAuthMethod << ", required: "
+                << (config.postgresqlClientAuthRequired ? "true" : "false")
+                << ", database: " << config.postgresqlClientAuthDatabase
+                << std::endl;
         }
         else
         {
@@ -377,48 +417,34 @@ int main(int argc, char* argv[])
                       << std::endl;
         }
 
-        CLogger logger(config);
-        logger.enableConsoleOutput(
-            !(daemonMode ||
-              config.daemonMode)); /* Disable console output in daemon mode */
-        logger.setLogLevel(CLogLevel::INFO);
         std::string logFile = "fauxdb.log";
-        logger.setLogFile(logFile);
-        logger.initialize();
-
-        CServer server;
-        std::cout << "DEBUG: Server object created" << std::endl;
         auto loggerPtr = std::make_shared<CLogger>(config);
         loggerPtr->enableConsoleOutput(!(daemonMode || config.daemonMode));
         loggerPtr->setLogLevel(CLogLevel::DEBUG);
         loggerPtr->setLogFile(logFile);
         loggerPtr->initialize();
+
+        CServer server;
         server.setLogger(loggerPtr);
-        std::cout << "DEBUG: About to initialize server with config: port="
-                  << config.port << ", host=" << config.pgHost << std::endl;
-        std::cout << "DEBUG: Logger set on server" << std::endl;
-        loggerPtr->log(CLogLevel::DEBUG,
-                       "Test debug message from server logger");
+        // Only log actionable or unique events.
         try
         {
             if (!server.initialize(config))
             {
                 std::string lastError = server.getLastError();
-                logger.log(CLogLevel::ERROR,
-                           "FauxDB daemon failed to initialize server with "
-                           "config: address=" +
-                               config.bindAddress + ", port=" +
-                               std::to_string(config.port) + ", threads=" +
-                               std::to_string(config.workerThreads) +
-                               ", error: " + lastError);
+                loggerPtr->log(CLogLevel::ERROR,
+                               "FauxDB daemon failed to initialize server with "
+                               "config: address=" +
+                                   config.bindAddress + ", port=" +
+                                   std::to_string(config.port) + ", threads=" +
+                                   std::to_string(config.workerThreads) +
+                                   ", error: " + lastError);
                 return 1;
             }
         }
         catch (const std::exception& e)
         {
-            std::cerr << "DEBUG: Exception during server initialization: "
-                      << e.what() << std::endl;
-            logger.log(
+            loggerPtr->log(
                 CLogLevel::ERROR,
                 "FauxDB daemon failed to initialize server with exception: " +
                     std::string(e.what()));
@@ -427,50 +453,67 @@ int main(int argc, char* argv[])
 
         if (!server.start())
         {
-            logger.log(CLogLevel::ERROR,
-                       "FauxDB daemon failed to start server process. Check "
-                       "network/database configuration and logs for details.");
+            loggerPtr->log(
+                CLogLevel::ERROR,
+                "FauxDB daemon failed to start server process. Check "
+                "network/database configuration and logs for details.");
             return 1;
         }
 
-        logger.log(
-            CLogLevel::INFO,
-            "FauxDB daemon started successfully. Listening on " +
-                config.bindAddress + ":" + std::to_string(config.port) +
-                ", worker threads=" + std::to_string(config.workerThreads));
-        logger.log(CLogLevel::INFO, "Server Info: " + server.getServerInfo());
-        logger.log(CLogLevel::INFO,
-                   "Database Status: " + server.getDatabaseStatus());
-        logger.log(CLogLevel::INFO,
-                   "Network Status: " + server.getNetworkStatus());
-        logger.log(CLogLevel::INFO, "Initial Server Statistics: " +
-                                        server.getServerStatistics());
+        loggerPtr->log(CLogLevel::INFO,
+                       "FauxDB daemon started. Listening on " +
+                           config.bindAddress + ":" +
+                           std::to_string(config.port) + ", worker threads=" +
+                           std::to_string(config.workerThreads) + ".");
+        loggerPtr->log(CLogLevel::INFO,
+                       "Server info: " + server.getServerInfo() + ".");
+        loggerPtr->log(CLogLevel::INFO,
+                       "Database status: " + server.getDatabaseStatus() + ".");
+        loggerPtr->log(CLogLevel::INFO,
+                       "Network status: " + server.getNetworkStatus() + ".");
+        loggerPtr->log(CLogLevel::INFO, "Initial server statistics: " +
+                                            server.getServerStatistics() + ".");
 
-        CSignal signalHandler;
-        signalHandler.setLogger(std::make_shared<CLogger>(config));
-        signalHandler.initialize();
+        static std::atomic<bool> shutdownRequested{false};
+        auto signalHandlerFunc = [](int signal) { shutdownRequested = true; };
+        std::signal(SIGINT, signalHandlerFunc);
+        std::signal(SIGTERM, signalHandlerFunc);
 
-        while (server.isRunning())
+        bool shutdownLogged = false;
+        while (true)
         {
+            if (shutdownRequested && !shutdownLogged)
+            {
+                loggerPtr->log(
+                    CLogLevel::INFO,
+                    "Shutdown signal received. Initiating shutdown sequence.");
+                shutdownLogged = true;
+            }
+            if (!server.isRunning() || shutdownRequested)
+            {
+                break;
+            }
             static auto lastStatusUpdate = steady_clock::now();
             auto now = steady_clock::now();
             if (duration_cast<seconds>(now - lastStatusUpdate).count() >= 30)
             {
-                logger.log(CLogLevel::INFO, "[Status] FauxDB daemon periodic "
-                                            "update: Database Status: " +
-                                                server.getDatabaseStatus() +
-                                                ", Network Status: " +
-                                                server.getNetworkStatus());
+                loggerPtr->log(
+                    CLogLevel::INFO,
+                    "[Status] FauxDB daemon periodic update: database "
+                    "status: " +
+                        server.getDatabaseStatus() +
+                        ", network status: " + server.getNetworkStatus() + ".");
                 lastStatusUpdate = now;
             }
             std::this_thread::sleep_for(milliseconds(100));
         }
-
+        loggerPtr->log(CLogLevel::INFO, "Shutdown requested. Stopping FauxDB "
+                                        "server and cleaning up resources.");
         server.shutdown();
-        logger.log(CLogLevel::INFO,
-                   "[Shutdown] FauxDB daemon shutdown complete. All resources "
-                   "released and server stopped.");
-        logger.shutdown();
+        loggerPtr->log(CLogLevel::INFO,
+                       "FauxDB daemon shutdown complete. All resources "
+                       "released and server stopped.");
+        loggerPtr->shutdown();
         return 0;
     }
     catch (const std::exception& e)

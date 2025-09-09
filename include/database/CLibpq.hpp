@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CLibpq.hpp
+ *      PostgreSQL libpq wrapper for FauxDB.
+ *      Low-level PostgreSQL connection and query interface.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 
 #include <chrono>

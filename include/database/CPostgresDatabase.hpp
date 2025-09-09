@@ -81,7 +81,7 @@ class CPostgresDatabase : public CDatabase
     void setAuthConfig(const AuthConfig& authConfig);
     CDatabaseConfig getConfig() const;
     AuthConfig getAuthConfig() const;
-    
+
     bool authenticate(const std::string& username, const std::string& password);
     bool isAuthenticationRequired() const;
     void setConnectionTimeout(std::chrono::milliseconds timeout);

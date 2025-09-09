@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * BaseCommand.hpp
+ *      Base command class for MongoDB command implementations.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 /* Base MongoDB Command Implementation */
 #pragma once
 

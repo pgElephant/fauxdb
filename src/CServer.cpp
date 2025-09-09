@@ -1,4 +1,15 @@
 
+/*-------------------------------------------------------------------------
+ *
+ * CServer.cpp
+ *      Main server implementation for FauxDB.
+ *      Handles server lifecycle, connections, and component management.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 // System headers
 #include <algorithm>
 #include <chrono>
@@ -34,10 +45,8 @@ CServer::CServer()
     : status_(CServerStatus::Stopped), running_(false), maintenanceMode_(false),
       lastErrorTime_(std::chrono::steady_clock::now()), metricsEnabled_(false)
 {
-    std::cerr << "DEBUG: CServer constructor called" << std::endl;
     initializeDefaults();
     initializeComponentPointers();
-    std::cerr << "DEBUG: CServer constructor completed" << std::endl;
 }
 
 CServer::~CServer()
@@ -50,41 +59,17 @@ bool CServer::initialize(const CServerConfig& config)
 {
     try
     {
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG, "Starting server initialization");
-        }
-        else
-        {
-            std::cerr << "DEBUG: Starting server initialization" << std::endl;
-        }
-
         setConfig(config);
-
         if (!validateConfig(config))
         {
-            handleServerError("Invalid configuration");
+            handleServerError("Invalid configuration.");
             return false;
         }
-
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Configuration validated, initializing components");
-        }
-        else
-        {
-            std::cerr
-                << "DEBUG: Configuration validated, initializing components"
-                << std::endl;
-        }
-
         if (!initializeComponents())
         {
-            handleServerError("Failed to initialize components");
+            handleServerError("Failed to initialize components.");
             return false;
         }
-
         setStatus(CServerStatus::Starting);
         return true;
     }
@@ -185,20 +170,7 @@ void CServer::setConfig(const CServerConfig& config)
 {
     config_ = config;
 
-    if (logger_)
-    {
-        logger_->log(
-            CLogLevel::DEBUG,
-            "Config set on server: port=" + std::to_string(config.port) +
-                ", bind_address=" + config.bindAddress +
-                ", max_connections=" + std::to_string(config.maxConnections));
-    }
-    else
-    {
-        std::cerr << "DEBUG: Config set on server: port=" << config.port
-                  << ", bind_address=" << config.bindAddress
-                  << ", max_connections=" << config.maxConnections << std::endl;
-    }
+    // Configuration set. No debug log needed unless for error or info.
 
     /* Initialize TCP server with config if not already initialized */
     if (!tcpServer_)
@@ -397,10 +369,7 @@ bool CServer::initializeComponents()
 {
     try
     {
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG, "Starting component initialization");
-        }
+        // Starting component initialization.
 
         if (!initializeNetworkComponent())
         {
@@ -412,11 +381,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Network component initialized successfully");
-        }
+        // Network component initialized.
 
         if (!initializeDatabaseComponent())
         {
@@ -438,11 +403,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Database component initialized successfully");
-        }
+        // Database component initialized.
 
         if (!initializeProtocolComponent())
         {
@@ -454,11 +415,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Protocol component initialized successfully");
-        }
+        // Protocol component initialized.
 
         if (!initializeParsingComponent())
         {
@@ -470,11 +427,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Parsing component initialized successfully");
-        }
+        // Parsing component initialized.
 
         if (!initializeQueryComponent())
         {
@@ -486,11 +439,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Query component initialized successfully");
-        }
+        // Query component initialized.
 
         if (!initializeResponseComponent())
         {
@@ -502,11 +451,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Response component initialized successfully");
-        }
+        // Response component initialized.
 
         if (!initializeLoggingComponent())
         {
@@ -518,11 +463,7 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Logging component initialized successfully");
-        }
+        // Logging component initialized.
 
         if (!initializeConfigurationComponent())
         {
@@ -534,17 +475,9 @@ bool CServer::initializeComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Configuration component initialized successfully");
-        }
+        // Configuration component initialized.
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "All components initialized successfully");
-        }
+        // All components initialized.
 
         return true;
     }
@@ -559,11 +492,7 @@ bool CServer::startComponents()
 {
     try
     {
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Starting component startup process");
-        }
+        // Starting component startup process.
 
         if (!startNetworkComponent())
         {
@@ -575,11 +504,7 @@ bool CServer::startComponents()
             return false;
         }
 
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Network component started successfully");
-        }
+        // Network component started.
 
         if (!startDatabaseComponent())
         {
@@ -951,39 +876,15 @@ bool CServer::initializeNetworkComponent()
 {
     try
     {
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Starting network component initialization");
-        }
-        else
-        {
-            std::cerr << "DEBUG: Starting network component initialization"
-                      << std::endl;
-        }
+        // Only log actionable or unique events.
 
         /* Check if components exist */
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Checking if connection pooler exists: " +
-                             std::string(connectionPooler_ ? "yes" : "no"));
-        }
-        else
-        {
-            std::cerr << "DEBUG: Checking if connection pooler exists: "
-                      << (connectionPooler_ ? "yes" : "no") << std::endl;
-        }
+        // Only log actionable or unique events.
 
         /* Always recreate the connection pooler to ensure proper configuration
          */
         if (connectionPooler_)
         {
-            if (logger_)
-            {
-                logger_->log(CLogLevel::DEBUG,
-                             "Shutting down existing connection pooler");
-            }
             connectionPooler_->shutdown();
             connectionPooler_.reset();
         }
@@ -991,11 +892,6 @@ bool CServer::initializeNetworkComponent()
         /* Always recreate the TCP server to ensure proper configuration */
         if (tcpServer_)
         {
-            if (logger_)
-            {
-                logger_->log(CLogLevel::DEBUG,
-                             "Shutting down existing TCP server");
-            }
             tcpServer_->stop();
             tcpServer_.reset();
         }
@@ -1026,30 +922,10 @@ bool CServer::initializeNetworkComponent()
             /* Set logger for the connection pooler */
             pooler->setLogger(logger_);
 
-            if (logger_)
-            {
-                logger_->log(
-                    CLogLevel::DEBUG,
-                    "About to initialize PostgreSQL connection pooler");
-            }
-            else
-            {
-                std::cerr
-                    << "DEBUG: About to initialize PostgreSQL connection pooler"
-                    << std::endl;
-            }
+            // Only log actionable or unique events.
 
-            if (!pooler->initialize(poolConfig))
-            {
-                setError("Failed to initialize PostgreSQL connection pooler");
-                return false;
-            }
-
-            if (!pooler->start())
-            {
-                setError("Failed to start PostgreSQL connection pooler");
-                return false;
-            }
+            // Do not initialize or start the pooler here. It will be started on
+            // first mongosh client connect.
 
             /* Store the pooler */
             connectionPooler_ = pooler;
@@ -1074,7 +950,8 @@ bool CServer::initializeNetworkComponent()
         {
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG, "Creating TCP server");
+                logger_->log(CLogLevel::DEBUG,
+                             "Creating TCP server for network component.");
             }
 
             /* Create TCP network server */
@@ -1085,8 +962,7 @@ bool CServer::initializeNetworkComponent()
 
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "About to initialize TCP server");
+                // Unnecessary debug log removed.
             }
 
             /* Initialize the TCP server */
@@ -1100,8 +976,8 @@ bool CServer::initializeNetworkComponent()
 
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "TCP server initialized successfully");
+                logger_->log(CLogLevel::INFO,
+                             "TCP server initialized successfully.");
             }
 
             /* Store the TCP server */
@@ -1109,15 +985,15 @@ bool CServer::initializeNetworkComponent()
 
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "TCP server stored successfully");
+                // Unnecessary debug log removed.
             }
         }
         else
         {
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG, "TCP server already exists");
+                logger_->log(CLogLevel::INFO,
+                             "TCP server already exists. Skipping creation.");
             }
         }
 
@@ -1135,22 +1011,9 @@ bool CServer::initializeDatabaseComponent()
 {
     try
     {
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Starting database component initialization");
-        }
-        else
-        {
-            std::cerr << "DEBUG: Starting database component initialization"
-                      << std::endl;
-        }
-
-        /* Database component is now integrated with network component */
-        /* The connection pooler is created in initializeNetworkComponent() */
-        /* This method validates that the database connection pooler is working
-         */
-
+        // Database component initialization is now deferred until a mongosh
+        // client connects. No connection to PostgreSQL will be attempted at
+        // startup.
         if (!connectionPooler_)
         {
             if (logger_)
@@ -1163,44 +1026,6 @@ bool CServer::initializeDatabaseComponent()
                      "component must be initialized first");
             return false;
         }
-
-        if (logger_)
-        {
-            logger_->log(
-                CLogLevel::DEBUG,
-                "Connection pooler found, testing database connectivity");
-        }
-
-        /* Test database connectivity by getting a connection */
-        auto testConnection = connectionPooler_->getConnection();
-        if (!testConnection)
-        {
-            if (logger_)
-            {
-                logger_->log(CLogLevel::ERROR,
-                             "Failed to get test database connection - "
-                             "database may be unreachable");
-            }
-            setError("Failed to get test database connection - database may be "
-                     "unreachable");
-            return false;
-        }
-
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Test database connection acquired successfully");
-        }
-
-        /* Return the test connection to the pool */
-        connectionPooler_->releaseConnection(testConnection);
-
-        if (logger_)
-        {
-            logger_->log(CLogLevel::DEBUG,
-                         "Test database connection returned to pool");
-        }
-
         return true;
     }
     catch (const std::exception& e)
@@ -1235,6 +1060,12 @@ bool CServer::initializeProtocolComponent()
         if (connectionPooler_)
         {
             documentProtocolHandler_->setConnectionPooler(connectionPooler_);
+        }
+
+        /* Set logger on the document protocol handler */
+        if (logger_)
+        {
+            documentProtocolHandler_->setLogger(logger_);
         }
 
         /* Initialize command handlers */
@@ -1336,7 +1167,7 @@ bool CServer::startNetworkComponent()
     {
         if (logger_)
         {
-            logger_->log(CLogLevel::DEBUG, "Starting network component");
+            logger_->log(CLogLevel::INFO, "Starting network component.");
         }
 
         if (!tcpServer_)
@@ -1347,7 +1178,7 @@ bool CServer::startNetworkComponent()
 
         if (logger_)
         {
-            logger_->log(CLogLevel::DEBUG, "About to start TCP server");
+            // Unnecessary debug log removed.
         }
 
         /* Start the TCP server */
@@ -1360,7 +1191,7 @@ bool CServer::startNetworkComponent()
 
         if (logger_)
         {
-            logger_->log(CLogLevel::DEBUG, "TCP server started successfully");
+            logger_->log(CLogLevel::INFO, "TCP server started successfully.");
         }
 
         return true;
@@ -1909,7 +1740,7 @@ void CServer::setLogger(std::shared_ptr<CLogger> logger)
     logger_ = logger;
     if (logger_)
     {
-        logger_->log(CLogLevel::DEBUG, "Logger set on server");
+        logger_->log(CLogLevel::INFO, "Logger set on server.");
     }
     else
     {
@@ -1925,7 +1756,7 @@ bool CServer::initializeAuthentication()
         setError("Authentication registry not initialized");
         return false;
     }
-    
+
     /* Create PostgreSQL client-side authentication from config */
     AuthConfig postgresqlConfig;
     postgresqlConfig.type = AuthType::BASIC;
@@ -1939,13 +1770,14 @@ bool CServer::initializeAuthentication()
     postgresqlConfig.sslCert = config_.postgresqlClientAuthSSLCert;
     postgresqlConfig.sslKey = config_.postgresqlClientAuthSSLKey;
     postgresqlConfig.sslCA = config_.postgresqlClientAuthSSLCA;
-    
-    auto postgresqlAuth = authRegistry_->createPostgreSQLAuth(AuthType::BASIC, postgresqlConfig);
+
+    auto postgresqlAuth =
+        authRegistry_->createPostgreSQLAuth(AuthType::BASIC, postgresqlConfig);
     if (postgresqlAuth)
     {
         authRegistry_->registerAuth(postgresqlAuth);
     }
-    
+
     /* Create MongoDB server-side authentication from config */
     AuthConfig mongodbConfig;
     mongodbConfig.type = AuthType::SCRAM_SHA_256;
@@ -1959,19 +1791,21 @@ bool CServer::initializeAuthentication()
     mongodbConfig.sslCert = config_.mongodbServerAuthSSLCert;
     mongodbConfig.sslKey = config_.mongodbServerAuthSSLKey;
     mongodbConfig.sslCA = config_.mongodbServerAuthSSLCA;
-    
-    auto mongodbAuth = authRegistry_->createMongoDBAuth(AuthType::SCRAM_SHA_256, mongodbConfig);
+
+    auto mongodbAuth = authRegistry_->createMongoDBAuth(AuthType::SCRAM_SHA_256,
+                                                        mongodbConfig);
     if (mongodbAuth)
     {
         authRegistry_->registerAuth(mongodbAuth);
     }
-    
+
     return true;
 }
 
 std::shared_ptr<FauxDB::CAuthRegistry> CServer::getAuthRegistry() const
 {
-    return std::shared_ptr<FauxDB::CAuthRegistry>(authRegistry_.get(), [](FauxDB::CAuthRegistry*){});
+    return std::shared_ptr<FauxDB::CAuthRegistry>(
+        authRegistry_.get(), [](FauxDB::CAuthRegistry*) {});
 }
 
 std::shared_ptr<FauxDB::IPostgreSQLAuth> CServer::getPostgreSQLAuth() const
@@ -1992,7 +1826,8 @@ std::shared_ptr<FauxDB::IMongoDBAuth> CServer::getMongoDBAuth() const
     return authRegistry_->getMongoDBAuth(AuthType::SCRAM_SHA_256);
 }
 
-bool CServer::authenticateMongoDBClient(const std::string& username, const std::string& password)
+bool CServer::authenticateMongoDBClient(const std::string& username,
+                                        const std::string& password)
 {
     auto mongodbAuth = getMongoDBAuth();
     if (!mongodbAuth)
@@ -2000,12 +1835,12 @@ bool CServer::authenticateMongoDBClient(const std::string& username, const std::
         setError("MongoDB authentication not available");
         return false;
     }
-    
+
     if (!mongodbAuth->isRequired())
     {
         return true; /* Authentication not required */
     }
-    
+
     return mongodbAuth->authenticateMongoDBClient(username, password);
 }
 
@@ -2015,32 +1850,34 @@ std::string CServer::getAuthenticationStatus() const
     {
         return "Authentication registry not initialized";
     }
-    
+
     std::ostringstream status;
     status << "Authentication Status:\n";
-    
+
     auto postgresqlAuth = getPostgreSQLAuth();
     if (postgresqlAuth)
     {
         status << "  PostgreSQL Client Auth: " << postgresqlAuth->getName()
-               << " (Required: " << (postgresqlAuth->isRequired() ? "Yes" : "No") << ")\n";
+               << " (Required: "
+               << (postgresqlAuth->isRequired() ? "Yes" : "No") << ")\n";
     }
     else
     {
         status << "  PostgreSQL Client Auth: Not configured\n";
     }
-    
+
     auto mongodbAuth = getMongoDBAuth();
     if (mongodbAuth)
     {
         status << "  MongoDB Server Auth: " << mongodbAuth->getName()
-               << " (Required: " << (mongodbAuth->isRequired() ? "Yes" : "No") << ")\n";
+               << " (Required: " << (mongodbAuth->isRequired() ? "Yes" : "No")
+               << ")\n";
     }
     else
     {
         status << "  MongoDB Server Auth: Not configured\n";
     }
-    
+
     return status.str();
 }
 

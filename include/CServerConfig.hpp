@@ -1,4 +1,15 @@
 
+/*-------------------------------------------------------------------------
+ *
+ * CServerConfig.hpp
+ *      Server configuration and status management for FauxDB.
+ *      Defines server states, configuration options, and statistics.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 
 #include <chrono>
@@ -51,7 +62,7 @@ struct CServerConfig
     std::string pgPassword;
     size_t pgPoolSize;
     std::chrono::milliseconds pgTimeout;
-    
+
     /* MongoDB server-side authentication (FauxDB as MongoDB server) */
     std::string mongodbServerAuthMethod;
     bool mongodbServerAuthRequired;
@@ -62,7 +73,7 @@ struct CServerConfig
     std::string mongodbServerAuthSSLCert;
     std::string mongodbServerAuthSSLKey;
     std::string mongodbServerAuthSSLCA;
-    
+
     /* PostgreSQL client-side authentication (FauxDB to PostgreSQL) */
     std::string postgresqlClientAuthMethod;
     bool postgresqlClientAuthRequired;
@@ -85,13 +96,17 @@ struct CServerConfig
           enableHotReload(false), configFormat("json"), daemonMode(false),
           pgHost("localhost"), pgPort("5432"), pgDatabase("fauxdb"),
           pgUser("fauxdb"), pgPassword("fauxdb"), pgPoolSize(10),
-          pgTimeout(10000), 
-          mongodbServerAuthMethod("scram-sha-256"), mongodbServerAuthRequired(false),
-          mongodbServerAuthDatabase("admin"), mongodbServerAuthUsername(""), mongodbServerAuthPassword(""),
-          mongodbServerAuthUseSSL(false), mongodbServerAuthSSLCert(""), mongodbServerAuthSSLKey(""), mongodbServerAuthSSLCA(""),
-          postgresqlClientAuthMethod("basic"), postgresqlClientAuthRequired(false),
-          postgresqlClientAuthDatabase("fauxdb"), postgresqlClientAuthUsername(""), postgresqlClientAuthPassword(""),
-          postgresqlClientAuthUseSSL(false), postgresqlClientAuthSSLCert(""), postgresqlClientAuthSSLKey(""), postgresqlClientAuthSSLCA("")
+          pgTimeout(10000), mongodbServerAuthMethod("scram-sha-256"),
+          mongodbServerAuthRequired(false), mongodbServerAuthDatabase("admin"),
+          mongodbServerAuthUsername(""), mongodbServerAuthPassword(""),
+          mongodbServerAuthUseSSL(false), mongodbServerAuthSSLCert(""),
+          mongodbServerAuthSSLKey(""), mongodbServerAuthSSLCA(""),
+          postgresqlClientAuthMethod("basic"),
+          postgresqlClientAuthRequired(false),
+          postgresqlClientAuthDatabase("fauxdb"),
+          postgresqlClientAuthUsername(""), postgresqlClientAuthPassword(""),
+          postgresqlClientAuthUseSSL(false), postgresqlClientAuthSSLCert(""),
+          postgresqlClientAuthSSLKey(""), postgresqlClientAuthSSLCA("")
     {
     }
 

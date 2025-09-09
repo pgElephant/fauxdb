@@ -12,11 +12,11 @@
 #pragma once
 #include "CLogger.hpp"
 #include "CServerConfig.hpp"
+#include "auth/CAuthRegistry.hpp"
 #include "database/CPGConnectionPooler.hpp"
 #include "network/CTcp.hpp"
 #include "protocol/CDocumentCommandHandler.hpp"
 #include "protocol/CDocumentProtocolHandler.hpp"
-#include "auth/CAuthRegistry.hpp"
 
 #include <atomic>
 #include <boost/system/error_code.hpp>
@@ -113,7 +113,8 @@ class CServer
     virtual std::shared_ptr<FauxDB::CAuthRegistry> getAuthRegistry() const;
     virtual std::shared_ptr<FauxDB::IPostgreSQLAuth> getPostgreSQLAuth() const;
     virtual std::shared_ptr<FauxDB::IMongoDBAuth> getMongoDBAuth() const;
-    virtual bool authenticateMongoDBClient(const std::string& username, const std::string& password);
+    virtual bool authenticateMongoDBClient(const std::string& username,
+                                           const std::string& password);
     virtual std::string getAuthenticationStatus() const;
 
     /* Server statistics */

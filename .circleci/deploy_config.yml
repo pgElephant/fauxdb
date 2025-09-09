@@ -1,0 +1,287 @@
+# Deployment configuration for FauxDB
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@4.0
+  kubernetes: circleci/kubernetes@1.3
+
+executors:
+  deploy-executor:
+    docker:
+      - image: cimg/aws:2024.02
+    resource_class: medium
+
+commands:
+  setup_kubectl:
+    steps:
+      - kubernetes/install-kubectl:
+          kubectl-version: v1.28.0
+      - run:
+          name: Configure kubectl
+          command: |
+            aws eks update-kubeconfig --name fauxdb-cluster --region us-west-2
+
+jobs:
+  deploy_staging:
+    executor: deploy-executor
+    steps:
+      - checkout
+      - aws-cli/setup
+      - setup_kubectl
+      
+      - run:
+          name: Create Kubernetes manifests
+          command: |
+            mkdir -p k8s
+            
+            # ConfigMap for FauxDB configuration
+            cat > k8s/configmap.yaml << 'EOF'
+            apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: fauxdb-config
+              namespace: fauxdb-staging
+            data:
+              fauxdb.conf: |
+                {
+                  "server": {
+                    "host": "0.0.0.0",
+                    "port": 27018,
+                    "workers": 4,
+                    "daemon": false
+                  },
+                  "database": {
+                    "type": "postgresql",
+                    "postgresql": {
+                      "host": "postgres-service",
+                      "port": 5432,
+                      "database": "fauxdb",
+                      "user": "fauxdb",
+                      "password": "${POSTGRES_PASSWORD}",
+                      "pool_size": 10,
+                      "timeout": 30
+                    }
+                  },
+                  "logging": {
+                    "level": "info",
+                    "file": "/var/log/fauxdb/fauxdb.log"
+                  }
+                }
+            EOF
+            
+            # Secret for PostgreSQL password
+            cat > k8s/secret.yaml << 'EOF'
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: fauxdb-secrets
+              namespace: fauxdb-staging
+            type: Opaque
+            data:
+              postgres-password: ${POSTGRES_PASSWORD_B64}
+            EOF
+            
+            # Deployment
+            cat > k8s/deployment.yaml << 'EOF'
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: fauxdb
+              namespace: fauxdb-staging
+              labels:
+                app: fauxdb
+                version: staging
+            spec:
+              replicas: 2
+              selector:
+                matchLabels:
+                  app: fauxdb
+              template:
+                metadata:
+                  labels:
+                    app: fauxdb
+                spec:
+                  containers:
+                  - name: fauxdb
+                    image: pgelephant/fauxdb:${CIRCLE_SHA1}
+                    ports:
+                    - containerPort: 27018
+                      name: mongodb-wire
+                    env:
+                    - name: POSTGRES_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: fauxdb-secrets
+                          key: postgres-password
+                    volumeMounts:
+                    - name: config
+                      mountPath: /etc/fauxdb
+                    - name: logs
+                      mountPath: /var/log/fauxdb
+                    livenessProbe:
+                      tcpSocket:
+                        port: 27018
+                      initialDelaySeconds: 30
+                      periodSeconds: 10
+                    readinessProbe:
+                      tcpSocket:
+                        port: 27018
+                      initialDelaySeconds: 5
+                      periodSeconds: 5
+                    resources:
+                      requests:
+                        memory: "256Mi"
+                        cpu: "250m"
+                      limits:
+                        memory: "512Mi"
+                        cpu: "500m"
+                  volumes:
+                  - name: config
+                    configMap:
+                      name: fauxdb-config
+                  - name: logs
+                    emptyDir: {}
+            EOF
+            
+            # Service
+            cat > k8s/service.yaml << 'EOF'
+            apiVersion: v1
+            kind: Service
+            metadata:
+              name: fauxdb-service
+              namespace: fauxdb-staging
+              labels:
+                app: fauxdb
+            spec:
+              selector:
+                app: fauxdb
+              ports:
+              - port: 27018
+                targetPort: 27018
+                name: mongodb-wire
+              type: ClusterIP
+            EOF
+            
+            # Ingress
+            cat > k8s/ingress.yaml << 'EOF'
+            apiVersion: networking.k8s.io/v1
+            kind: Ingress
+            metadata:
+              name: fauxdb-ingress
+              namespace: fauxdb-staging
+              annotations:
+                kubernetes.io/ingress.class: nginx
+                nginx.ingress.kubernetes.io/tcp-services-configmap: fauxdb-staging/tcp-services
+            spec:
+              rules:
+              - host: fauxdb-staging.example.com
+                http:
+                  paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: fauxdb-service
+                        port:
+                          number: 27018
+            EOF
+
+      - run:
+          name: Deploy to staging
+          command: |
+            # Create namespace if it doesn't exist
+            kubectl create namespace fauxdb-staging --dry-run=client -o yaml | kubectl apply -f -
+            
+            # Encode password
+            export POSTGRES_PASSWORD_B64=$(echo -n "${POSTGRES_PASSWORD}" | base64)
+            
+            # Apply manifests
+            envsubst < k8s/secret.yaml | kubectl apply -f -
+            kubectl apply -f k8s/configmap.yaml
+            kubectl apply -f k8s/deployment.yaml
+            kubectl apply -f k8s/service.yaml
+            kubectl apply -f k8s/ingress.yaml
+            
+            # Wait for deployment
+            kubectl rollout status deployment/fauxdb -n fauxdb-staging --timeout=300s
+
+      - run:
+          name: Run deployment tests
+          command: |
+            # Test service connectivity
+            kubectl get pods -n fauxdb-staging
+            kubectl get services -n fauxdb-staging
+            
+            # Port forward for testing
+            kubectl port-forward service/fauxdb-service 27018:27018 -n fauxdb-staging &
+            PF_PID=$!
+            sleep 10
+            
+            # Test connectivity (basic TCP check)
+            nc -z localhost 27018 && echo "Service is accessible" || echo "Service is not accessible"
+            
+            kill $PF_PID
+
+  deploy_production:
+    executor: deploy-executor
+    steps:
+      - checkout
+      - aws-cli/setup
+      - setup_kubectl
+      
+      - run:
+          name: Deploy to production
+          command: |
+            # Similar to staging but with production namespace and configs
+            kubectl create namespace fauxdb-production --dry-run=client -o yaml | kubectl apply -f -
+            
+            # Production deployment with higher resources and replicas
+            sed 's/fauxdb-staging/fauxdb-production/g; s/replicas: 2/replicas: 5/g' k8s/deployment.yaml | \
+              sed 's/memory: "256Mi"/memory: "512Mi"/g; s/cpu: "250m"/cpu: "500m"/g; s/memory: "512Mi"/memory: "1Gi"/g; s/cpu: "500m"/cpu: "1"/g' | \
+              kubectl apply -f -
+
+  rollback:
+    executor: deploy-executor
+    steps:
+      - aws-cli/setup
+      - setup_kubectl
+      
+      - run:
+          name: Rollback deployment
+          command: |
+            kubectl rollout undo deployment/fauxdb -n ${ENVIRONMENT:-fauxdb-staging}
+            kubectl rollout status deployment/fauxdb -n ${ENVIRONMENT:-fauxdb-staging}
+
+workflows:
+  deploy_workflow:
+    jobs:
+      - deploy_staging:
+          context: aws-staging
+          requires:
+            - build_and_test
+          filters:
+            branches:
+              only: develop
+
+      - hold_for_approval:
+          type: approval
+          requires:
+            - deploy_staging
+          filters:
+            branches:
+              only: develop
+
+      - deploy_production:
+          context: aws-production
+          requires:
+            - hold_for_approval
+          filters:
+            branches:
+              only: main
+
+      - rollback:
+          context: aws-staging
+          filters:
+            branches:
+              ignore: /.*/
+          # This job can be triggered manually via API

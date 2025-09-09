@@ -1,0 +1,175 @@
+# Docker build configuration for FauxDB
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.4.0
+
+jobs:
+  build_docker_image:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker:
+          version: 20.10.14
+          docker_layer_caching: true
+      
+      - checkout
+      
+      - run:
+          name: Create multi-stage Dockerfile
+          command: |
+            cat > Dockerfile << 'EOF'
+            # Multi-stage Docker build for FauxDB
+            FROM ubuntu:22.04 as builder
+            
+            # Install build dependencies
+            RUN apt-get update && apt-get install -y \
+                build-essential \
+                cmake \
+                ninja-build \
+                pkg-config \
+                git \
+                curl \
+                wget \
+                software-properties-common \
+                postgresql-server-dev-14 \
+                libssl-dev \
+                zlib1g-dev \
+                libbz2-dev \
+                liblz4-dev \
+                libzstd-dev
+            
+            # Install GCC 12
+            RUN add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
+                apt-get update && \
+                apt-get install -y gcc-12 g++-12 && \
+                update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 60 && \
+                update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 60
+            
+            # Install vcpkg
+            WORKDIR /opt
+            RUN git clone https://github.com/Microsoft/vcpkg.git && \
+                cd vcpkg && \
+                ./bootstrap-vcpkg.sh
+            
+            # Install dependencies via vcpkg
+            WORKDIR /opt/vcpkg
+            RUN ./vcpkg install \
+                boost \
+                nlohmann-json \
+                fmt \
+                spdlog \
+                openssl \
+                zlib \
+                bzip2 \
+                lz4 \
+                zstd
+            
+            # Copy source code
+            WORKDIR /app
+            COPY . .
+            
+            # Build FauxDB
+            RUN mkdir -p build && \
+                cd build && \
+                cmake .. \
+                  -GNinja \
+                  -DCMAKE_BUILD_TYPE=Release \
+                  -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
+                  -DCMAKE_INSTALL_PREFIX=/usr/local && \
+                ninja -j$(nproc) && \
+                ninja install
+            
+            # Runtime stage
+            FROM ubuntu:22.04 as runtime
+            
+            # Install runtime dependencies
+            RUN apt-get update && apt-get install -y \
+                postgresql-client-14 \
+                ca-certificates \
+                && rm -rf /var/lib/apt/lists/*
+            
+            # Create fauxdb user
+            RUN useradd -r -s /bin/false fauxdb
+            
+            # Copy binaries and configs
+            COPY --from=builder /usr/local/bin/fauxdb /usr/local/bin/
+            COPY --from=builder /app/config /etc/fauxdb/
+            
+            # Create directories
+            RUN mkdir -p /var/log/fauxdb /var/lib/fauxdb && \
+                chown -R fauxdb:fauxdb /var/log/fauxdb /var/lib/fauxdb
+            
+            # Expose MongoDB default port
+            EXPOSE 27018
+            
+            # Health check
+            HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+              CMD nc -z localhost 27018 || exit 1
+            
+            USER fauxdb
+            WORKDIR /var/lib/fauxdb
+            
+            CMD ["/usr/local/bin/fauxdb", "-c", "/etc/fauxdb/fauxdb.conf"]
+            EOF
+
+      - docker/build:
+          image: pgelephant/fauxdb
+          tag: << pipeline.git.revision >>
+          extra_build_args: |
+            --target runtime
+            --label "org.opencontainers.image.source=https://github.com/pgElephant/fauxdb"
+            --label "org.opencontainers.image.revision=<< pipeline.git.revision >>"
+            --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+      - run:
+          name: Test Docker image
+          command: |
+            # Start PostgreSQL for testing
+            docker run -d --name postgres-test \
+              -e POSTGRES_DB=fauxdb \
+              -e POSTGRES_USER=fauxdb \
+              -e POSTGRES_PASSWORD=fauxdb \
+              -p 5432:5432 \
+              postgres:17
+            
+            sleep 10
+            
+            # Test FauxDB container
+            docker run -d --name fauxdb-test \
+              --link postgres-test:postgres \
+              -p 27018:27018 \
+              -e POSTGRES_HOST=postgres \
+              pgelephant/fauxdb:<< pipeline.git.revision >>
+            
+            sleep 10
+            
+            # Verify container is running
+            docker ps | grep fauxdb-test
+            
+            # Test connectivity (if mongosh is available)
+            # docker run --rm --link fauxdb-test:fauxdb \
+            #   mongo:latest mongosh --host fauxdb --port 27018 --eval "db.runCommand({ping: 1})"
+
+      - when:
+          condition:
+            equal: [ main, << pipeline.git.branch >> ]
+          steps:
+            - docker/push:
+                image: pgelephant/fauxdb
+                tag: << pipeline.git.revision >>
+            - docker/push:
+                image: pgelephant/fauxdb
+                tag: latest
+
+workflows:
+  docker_workflow:
+    jobs:
+      - build_docker_image:
+          context: docker-hub
+          filters:
+            branches:
+              only:
+                - main
+                - develop
+            tags:
+              only: /^v.*/

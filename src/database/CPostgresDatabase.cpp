@@ -10,6 +10,8 @@
  */
 #include "CPostgresDatabase.hpp"
 
+#include "CLogger.hpp"
+
 #include <algorithm>
 #include <sstream>
 #include <stdexcept>
@@ -21,9 +23,8 @@ namespace FauxDB
  * Constructor and Destructor
  *-------------------------------------------------------------------------*/
 CPostgresDatabase::CPostgresDatabase()
-    : libpq_(std::make_unique<CLibpq>()), 
-      basicAuth_(std::make_unique<CBasicAuth>()),
-      connectionEstablished_(false)
+    : libpq_(std::make_unique<CLibpq>()),
+      basicAuth_(std::make_unique<CBasicAuth>()), connectionEstablished_(false)
 {
     initializePostgresDefaults();
 }
@@ -94,7 +95,8 @@ bool CPostgresDatabase::connect(const CDatabaseConfig& config)
     }
 }
 
-bool CPostgresDatabase::connect(const CDatabaseConfig& config, const AuthConfig& authConfig)
+bool CPostgresDatabase::connect(const CDatabaseConfig& config,
+                                const AuthConfig& authConfig)
 {
     if (connectionEstablished_)
     {
@@ -107,7 +109,8 @@ bool CPostgresDatabase::connect(const CDatabaseConfig& config, const AuthConfig&
         authConfig_ = authConfig;
         if (!basicAuth_->initialize(authConfig))
         {
-            lastError_ = "Failed to initialize authentication: " + basicAuth_->getLastError();
+            lastError_ = "Failed to initialize authentication: " +
+                         basicAuth_->getLastError();
             return false;
         }
 
@@ -120,8 +123,10 @@ bool CPostgresDatabase::connect(const CDatabaseConfig& config, const AuthConfig&
         postgresConfig_.options = config.options;
 
         /* Build connection string with authentication */
-        std::string connectionString = basicAuth_->buildPostgreSQLConnectionString(
-            postgresConfig_.host, postgresConfig_.port, postgresConfig_.database);
+        std::string connectionString =
+            basicAuth_->buildPostgreSQLConnectionString(
+                postgresConfig_.host, postgresConfig_.port,
+                postgresConfig_.database);
 
         /* Connect using CLibpq with authentication */
         if (!libpq_->connect(connectionString))
@@ -135,7 +140,8 @@ bool CPostgresDatabase::connect(const CDatabaseConfig& config, const AuthConfig&
     }
     catch (const std::exception& e)
     {
-        lastError_ = "Exception during authenticated connection: " + std::string(e.what());
+        lastError_ = "Exception during authenticated connection: " +
+                     std::string(e.what());
         return false;
     }
 }
@@ -1074,19 +1080,21 @@ bool CPostgresDatabase::connect()
 
 bool CPostgresDatabase::ping()
 {
-    if (!isConnected())
-    {
-        return false;
-    }
-
+    // Always attempt a real query, even if isConnected() returns true
     try
     {
-        // Simple query to test connection
         auto result = executeQuery("SELECT 1");
-        return result.success;
+        if (!result.success)
+        {
+            disconnect();
+            lastError_ = "Ping failed: could not execute query.";
+            return false;
+        }
+        return true;
     }
     catch (const std::exception& e)
     {
+        disconnect();
         lastError_ = "Ping failed: " + std::string(e.what());
         return false;
     }
@@ -1148,14 +1156,15 @@ AuthConfig CPostgresDatabase::getAuthConfig() const
     return authConfig_;
 }
 
-bool CPostgresDatabase::authenticate(const std::string& username, const std::string& password)
+bool CPostgresDatabase::authenticate(const std::string& username,
+                                     const std::string& password)
 {
     if (!basicAuth_)
     {
         lastError_ = "Basic authentication not initialized";
         return false;
     }
-    
+
     return basicAuth_->authenticate(username, password);
 }
 
@@ -1165,7 +1174,7 @@ bool CPostgresDatabase::isAuthenticationRequired() const
     {
         return false;
     }
-    
+
     return basicAuth_->isRequired();
 }
 

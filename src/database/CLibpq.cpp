@@ -228,8 +228,8 @@ bool CLibpq::connect(const std::string& connectionString)
                                     "password=***");
             }
         }
-        std::cerr << "DEBUG: Connecting with string: " << debugString
-                  << std::endl;
+
+        // Only log connection string if not immediately followed by an error
 
         connection_ = PQconnectdb(connectionString.c_str());
 
@@ -237,7 +237,7 @@ bool CLibpq::connect(const std::string& connectionString)
         {
             std::string errorMsg = connection_ ? PQerrorMessage(connection_)
                                                : "PQconnectdb returned null";
-            std::cerr << "DEBUG: Connection failed: " << errorMsg << std::endl;
+            // Only log the error, not the debug string
             setError(errorMsg);
             return false;
         }

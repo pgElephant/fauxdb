@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * COpMsgHandler.hpp
+ *      OP_MSG message handler for MongoDB wire protocol.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 #pragma once
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"

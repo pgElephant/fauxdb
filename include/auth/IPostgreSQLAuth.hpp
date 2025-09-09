@@ -1,7 +1,8 @@
 /*-------------------------------------------------------------------------
  *
  * IPostgreSQLAuth.hpp
- *      PostgreSQL client-side authentication interface for FauxDB to PostgreSQL.
+ *      PostgreSQL client-side authentication interface for FauxDB to
+ * PostgreSQL.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
  *
@@ -25,9 +26,10 @@ class IPostgreSQLAuth : public IAuthentication
     virtual std::string getPostgreSQLPassword() const = 0;
     virtual bool testConnection() = 0;
     virtual std::string getConnectionInfo() const = 0;
-    virtual std::string buildPostgreSQLConnectionString(const std::string& host,
-                                                        const std::string& port,
-                                                        const std::string& database) const = 0;
+    virtual std::string
+    buildPostgreSQLConnectionString(const std::string& host,
+                                    const std::string& port,
+                                    const std::string& database) const = 0;
 
     /* Override direction to always be POSTGRESQL_CLIENT_SIDE */
     AuthDirection getDirection() const override

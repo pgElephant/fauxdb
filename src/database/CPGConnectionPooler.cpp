@@ -1,3 +1,14 @@
+/*-------------------------------------------------------------------------
+ *
+ * CPGConnectionPooler.cpp
+ *      PostgreSQL connection pooler implementation.
+ *      Part of the FauxDB MongoDB-compatible database server.
+ *
+ * Copyright (c) 2024-2025, pgElephant, Inc.
+ *
+ *-------------------------------------------------------------------------
+ */
+
 
 
 #include "CPGConnectionPooler.hpp"
@@ -63,23 +74,14 @@ bool CPGConnectionPooler::initialize(const CConnectionPoolConfig& config)
     {
         if (logger_)
         {
-            logger_->log(CLogLevel::DEBUG,
-                         "Initializing PostgreSQL connection pool with config: "
-                         "max_connections=" +
-                             std::to_string(config.maxConnections) +
-                             ", min_connections=" +
-                             std::to_string(config.minConnections) +
-                             ", initial_connections=" +
-                             std::to_string(config.initialConnections));
-        }
-        else
-        {
-            std::cerr << "DEBUG: Initializing PostgreSQL connection pool with "
-                         "config: max_connections="
-                      << config.maxConnections
-                      << ", min_connections=" << config.minConnections
-                      << ", initial_connections=" << config.initialConnections
-                      << std::endl;
+            logger_->log(
+                CLogLevel::DEBUG,
+                "Initializing PostgreSQL connection pool. Max connections: '" +
+                    std::to_string(config.maxConnections) +
+                    "', Min connections: '" +
+                    std::to_string(config.minConnections) +
+                    "', Initial connections: '" +
+                    std::to_string(config.initialConnections) + "'.");
         }
 
         config_ = config;
@@ -87,10 +89,7 @@ bool CPGConnectionPooler::initialize(const CConnectionPoolConfig& config)
         {
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "Creating initial connection " +
-                                 std::to_string(i + 1) + "/" +
-                                 std::to_string(config_.initialConnections));
+                // Unnecessary debug log removed.
             }
 
             if (!addConnection())
@@ -171,33 +170,42 @@ void CPGConnectionPooler::shutdown()
 
 bool CPGConnectionPooler::addConnection()
 {
-    try
+    while (true)
     {
-        if (logger_)
+        try
         {
-            logger_->log(
-                CLogLevel::DEBUG,
-                "Creating new PostgreSQL connection. Current pool size: " +
-                    std::to_string(connections_.size()) + "/" +
-                    std::to_string(config_.maxConnections));
+            shared_ptr<PGConnection> newConn = createNewConnection();
+            if (newConn)
+            {
+                connections_.push_back(newConn);
+                availableConnections_.push_back(newConn);
+                logConnectionEvent("CONNECTION_ADDED",
+                                   "New connection added to pool");
+                return true;
+            }
+            // If connection failed, wait 15 seconds and try again
+            if (logger_)
+            {
+                logger_->log(CLogLevel::ERROR,
+                             "Failed to create PostgreSQL connection. Will "
+                             "retry in 15 seconds.");
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(15));
         }
-
-        shared_ptr<PGConnection> newConn = createNewConnection();
-        if (newConn)
+        catch (const exception& e)
         {
-            connections_.push_back(newConn);
-            availableConnections_.push_back(newConn);
-            logConnectionEvent("CONNECTION_ADDED",
-                               "New connection added to pool");
-            return true;
+            logConnectionEvent("CONNECTION_ADD_ERROR",
+                               "Exception adding connection: " +
+                                   string(e.what()));
+            if (logger_)
+            {
+                logger_->log(CLogLevel::ERROR,
+                             "Exception while creating PostgreSQL connection. "
+                             "Will retry in 15 seconds. Error: '" +
+                                 std::string(e.what()) + "'.");
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(15));
         }
-        return false;
-    }
-    catch (const exception& e)
-    {
-        logConnectionEvent("CONNECTION_ADD_ERROR",
-                           "Exception adding connection: " + string(e.what()));
-        return false;
     }
 }
 
@@ -216,7 +224,7 @@ bool CPGConnectionPooler::removeConnection(shared_ptr<void> connection)
         removeFromVector(inUseConnections_);
         closeConnection(pgConn);
         logConnectionEvent("CONNECTION_REMOVED",
-                           "Connection removed from pool");
+                           "Connection removed from pool.");
         return true;
     }
     catch (const exception& e)
@@ -243,15 +251,10 @@ void CPGConnectionPooler::setPostgresConfig(const string& host,
 
     if (logger_)
     {
-        logger_->log(CLogLevel::DEBUG,
-                     "PostgreSQL config set: host=" + host + ", port=" + port +
-                         ", database=" + database + ", user=" + username);
-    }
-    else
-    {
-        std::cerr << "DEBUG: PostgreSQL config set: host=" << host
-                  << ", port=" << port << ", database=" << database
-                  << ", user=" << username << std::endl;
+        logger_->log(CLogLevel::INFO,
+                     "PostgreSQL connection configuration updated. Host: '" +
+                         host + "', Port: '" + port + "', Database: '" +
+                         database + "', User: '" + username + "'.");
     }
 
     logConnectionEvent("CONFIG_UPDATED", "PostgreSQL configuration updated");
@@ -265,10 +268,11 @@ shared_ptr<PGConnection> CPGConnectionPooler::getPostgresConnection()
 
     if (logger_)
     {
-        logger_->log(CLogLevel::DEBUG,
-                     "Requesting PostgreSQL connection from pool. Available: " +
-                         std::to_string(availableConnections_.size()) +
-                         ", Total: " + std::to_string(connections_.size()));
+        logger_->log(
+            CLogLevel::INFO,
+            "Requesting PostgreSQL connection from pool. Available: '" +
+                std::to_string(availableConnections_.size()) + "', Total: '" +
+                std::to_string(connections_.size()) + "'.");
     }
 
     while (availableConnections_.empty())
@@ -277,11 +281,7 @@ shared_ptr<PGConnection> CPGConnectionPooler::getPostgresConnection()
         {
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "No available connections, creating new "
-                             "connection. Current: " +
-                                 std::to_string(connections_.size()) + "/" +
-                                 std::to_string(config_.maxConnections));
+                // Unnecessary debug log removed.
             }
 
             // Create connection while holding the lock to prevent race
@@ -305,10 +305,10 @@ shared_ptr<PGConnection> CPGConnectionPooler::getPostgresConnection()
             if (logger_)
             {
                 logger_->log(
-                    CLogLevel::DEBUG,
-                    "Waiting for available connection with timeout: " +
+                    CLogLevel::INFO,
+                    "Waiting for available PostgreSQL connection. Timeout: '" +
                         std::to_string(config_.connectionTimeout.count()) +
-                        "ms");
+                        " ms'.");
             }
 
             auto timeout =
@@ -345,9 +345,9 @@ shared_ptr<PGConnection> CPGConnectionPooler::getPostgresConnection()
         {
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "Connection validation failed, removing broken "
-                             "connection and retrying");
+                logger_->log(CLogLevel::INFO,
+                             "Connection validation failed. Removing broken "
+                             "connection and retrying.");
             }
 
             removeBrokenConnection(conn);
@@ -581,7 +581,7 @@ void CPGConnectionPooler::logConnectionEvent(const string& event,
     {
         if (logger_)
         {
-            logger_->log(CLogLevel::ERROR, event + ": " + details);
+            logger_->log(CLogLevel::ERROR, details);
         }
         else
         {
@@ -697,22 +697,22 @@ shared_ptr<PGConnection> CPGConnectionPooler::createNewConnection()
         if (logger_)
         {
             logger_->log(
-                CLogLevel::DEBUG,
-                "Attempting to connect to PostgreSQL with config: host=" +
-                    config.host + ", port=" + config.port + ", database=" +
-                    config.database + ", user=" + config.username);
+                CLogLevel::INFO,
+                "Attempting to connect to PostgreSQL with config. Host: '" +
+                    config.host + "', Port: '" + config.port +
+                    "', Database: '" + config.database + "', User: '" +
+                    config.username + "'.");
         }
 
         if (db->connect(config))
         {
             if (logger_)
             {
-                logger_->log(CLogLevel::DEBUG,
-                             "PostgreSQL connection created successfully");
+                logger_->log(CLogLevel::INFO,
+                             "Connected to PostgreSQL successfully.");
             }
-            logConnectionEvent(
-                "CONNECTION_CREATED",
-                "New PostgreSQL connection created successfully");
+            logConnectionEvent("CONNECTION_CREATED",
+                               "Connected to PostgreSQL successfully");
             return make_shared<PGConnection>(db);
         }
         else
@@ -803,6 +803,12 @@ void CPGConnectionPooler::removeBrokenConnection(
         if (connection->database)
         {
             connection->database->disconnect();
+            if (logger_)
+            {
+                logger_->log(CLogLevel::INFO, "Disconnected from PostgreSQL.");
+            }
+            logConnectionEvent("CONNECTION_DISCONNECTED",
+                               "Disconnected from PostgreSQL");
         }
     }
 }
@@ -820,6 +826,15 @@ void CPGConnectionPooler::cleanupExpiredConnections()
             if ((*it)->database)
             {
                 (*it)->database->disconnect();
+                if (logger_)
+                {
+                    logger_->log(
+                        CLogLevel::INFO,
+                        "Disconnected from PostgreSQL (expired connection).");
+                }
+                logConnectionEvent(
+                    "CONNECTION_DISCONNECTED",
+                    "Disconnected from PostgreSQL (expired connection)");
             }
             it = availableConnections_.erase(it);
         }

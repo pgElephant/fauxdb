@@ -77,11 +77,11 @@ CREATE FUNCTION bson_lt(bson, bson) RETURNS boolean
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE FUNCTION bson_gte(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_gte'
+    AS '$libdir/bson', 'bson_ge'
     LANGUAGE C IMMUTABLE STRICT;
 
 CREATE FUNCTION bson_lte(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_lte'
+    AS '$libdir/bson', 'bson_le'
     LANGUAGE C IMMUTABLE STRICT;
 
 -- Hash and comparison functions
@@ -89,73 +89,16 @@ CREATE FUNCTION bson_hash(bson) RETURNS integer
     AS '$libdir/bson', 'bson_hash'
     LANGUAGE C IMMUTABLE STRICT;
 
--- Comparison functions
 CREATE FUNCTION bson_cmp(bson, bson) RETURNS integer
     AS '$libdir/bson', 'bson_cmp'
     LANGUAGE C IMMUTABLE STRICT;
 
--- BSON Query Operator functions
-CREATE FUNCTION bson_eq_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_eq_op'
+-- Document merge function
+CREATE FUNCTION bson_merge(bson, bson) RETURNS bson
+    AS '$libdir/bson', 'bson_merge'
     LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION bson_ne_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_ne_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_gt_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_gt_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_lt_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_lt_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_gte_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_gte_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_lte_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_lte_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_in_op(bson, bson[]) RETURNS boolean
-    AS '$libdir/bson', 'bson_in_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_nin_op(bson, bson[]) RETURNS boolean
-    AS '$libdir/bson', 'bson_nin_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_all_op(bson, text[]) RETURNS boolean
-    AS '$libdir/bson', 'bson_all_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_size_op(bson, integer) RETURNS boolean
-    AS '$libdir/bson', 'bson_size_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_type_op(bson, integer) RETURNS boolean
-    AS '$libdir/bson', 'bson_type_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_regex_op(bson, text) RETURNS boolean
-    AS '$libdir/bson', 'bson_regex_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_exists_op(bson, text) RETURNS boolean
-    AS '$libdir/bson', 'bson_exists_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_mod_op(bson, integer, integer) RETURNS boolean
-    AS '$libdir/bson', 'bson_mod_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION bson_elem_match_op(bson, bson) RETURNS boolean
-    AS '$libdir/bson', 'bson_elem_match_op'
-    LANGUAGE C IMMUTABLE STRICT;
-
--- Create operators
+-- Standard PostgreSQL operators
 CREATE OPERATOR -> (
     LEFTARG = bson,
     RIGHTARG = text,
@@ -257,11 +200,58 @@ CREATE OPERATOR ?& (
     PROCEDURE = bson_exists_all
 );
 
--- BSON Query Operator functions (for MongoDB-style queries)
--- These are not operators but functions that can be used in WHERE clauses
--- Example: WHERE bson_eq_op(data, '{"field": "value"}')
+-- MongoDB-style operators (alternative syntax)
+CREATE OPERATOR ~= (
+    LEFTARG = bson,
+    RIGHTARG = bson,
+    PROCEDURE = bson_eq,
+    COMMUTATOR = ~=,
+    RESTRICT = eqsel,
+    JOIN = eqjoinsel
+);
 
--- Create operator classes for indexing
+CREATE OPERATOR ~> (
+    LEFTARG = bson,
+    RIGHTARG = bson,
+    PROCEDURE = bson_contains,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+CREATE OPERATOR <~ (
+    LEFTARG = bson,
+    RIGHTARG = bson,
+    PROCEDURE = bson_contained,
+    RESTRICT = contsel,
+    JOIN = contjoinsel
+);
+
+CREATE OPERATOR ?? (
+    LEFTARG = bson,
+    RIGHTARG = text,
+    PROCEDURE = bson_exists
+);
+
+CREATE OPERATOR ??| (
+    LEFTARG = bson,
+    RIGHTARG = text[],
+    PROCEDURE = bson_exists_any
+);
+
+CREATE OPERATOR ??& (
+    LEFTARG = bson,
+    RIGHTARG = text[],
+    PROCEDURE = bson_exists_all
+);
+
+-- Document merge operator
+CREATE OPERATOR || (
+    LEFTARG = bson,
+    RIGHTARG = bson,
+    PROCEDURE = bson_merge
+);
+
+-- Operator classes for indexing
 CREATE OPERATOR CLASS bson_ops
     DEFAULT FOR TYPE bson USING btree AS
         OPERATOR    1   <,

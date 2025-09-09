@@ -1,712 +1,771 @@
 /*
  * bson.c
+ *		  PostgreSQL BSON data type support
  *
- * PostgreSQL BSON extension using mongo-c-driver
- *
- * This module implements a PostgreSQL data type that stores and manipulates
- * BSON (Binary JSON) data using the official MongoDB C driver.
+ * This module implements a BSON (Binary JSON) data type for PostgreSQL
+ * that provides compatibility with the standard BSON format using the
+ * official libbson C driver library.
  *
  * Copyright (c) 2024, PostgreSQL Global Development Group
  *
  * IDENTIFICATION
- *    contrib/bson/bson.c
+ *		  extension/bson/src/bson.c
  */
 
 #include "postgres.h"
 
-#include <string.h>
-#include <ctype.h>
-
-#include "access/htup_details.h"
-#include "catalog/pg_type.h"
-#include "libpq/pqformat.h"
-#include "utils/builtins.h"
-#include "utils/varlena.h"
 #include "access/hash.h"
+#include "catalog/pg_type.h"
 #include "fmgr.h"
-#include "funcapi.h"
-#include "lib/stringinfo.h"
+#include "libpq/pqformat.h"
 #include "utils/array.h"
 #include "utils/builtins.h"
-#include "utils/varlena.h"
-#include "access/hash.h"
+#include "utils/lsyscache.h"
+#include "utils/memutils.h"
 
-/* mongo-c-driver includes */
 #include <bson/bson.h>
+#include <string.h>
+
+#include "bson.h"
 
 PG_MODULE_MAGIC;
 
 /*
- * BSON type OID
- */
-Oid BSONOID = InvalidOid;
-
-/*
- * PostgreSQL BSON storage structure
- * We store the BSON data in its native binary format from mongo-c-driver
- */
-typedef struct
-{
-	int32		vl_len_;		/* varlena header */
-	char		data[FLEXIBLE_ARRAY_MEMBER];	/* BSON binary data */
-} BsonData;
-
-#define DatumGetBsonP(X)		((BsonData *) PG_DETOAST_DATUM(X))
-#define BsonPGetDatum(X)		PointerGetDatum(X)
-#define PG_GETARG_BSON_P(n)		DatumGetBsonP(PG_GETARG_DATUM(n))
-#define PG_RETURN_BSON_P(x)		PG_RETURN_POINTER(x)
-
-/*
- * Forward declarations
- */
-extern Datum bson_in(PG_FUNCTION_ARGS);
-extern Datum bson_out(PG_FUNCTION_ARGS);
-extern Datum bson_recv(PG_FUNCTION_ARGS);
-extern Datum bson_send(PG_FUNCTION_ARGS);
-extern Datum bson_get(PG_FUNCTION_ARGS);
-extern Datum bson_get_text(PG_FUNCTION_ARGS);
-extern Datum bson_exists(PG_FUNCTION_ARGS);
-extern Datum bson_exists_any(PG_FUNCTION_ARGS);
-extern Datum bson_exists_all(PG_FUNCTION_ARGS);
-extern Datum bson_contains(PG_FUNCTION_ARGS);
-extern Datum bson_contained(PG_FUNCTION_ARGS);
-extern Datum bson_eq(PG_FUNCTION_ARGS);
-extern Datum bson_ne(PG_FUNCTION_ARGS);
-extern Datum bson_gt(PG_FUNCTION_ARGS);
-extern Datum bson_gte(PG_FUNCTION_ARGS);
-extern Datum bson_lt(PG_FUNCTION_ARGS);
-extern Datum bson_lte(PG_FUNCTION_ARGS);
-extern Datum bson_cmp(PG_FUNCTION_ARGS);
-extern Datum bson_hash(PG_FUNCTION_ARGS);
-
-/*
- * Helper function to compare bson values
- */
-static bool
-bson_values_equal(const bson_value_t *val1, const bson_value_t *val2)
-{
-	if (val1->value_type != val2->value_type)
-		return false;
-
-	switch (val1->value_type)
-	{
-		case BSON_TYPE_UTF8:
-			return (val1->value.v_utf8.len == val2->value.v_utf8.len &&
-					memcmp(val1->value.v_utf8.str, val2->value.v_utf8.str, val1->value.v_utf8.len) == 0);
-		case BSON_TYPE_INT32:
-			return val1->value.v_int32 == val2->value.v_int32;
-		case BSON_TYPE_INT64:
-			return val1->value.v_int64 == val2->value.v_int64;
-		case BSON_TYPE_DOUBLE:
-			return val1->value.v_double == val2->value.v_double;
-		case BSON_TYPE_BOOL:
-			return val1->value.v_bool == val2->value.v_bool;
-		case BSON_TYPE_NULL:
-			return true;
-		default:
-			return false; /* For simplicity, other types not equal */
-	}
-}
-
-/*
- * Helper function to create BsonData from bson_t
- */
-static BsonData *
-bson_t_to_bson_data(const bson_t *bson)
-{
-	BsonData   *result;
-	const uint8_t *data;
-	uint32_t	len;
-
-	data = bson_get_data(bson);
-	len = bson->len;
-
-	result = (BsonData *) palloc(VARHDRSZ + len);
-	SET_VARSIZE(result, VARHDRSZ + len);
-	memcpy(result->data, data, len);
-
-	return result;
-}
-
-/*
- * Helper function to create bson_t from BsonData
- */
-static bson_t *
-bson_data_to_bson_t(const BsonData *bson_data)
-{
-	const uint8_t *data = (const uint8_t *) bson_data->data;
-	size_t		len = VARSIZE_ANY_EXHDR(bson_data);
-
-	return bson_new_from_data(data, len);
-}
-
-/*
- * Input function for BSON type
- * Converts JSON string to BSON
+ * Function declarations for PostgreSQL
  */
 PG_FUNCTION_INFO_V1(bson_in);
+PG_FUNCTION_INFO_V1(bson_out);
+PG_FUNCTION_INFO_V1(bson_recv);
+PG_FUNCTION_INFO_V1(bson_send);
+PG_FUNCTION_INFO_V1(bson_cmp);
+PG_FUNCTION_INFO_V1(bson_eq);
+PG_FUNCTION_INFO_V1(bson_lt);
+PG_FUNCTION_INFO_V1(bson_le);
+PG_FUNCTION_INFO_V1(bson_gt);
+PG_FUNCTION_INFO_V1(bson_ge);
+PG_FUNCTION_INFO_V1(bson_ne);
+PG_FUNCTION_INFO_V1(bson_hash);
+PG_FUNCTION_INFO_V1(bson_get);
+PG_FUNCTION_INFO_V1(bson_get_text);
+PG_FUNCTION_INFO_V1(bson_exists);
+PG_FUNCTION_INFO_V1(bson_exists_any);
+PG_FUNCTION_INFO_V1(bson_exists_all);
+PG_FUNCTION_INFO_V1(bson_contains);
+PG_FUNCTION_INFO_V1(bson_contained);
 
+
+/*
+ * bson_in
+ *		Convert a string to internal BSON representation
+ *
+ * The input string is expected to be in JSON format, which is then
+ * converted to BSON using the libbson C driver and stored as bytea.
+ */
 Datum
 bson_in(PG_FUNCTION_ARGS)
 {
-	char	   *input = PG_GETARG_CSTRING(0);
-	bson_t	   *bson;
+	char	   *str = PG_GETARG_CSTRING(0);
+	bson_t	   *bson_doc;
 	bson_error_t error;
-	BsonData   *result;
-	char	   *wrapped_input = NULL;
+	bytea	   *result;
+	const uint8_t *data;
+	uint32_t	length;
 
-	/* Try parsing as-is first */
-	bson = bson_new_from_json((const uint8_t *) input, -1, &error);
-	
-	/* If it fails and it's a standalone value, wrap it in a document */
-	if (!bson && (input[0] == '"' || isdigit(input[0]) || input[0] == '-' || 
-				  strncmp(input, "true", 4) == 0 || strncmp(input, "false", 5) == 0 || 
-				  strncmp(input, "null", 4) == 0))
-	{
-		wrapped_input = psprintf("{\"value\": %s}", input);
-		bson = bson_new_from_json((const uint8_t *) wrapped_input, -1, &error);
-	}
-
-	if (!bson)
-	{
+	/* Create BSON document from JSON string */
+	bson_doc = bson_new_from_json((const uint8_t *) str, -1, &error);
+	if (bson_doc == NULL)
 		ereport(ERROR,
 				(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
-				 errmsg("invalid input syntax for type bson: \"%s\"", input),
-				 errdetail("%s", error.message)));
-	}
+				 errmsg("invalid input syntax for type bson: \"%s\"", str),
+				 errdetail("JSON parse error: %s", error.message)));
 
-	/* Convert to PostgreSQL storage format */
-	result = bson_t_to_bson_data(bson);
-	bson_destroy(bson);
-	
-	if (wrapped_input)
-		pfree(wrapped_input);
+	/* Get raw BSON data */
+	data = bson_get_data(bson_doc);
+	length = bson_doc->len;
 
-	PG_RETURN_POINTER(result);
+	/* Create PostgreSQL bytea */
+	result = (bytea *) palloc(VARHDRSZ + length);
+	SET_VARSIZE(result, VARHDRSZ + length);
+	memcpy(VARDATA(result), data, length);
+
+	bson_destroy(bson_doc);
+
+	PG_RETURN_BYTEA_P(result);
 }
 
-/*
- * Output function for BSON type
- * Converts BSON to JSON string
- */
-PG_FUNCTION_INFO_V1(bson_out);
 
+/*
+ * bson_out
+ *		Convert internal BSON representation to string
+ *
+ * The internal BSON data (stored as bytea) is converted to its
+ * canonical extended JSON representation for output.
+ */
 Datum
 bson_out(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	bson_t	   *bson;
+	bytea	   *arg = PG_GETARG_BYTEA_PP(0);
+	bson_t		bson_doc;
 	char	   *json_str;
 	char	   *result;
 
-	/* Convert to bson_t */
-	bson = bson_data_to_bson_t(bson_data);
-	if (!bson)
-		ereport(ERROR, (errmsg("invalid BSON data")));
+	/* Initialize BSON document from stored data */
+	if (!bson_init_static(&bson_doc, (const uint8_t *) VARDATA_ANY(arg),
+						  VARSIZE_ANY_EXHDR(arg)))
+		ereport(ERROR,
+				(errcode(ERRCODE_DATA_CORRUPTED),
+				 errmsg("invalid BSON data")));
 
-	/* Convert to JSON string */
-	json_str = bson_as_canonical_extended_json(bson, NULL);
+	/* Convert BSON to canonical extended JSON */
+	json_str = bson_as_canonical_extended_json(&bson_doc, NULL);
+	if (json_str == NULL)
+		ereport(ERROR,
+				(errcode(ERRCODE_OUT_OF_MEMORY),
+				 errmsg("could not convert BSON to JSON")));
+
+	/* Copy to PostgreSQL memory context */
 	result = pstrdup(json_str);
-
 	bson_free(json_str);
-	bson_destroy(bson);
 
 	PG_RETURN_CSTRING(result);
 }
 
-/*
- * Receive function for BSON type (binary input)
- */
-PG_FUNCTION_INFO_V1(bson_recv);
 
+/*
+ * bson_recv
+ *		Receive function for binary input
+ *
+ * Reads BSON data from a binary input stream.
+ */
 Datum
 bson_recv(PG_FUNCTION_ARGS)
 {
 	StringInfo	buf = (StringInfo) PG_GETARG_POINTER(0);
-	BsonData   *result;
-	int32		len;
-	const char *data;
+	bytea	   *result;
+	int			nbytes;
 
-	/* Read length and data from binary representation */
-	len = pq_getmsgint(buf, 4);
-	data = pq_getmsgbytes(buf, len);
+	nbytes = buf->len - buf->cursor;
+	result = (bytea *) palloc(VARHDRSZ + nbytes);
+	SET_VARSIZE(result, VARHDRSZ + nbytes);
+	pq_copymsgbytes(buf, VARDATA(result), nbytes);
 
-	/* Create BsonData structure */
-	result = (BsonData *) palloc(VARHDRSZ + len);
-	SET_VARSIZE(result, VARHDRSZ + len);
-	memcpy(result->data, data, len);
-
-	PG_RETURN_POINTER(result);
+	PG_RETURN_BYTEA_P(result);
 }
 
-/*
- * Send function for BSON type (binary output)
- */
-PG_FUNCTION_INFO_V1(bson_send);
 
+/*
+ * bson_send
+ *		Send function for binary output
+ *
+ * Writes BSON data to a binary output stream.
+ */
 Datum
 bson_send(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	StringInfo	buf;
-	int32		len;
+	bytea	   *arg = PG_GETARG_BYTEA_PP(0);
+	StringInfoData buf;
 
-	buf = makeStringInfo();
-
-	len = VARSIZE_ANY_EXHDR(bson_data);
-	pq_sendint32(buf, len);
-	pq_sendbytes(buf, bson_data->data, len);
-
-	PG_RETURN_BYTEA_P(pq_endtypsend(buf));
+	pq_begintypsend(&buf);
+	pq_sendbytes(&buf, VARDATA_ANY(arg), VARSIZE_ANY_EXHDR(arg));
+	PG_RETURN_BYTEA_P(pq_endtypsend(&buf));
 }
 
-/*
- * Get element (-> operator)
- * Returns BSON value for the given key
- */
-PG_FUNCTION_INFO_V1(bson_get);
-
-Datum
-bson_get(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	text	   *key = PG_GETARG_TEXT_P(1);
-	char	   *key_str;
-	bson_t	   *bson;
-	bson_iter_t iter;
-	const bson_value_t *value;
-	bson_t	   *result_bson;
-	BsonData   *result;
-
-	key_str = text_to_cstring(key);
-	bson = bson_data_to_bson_t(bson_data);
-
-	if (!bson || !bson_iter_init_find(&iter, bson, key_str))
-	{
-		bson_destroy(bson);
-		pfree(key_str);
-		PG_RETURN_NULL();
-	}
-
-	/* Get the value and create a new BSON document with just that value */
-	value = bson_iter_value(&iter);
-	result_bson = bson_new();
-	bson_append_value(result_bson, "value", -1, value);
-
-	result = bson_t_to_bson_data(result_bson);
-
-	bson_destroy(bson);
-	bson_destroy(result_bson);
-	pfree(key_str);
-
-	PG_RETURN_POINTER(result);
-}
 
 /*
- * Get element as text (->> operator)
- * Returns text representation of the value for the given key
+ * bson_cmp
+ *		Comparison function for BSON values
+ *
+ * Compares two BSON documents using binary comparison of the raw data.
+ * Returns <0, 0, or >0 for less than, equal, or greater than.
  */
-PG_FUNCTION_INFO_V1(bson_get_text);
-
-Datum
-bson_get_text(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	text	   *key = PG_GETARG_TEXT_P(1);
-	char	   *key_str;
-	bson_t	   *bson;
-	bson_iter_t iter;
-	const bson_value_t *value;
-	char	   *result_str = NULL;
-	text	   *result;
-
-	key_str = text_to_cstring(key);
-	bson = bson_data_to_bson_t(bson_data);
-
-	if (!bson || !bson_iter_init_find(&iter, bson, key_str))
-	{
-		bson_destroy(bson);
-		pfree(key_str);
-		PG_RETURN_NULL();
-	}
-
-	value = bson_iter_value(&iter);
-
-	/* Convert value to string based on type */
-	switch (value->value_type)
-	{
-		case BSON_TYPE_UTF8:
-			result_str = pstrdup(value->value.v_utf8.str);
-			break;
-		case BSON_TYPE_INT32:
-			result_str = psprintf("%d", value->value.v_int32);
-			break;
-		case BSON_TYPE_INT64:
-			result_str = psprintf("%lld", (long long) value->value.v_int64);
-			break;
-		case BSON_TYPE_DOUBLE:
-			result_str = psprintf("%g", value->value.v_double);
-			break;
-		case BSON_TYPE_BOOL:
-			result_str = pstrdup(value->value.v_bool ? "true" : "false");
-			break;
-		case BSON_TYPE_NULL:
-			result_str = pstrdup("null");
-			break;
-		default:
-			result_str = pstrdup("");
-			break;
-	}
-
-	result = cstring_to_text(result_str);
-
-	bson_destroy(bson);
-	pfree(key_str);
-	pfree(result_str);
-
-	PG_RETURN_TEXT_P(result);
-}
-
-/*
- * Check if key exists (? operator)
- */
-PG_FUNCTION_INFO_V1(bson_exists);
-
-Datum
-bson_exists(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	text	   *key = PG_GETARG_TEXT_P(1);
-	char	   *key_str;
-	bson_t	   *bson;
-	bool		exists;
-
-	key_str = text_to_cstring(key);
-	bson = bson_data_to_bson_t(bson_data);
-
-	exists = bson && bson_has_field(bson, key_str);
-
-	bson_destroy(bson);
-	pfree(key_str);
-
-	PG_RETURN_BOOL(exists);
-}
-
-/*
- * Equality operator (=)
- */
-PG_FUNCTION_INFO_V1(bson_eq);
-
-Datum
-bson_eq(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
-	bson_t	   *b1, *b2;
-	bool		result;
-
-	b1 = bson_data_to_bson_t(bson1);
-	b2 = bson_data_to_bson_t(bson2);
-
-	result = (b1 && b2 && bson_equal(b1, b2));
-
-	bson_destroy(b1);
-	bson_destroy(b2);
-
-	PG_RETURN_BOOL(result);
-}
-
-/*
- * Inequality operator (!=, <>)
- */
-PG_FUNCTION_INFO_V1(bson_ne);
-
-Datum
-bson_ne(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
-	bson_t	   *b1, *b2;
-	bool		result;
-
-	b1 = bson_data_to_bson_t(bson1);
-	b2 = bson_data_to_bson_t(bson2);
-
-	result = !(b1 && b2 && bson_equal(b1, b2));
-
-	bson_destroy(b1);
-	bson_destroy(b2);
-
-	PG_RETURN_BOOL(result);
-}
-
-/*
- * Check if any of the keys exist (?| operator)
- */
-PG_FUNCTION_INFO_V1(bson_exists_any);
-
-Datum
-bson_exists_any(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	ArrayType  *keys = PG_GETARG_ARRAYTYPE_P(1);
-	bson_t	   *bson;
-	Datum	   *key_datums;
-	bool	   *key_nulls;
-	int			key_count;
-	bool		found = false;
-	int			i;
-
-	bson = bson_data_to_bson_t(bson_data);
-	if (!bson)
-		PG_RETURN_BOOL(false);
-
-	deconstruct_array(keys, TEXTOID, -1, false, TYPALIGN_INT,
-					  &key_datums, &key_nulls, &key_count);
-
-	for (i = 0; i < key_count && !found; i++)
-	{
-		if (!key_nulls[i])
-		{
-			char *key_str = TextDatumGetCString(key_datums[i]);
-			found = bson_has_field(bson, key_str);
-			pfree(key_str);
-		}
-	}
-
-	bson_destroy(bson);
-	pfree(key_datums);
-	pfree(key_nulls);
-
-	PG_RETURN_BOOL(found);
-}
-
-/*
- * Check if all of the keys exist (?& operator)
- */
-PG_FUNCTION_INFO_V1(bson_exists_all);
-
-Datum
-bson_exists_all(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	ArrayType  *keys = PG_GETARG_ARRAYTYPE_P(1);
-	bson_t	   *bson;
-	Datum	   *key_datums;
-	bool	   *key_nulls;
-	int			key_count;
-	bool		all_found = true;
-	int			i;
-
-	bson = bson_data_to_bson_t(bson_data);
-	if (!bson)
-		PG_RETURN_BOOL(false);
-
-	deconstruct_array(keys, TEXTOID, -1, false, TYPALIGN_INT,
-					  &key_datums, &key_nulls, &key_count);
-
-	for (i = 0; i < key_count && all_found; i++)
-	{
-		if (!key_nulls[i])
-		{
-			char *key_str = TextDatumGetCString(key_datums[i]);
-			all_found = bson_has_field(bson, key_str);
-			pfree(key_str);
-		}
-		else
-		{
-			all_found = false;
-		}
-	}
-
-	bson_destroy(bson);
-	pfree(key_datums);
-	pfree(key_nulls);
-
-	PG_RETURN_BOOL(all_found);
-}
-
-/*
- * Contains operator (@>)
- */
-PG_FUNCTION_INFO_V1(bson_contains);
-
-Datum
-bson_contains(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
-	bson_t	   *b1, *b2;
-	bson_iter_t iter1, iter2;
-	bool		result = true;
-
-	b1 = bson_data_to_bson_t(bson1);
-	b2 = bson_data_to_bson_t(bson2);
-
-	if (!b1 || !b2)
-	{
-		bson_destroy(b1);
-		bson_destroy(b2);
-		PG_RETURN_BOOL(false);
-	}
-
-	/* Check if all fields in b2 exist in b1 with same values */
-	bson_iter_init(&iter2, b2);
-	while (bson_iter_next(&iter2) && result)
-	{
-		const char *key = bson_iter_key(&iter2);
-		if (bson_iter_init_find(&iter1, b1, key))
-		{
-			const bson_value_t *val1 = bson_iter_value(&iter1);
-			const bson_value_t *val2 = bson_iter_value(&iter2);
-			result = bson_values_equal(val1, val2);
-		}
-		else
-		{
-			result = false;
-		}
-	}
-
-	bson_destroy(b1);
-	bson_destroy(b2);
-
-	PG_RETURN_BOOL(result);
-}
-
-/*
- * Contained operator (<@)
- */
-PG_FUNCTION_INFO_V1(bson_contained);
-
-Datum
-bson_contained(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
-
-	/* bson1 <@ bson2 is equivalent to bson2 @> bson1 */
-	return DirectFunctionCall2(bson_contains, PointerGetDatum(bson2), PointerGetDatum(bson1));
-}
-
-/*
- * Helper function for BSON comparison
- */
-static int
-bson_compare_internal(const BsonData *bson1, const BsonData *bson2)
-{
-	bson_t	   *b1, *b2;
-	char	   *json1, *json2;
-	int			result;
-
-	b1 = bson_data_to_bson_t(bson1);
-	b2 = bson_data_to_bson_t(bson2);
-
-	if (!b1 || !b2)
-	{
-		bson_destroy(b1);
-		bson_destroy(b2);
-		return 0;
-	}
-
-	/* For simplicity, compare as JSON strings */
-	json1 = bson_as_canonical_extended_json(b1, NULL);
-	json2 = bson_as_canonical_extended_json(b2, NULL);
-
-	result = strcmp(json1, json2);
-
-	bson_free(json1);
-	bson_free(json2);
-	bson_destroy(b1);
-	bson_destroy(b2);
-
-	return result;
-}
-
-/*
- * Compare function for sorting
- */
-PG_FUNCTION_INFO_V1(bson_cmp);
-
 Datum
 bson_cmp(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
+	bytea	   *arg1 = PG_GETARG_BYTEA_PP(0);
+	bytea	   *arg2 = PG_GETARG_BYTEA_PP(1);
+	bson_t		bson1,
+				bson2;
+	int			result;
+	int			len1,
+				len2;
 
-	PG_RETURN_INT32(bson_compare_internal(bson1, bson2));
+	/* Validate BSON data integrity */
+	if (!bson_init_static(&bson1, (const uint8_t *) VARDATA_ANY(arg1),
+						  VARSIZE_ANY_EXHDR(arg1)))
+		ereport(ERROR,
+				(errcode(ERRCODE_DATA_CORRUPTED),
+				 errmsg("invalid BSON data in first argument")));
+
+	if (!bson_init_static(&bson2, (const uint8_t *) VARDATA_ANY(arg2),
+						  VARSIZE_ANY_EXHDR(arg2)))
+		ereport(ERROR,
+				(errcode(ERRCODE_DATA_CORRUPTED),
+				 errmsg("invalid BSON data in second argument")));
+
+	/* Compare BSON documents using memcmp on raw data */
+	len1 = VARSIZE_ANY_EXHDR(arg1);
+	len2 = VARSIZE_ANY_EXHDR(arg2);
+	result = memcmp(VARDATA_ANY(arg1), VARDATA_ANY(arg2), Min(len1, len2));
+
+	if (result == 0)
+	{
+		/* If common prefix is equal, compare lengths */
+		if (len1 < len2)
+			result = -1;
+		else if (len1 > len2)
+			result = 1;
+	}
+
+	PG_RETURN_INT32(result);
 }
 
+
 /*
- * Greater than operator (>)
+ * bson_eq
+ *		Equality function for BSON values
+ *
+ * Returns true if two BSON documents are identical.
  */
-PG_FUNCTION_INFO_V1(bson_gt);
+Datum
+bson_eq(PG_FUNCTION_ARGS)
+{
+	bytea	   *arg1 = PG_GETARG_BYTEA_PP(0);
+	bytea	   *arg2 = PG_GETARG_BYTEA_PP(1);
+	int			len1,
+				len2;
+	bool		result;
+
+	len1 = VARSIZE_ANY_EXHDR(arg1);
+	len2 = VARSIZE_ANY_EXHDR(arg2);
+
+	/* If lengths differ, documents cannot be equal */
+	if (len1 != len2)
+		result = false;
+	else
+		result = (memcmp(VARDATA_ANY(arg1), VARDATA_ANY(arg2), len1) == 0);
+
+	PG_RETURN_BOOL(result);
+}
+
+
+/*
+ * bson_lt, bson_le, bson_gt, bson_ge, bson_ne
+ *		Comparison operators for BSON values
+ *
+ * These functions implement the standard comparison operators
+ * by delegating to bson_cmp or bson_eq as appropriate.
+ */
+Datum
+bson_lt(PG_FUNCTION_ARGS)
+{
+	Datum		cmp_result = DirectFunctionCall2(bson_cmp,
+												 PG_GETARG_DATUM(0),
+												 PG_GETARG_DATUM(1));
+
+	PG_RETURN_BOOL(DatumGetInt32(cmp_result) < 0);
+}
+
+Datum
+bson_le(PG_FUNCTION_ARGS)
+{
+	Datum		cmp_result = DirectFunctionCall2(bson_cmp,
+												 PG_GETARG_DATUM(0),
+												 PG_GETARG_DATUM(1));
+
+	PG_RETURN_BOOL(DatumGetInt32(cmp_result) <= 0);
+}
 
 Datum
 bson_gt(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
+	Datum		cmp_result = DirectFunctionCall2(bson_cmp,
+												 PG_GETARG_DATUM(0),
+												 PG_GETARG_DATUM(1));
 
-	PG_RETURN_BOOL(bson_compare_internal(bson1, bson2) > 0);
+	PG_RETURN_BOOL(DatumGetInt32(cmp_result) > 0);
 }
-
-/*
- * Greater than or equal operator (>=)
- */
-PG_FUNCTION_INFO_V1(bson_gte);
 
 Datum
-bson_gte(PG_FUNCTION_ARGS)
+bson_ge(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
+	Datum		cmp_result = DirectFunctionCall2(bson_cmp,
+												 PG_GETARG_DATUM(0),
+												 PG_GETARG_DATUM(1));
 
-	PG_RETURN_BOOL(bson_compare_internal(bson1, bson2) >= 0);
+	PG_RETURN_BOOL(DatumGetInt32(cmp_result) >= 0);
 }
-
-/*
- * Less than operator (<)
- */
-PG_FUNCTION_INFO_V1(bson_lt);
 
 Datum
-bson_lt(PG_FUNCTION_ARGS)
+bson_ne(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
+	Datum		eq_result = DirectFunctionCall2(bson_eq,
+												PG_GETARG_DATUM(0),
+												PG_GETARG_DATUM(1));
 
-	PG_RETURN_BOOL(bson_compare_internal(bson1, bson2) < 0);
+	PG_RETURN_BOOL(!DatumGetBool(eq_result));
 }
 
-/*
- * Less than or equal operator (<=)
- */
-PG_FUNCTION_INFO_V1(bson_lte);
-
-Datum
-bson_lte(PG_FUNCTION_ARGS)
-{
-	BsonData   *bson1 = (BsonData *) PG_GETARG_POINTER(0);
-	BsonData   *bson2 = (BsonData *) PG_GETARG_POINTER(1);
-
-	PG_RETURN_BOOL(bson_compare_internal(bson1, bson2) <= 0);
-}
 
 /*
- * Hash function for hash indexing
+ * bson_hash
+ *		Hash function for BSON values
+ *
+ * Computes a hash value for a BSON document, enabling the use
+ * of hash indexes and hash joins.
  */
-PG_FUNCTION_INFO_V1(bson_hash);
-
 Datum
 bson_hash(PG_FUNCTION_ARGS)
 {
-	BsonData   *bson_data = (BsonData *) PG_GETARG_POINTER(0);
-	uint32		hash;
+	bytea	   *arg = PG_GETARG_BYTEA_PP(0);
+	Datum		result;
 
-	/* Hash the raw binary BSON data */
-	hash = DatumGetUInt32(DirectFunctionCall2(hashvarlena, 
-											  PointerGetDatum(bson_data),
-											  Int32GetDatum(0)));
+	result = hash_any((unsigned char *) VARDATA_ANY(arg),
+					  VARSIZE_ANY_EXHDR(arg));
 
-	PG_RETURN_UINT32(hash);
+	PG_RETURN_DATUM(result);
+}
+
+
+/*
+ * bson_get
+ *		Extract a field value from a BSON document
+ *
+ * Given a BSON document and a field name, returns the value of that
+ * field as a new BSON document containing just that value.
+ */
+Datum
+bson_get(PG_FUNCTION_ARGS)
+{
+	bytea	   *bson_data = PG_GETARG_BYTEA_PP(0);
+	text	   *path_text = PG_GETARG_TEXT_PP(1);
+	bson_t		bson_doc;
+	bson_iter_t iter;
+	char	   *path;
+	bytea	   *result;
+	bson_t	   *result_bson;
+	const uint8_t *data;
+	uint32_t	length;
+
+	/* Extract path string */
+	path = text_to_cstring(path_text);
+
+	/* Initialize BSON document from stored data */
+	data = (const uint8_t *) VARDATA_ANY(bson_data);
+	length = VARSIZE_ANY_EXHDR(bson_data);
+
+	if (!bson_init_static(&bson_doc, data, length))
+	{
+		pfree(path);
+		ereport(ERROR,
+				(errcode(ERRCODE_DATA_CORRUPTED),
+				 errmsg("invalid BSON data")));
+	}
+
+	/* Find the specified field */
+	if (!bson_iter_init_find(&iter, &bson_doc, path))
+	{
+		pfree(path);
+		PG_RETURN_NULL();
+	}
+
+	/* Create new BSON document with just this field value */
+	result_bson = bson_new();
+
+	switch (bson_iter_type(&iter))
+	{
+		case BSON_TYPE_UTF8:
+			{
+				uint32_t	str_len;
+				const char *str_val = bson_iter_utf8(&iter, &str_len);
+
+				bson_append_utf8(result_bson, "value", 5, str_val, str_len);
+				break;
+			}
+		case BSON_TYPE_INT32:
+			{
+				int32_t		int_val = bson_iter_int32(&iter);
+
+				bson_append_int32(result_bson, "value", 5, int_val);
+				break;
+			}
+		case BSON_TYPE_INT64:
+			{
+				int64_t		int64_val = bson_iter_int64(&iter);
+
+				bson_append_int64(result_bson, "value", 5, int64_val);
+				break;
+			}
+		case BSON_TYPE_DOUBLE:
+			{
+				double		double_val = bson_iter_double(&iter);
+
+				bson_append_double(result_bson, "value", 5, double_val);
+				break;
+			}
+		case BSON_TYPE_BOOL:
+			{
+				bool		bool_val = bson_iter_bool(&iter);
+
+				bson_append_bool(result_bson, "value", 5, bool_val);
+				break;
+			}
+		case BSON_TYPE_NULL:
+			{
+				bson_append_null(result_bson, "value", 5);
+				break;
+			}
+		case BSON_TYPE_DOCUMENT:
+			{
+				bson_t		subdoc;
+				uint32_t	doc_len;
+				const uint8_t *doc_data;
+
+				bson_iter_document(&iter, &doc_len, &doc_data);
+				bson_init_static(&subdoc, doc_data, doc_len);
+				bson_append_document(result_bson, "value", 5, &subdoc);
+				break;
+			}
+		case BSON_TYPE_ARRAY:
+			{
+				bson_t		subarray;
+				uint32_t	array_len;
+				const uint8_t *array_data;
+
+				bson_iter_array(&iter, &array_len, &array_data);
+				bson_init_static(&subarray, array_data, array_len);
+				bson_append_array(result_bson, "value", 5, &subarray);
+				break;
+			}
+		default:
+			{
+				bson_append_null(result_bson, "value", 5);
+				break;
+			}
+	}
+
+	/* Convert result BSON to bytea */
+	data = bson_get_data(result_bson);
+	length = result_bson->len;
+
+	result = (bytea *) palloc(VARHDRSZ + length);
+	SET_VARSIZE(result, VARHDRSZ + length);
+	memcpy(VARDATA(result), data, length);
+
+	bson_destroy(result_bson);
+	pfree(path);
+
+	PG_RETURN_BYTEA_P(result);
+}
+
+
+/*
+ * bson_get_text
+ *		Extract a field value from BSON document as text
+ *
+ * Similar to bson_get, but returns the field value converted to
+ * PostgreSQL text type for easier consumption in SQL queries.
+ */
+Datum
+bson_get_text(PG_FUNCTION_ARGS)
+{
+    bytea *bson_data = PG_GETARG_BYTEA_PP(0);
+    text *path_text = PG_GETARG_TEXT_PP(1);
+    bson_t bson;
+    bson_iter_t iter;
+    char *path;
+    text *result;
+    char *str_result;
+    const uint8_t *data;
+    uint32_t length;
+    
+    /* Extract path string */
+    path = text_to_cstring(path_text);
+    
+    /* Initialize BSON from stored data */
+    data = (const uint8_t *)VARDATA_ANY(bson_data);
+    length = VARSIZE_ANY_EXHDR(bson_data);
+    
+    if (!bson_init_static(&bson, data, length))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_DATA_CORRUPTED),
+                 errmsg("invalid BSON data")));
+    }
+    
+    /* Find the field */
+    if (!bson_iter_init_find(&iter, &bson, path))
+    {
+        pfree(path);
+        PG_RETURN_NULL();
+    }
+    
+    /* Convert to text based on type */
+    switch (bson_iter_type(&iter))
+    {
+        case BSON_TYPE_UTF8:
+        {
+            uint32_t str_len;
+            const char *str = bson_iter_utf8(&iter, &str_len);
+            result = cstring_to_text_with_len(str, str_len);
+            break;
+        }
+        case BSON_TYPE_INT32:
+        {
+            int32_t val = bson_iter_int32(&iter);
+            str_result = psprintf("%d", val);
+            result = cstring_to_text(str_result);
+            pfree(str_result);
+            break;
+        }
+        case BSON_TYPE_INT64:
+        {
+            int64_t val = bson_iter_int64(&iter);
+            str_result = psprintf("%lld", (long long)val);
+            result = cstring_to_text(str_result);
+            pfree(str_result);
+            break;
+        }
+        case BSON_TYPE_DOUBLE:
+        {
+            double val = bson_iter_double(&iter);
+            str_result = psprintf("%g", val);
+            result = cstring_to_text(str_result);
+            pfree(str_result);
+            break;
+        }
+        case BSON_TYPE_BOOL:
+        {
+            bool val = bson_iter_bool(&iter);
+            result = cstring_to_text(val ? "true" : "false");
+            break;
+        }
+        case BSON_TYPE_NULL:
+        {
+            result = cstring_to_text("null");
+            break;
+        }
+        default:
+        {
+            pfree(path);
+            PG_RETURN_NULL();
+        }
+    }
+    
+    pfree(path);
+    PG_RETURN_TEXT_P(result);
+}
+
+/* Check if a field exists in BSON document */
+Datum
+bson_exists(PG_FUNCTION_ARGS)
+{
+    bytea *bson_data = PG_GETARG_BYTEA_PP(0);
+    text *path_text = PG_GETARG_TEXT_PP(1);
+    bson_t bson;
+    bson_iter_t iter;
+    char *path;
+    bool result;
+    
+    /* Extract path string */
+    path = text_to_cstring(path_text);
+    
+    /* Initialize BSON from data */
+    if (!bson_init_static(&bson, (const uint8_t *)VARDATA_ANY(bson_data), VARSIZE_ANY_EXHDR(bson_data)))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_DATA_CORRUPTED),
+                 errmsg("invalid BSON data")));
+    }
+    
+    /* Check if field exists */
+    result = bson_iter_init_find(&iter, &bson, path);
+    
+    pfree(path);
+    PG_RETURN_BOOL(result);
+}
+
+/* Check if any of the fields exist in BSON document */
+Datum
+bson_exists_any(PG_FUNCTION_ARGS)
+{
+    bytea *bson_data = PG_GETARG_BYTEA_PP(0);
+    ArrayType *paths_array = PG_GETARG_ARRAYTYPE_P(1);
+    bson_t bson;
+    bson_iter_t iter;
+    bool result = false;
+    Datum *elements;
+    bool *nulls;
+    int num_elements;
+    int16 typlen;
+    bool typbyval;
+    char typalign;
+    
+    /* Initialize BSON from data */
+    if (!bson_init_static(&bson, (const uint8_t *)VARDATA_ANY(bson_data), VARSIZE_ANY_EXHDR(bson_data)))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_DATA_CORRUPTED),
+                 errmsg("invalid BSON data")));
+    }
+    
+    /* Deconstruct array */
+    get_typlenbyvalalign(TEXTOID, &typlen, &typbyval, &typalign);
+    deconstruct_array(paths_array, TEXTOID, typlen, typbyval, typalign,
+                      &elements, &nulls, &num_elements);
+    
+    /* Check if any path exists */
+    for (int i = 0; i < num_elements && !result; i++)
+    {
+        if (!nulls[i])
+        {
+            char *path = TextDatumGetCString(elements[i]);
+            result = bson_iter_init_find(&iter, &bson, path);
+            pfree(path);
+        }
+    }
+    
+    pfree(elements);
+    pfree(nulls);
+    PG_RETURN_BOOL(result);
+}
+
+/* Check if all of the fields exist in BSON document */
+Datum
+bson_exists_all(PG_FUNCTION_ARGS)
+{
+    bytea *bson_data = PG_GETARG_BYTEA_PP(0);
+    ArrayType *paths_array = PG_GETARG_ARRAYTYPE_P(1);
+    bson_t bson;
+    bson_iter_t iter;
+    bool result = true;
+    Datum *elements;
+    bool *nulls;
+    int num_elements;
+    int16 typlen;
+    bool typbyval;
+    char typalign;
+    
+    /* Initialize BSON from data */
+    if (!bson_init_static(&bson, (const uint8_t *)VARDATA_ANY(bson_data), VARSIZE_ANY_EXHDR(bson_data)))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_DATA_CORRUPTED),
+                 errmsg("invalid BSON data")));
+    }
+    
+    /* Deconstruct array */
+    get_typlenbyvalalign(TEXTOID, &typlen, &typbyval, &typalign);
+    deconstruct_array(paths_array, TEXTOID, typlen, typbyval, typalign,
+                      &elements, &nulls, &num_elements);
+    
+    /* Check if all paths exist */
+    for (int i = 0; i < num_elements && result; i++)
+    {
+        if (!nulls[i])
+        {
+            char *path = TextDatumGetCString(elements[i]);
+            result = bson_iter_init_find(&iter, &bson, path);
+            pfree(path);
+        }
+        else
+        {
+            result = false;
+        }
+    }
+    
+    pfree(elements);
+    pfree(nulls);
+    PG_RETURN_BOOL(result);
+}
+
+/* Check if first BSON contains the second BSON */
+Datum
+bson_contains(PG_FUNCTION_ARGS)
+{
+    bytea *bson1_data = PG_GETARG_BYTEA_PP(0);
+    bytea *bson2_data = PG_GETARG_BYTEA_PP(1);
+    bson_t bson1, bson2;
+    bson_iter_t iter1, iter2;
+    bool result = true;
+    
+    /* Initialize BSON objects from data */
+    if (!bson_init_static(&bson1, (const uint8_t *)VARDATA_ANY(bson1_data), VARSIZE_ANY_EXHDR(bson1_data)))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_DATA_CORRUPTED),
+                 errmsg("invalid BSON data in first argument")));
+    }
+    
+    if (!bson_init_static(&bson2, (const uint8_t *)VARDATA_ANY(bson2_data), VARSIZE_ANY_EXHDR(bson2_data)))
+    {
+        ereport(ERROR,
+                (errcode(ERRCODE_DATA_CORRUPTED),
+                 errmsg("invalid BSON data in second argument")));
+    }
+    
+    /* Check if bson1 contains all key-value pairs from bson2 */
+    if (bson_iter_init(&iter2, &bson2))
+    {
+        while (bson_iter_next(&iter2) && result)
+        {
+            const char *key = bson_iter_key(&iter2);
+            
+            if (bson_iter_init_find(&iter1, &bson1, key))
+            {
+                /* Simple value comparison - compare types and values */
+                if (bson_iter_type(&iter1) != bson_iter_type(&iter2))
+                    result = false;
+                else
+                {
+                    /* Compare values based on type */
+                    switch (bson_iter_type(&iter1))
+                    {
+                        case BSON_TYPE_UTF8:
+                        {
+                            uint32_t len1, len2;
+                            const char *str1 = bson_iter_utf8(&iter1, &len1);
+                            const char *str2 = bson_iter_utf8(&iter2, &len2);
+                            if (len1 != len2 || memcmp(str1, str2, len1) != 0)
+                                result = false;
+                            break;
+                        }
+                        case BSON_TYPE_INT32:
+                            if (bson_iter_int32(&iter1) != bson_iter_int32(&iter2))
+                                result = false;
+                            break;
+                        case BSON_TYPE_INT64:
+                            if (bson_iter_int64(&iter1) != bson_iter_int64(&iter2))
+                                result = false;
+                            break;
+                        case BSON_TYPE_DOUBLE:
+                            if (bson_iter_double(&iter1) != bson_iter_double(&iter2))
+                                result = false;
+                            break;
+                        case BSON_TYPE_BOOL:
+                            if (bson_iter_bool(&iter1) != bson_iter_bool(&iter2))
+                                result = false;
+                            break;
+                        default:
+                            /* For other types, just assume they're different */
+                            result = false;
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                result = false;
+            }
+        }
+    }
+    
+    PG_RETURN_BOOL(result);
+}
+
+/* Check if first BSON is contained in the second BSON */
+Datum
+bson_contained(PG_FUNCTION_ARGS)
+{
+    /* bson_contained(A, B) is equivalent to bson_contains(B, A) */
+    return DirectFunctionCall2(bson_contains, PG_GETARG_DATUM(1), PG_GETARG_DATUM(0));
 }

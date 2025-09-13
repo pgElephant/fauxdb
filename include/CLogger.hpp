@@ -9,7 +9,6 @@
  *-------------------------------------------------------------------------
  */
 
-
 #pragma once
 #include "CServerConfig.hpp"
 #include "IInterfaces.hpp"

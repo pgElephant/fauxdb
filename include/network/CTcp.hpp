@@ -9,7 +9,6 @@
  *-------------------------------------------------------------------------
  */
 
-
 #pragma once
 
 #include "../CServerConfig.hpp"
@@ -19,6 +18,7 @@
 #include "../protocol/CResponseBuilder.hpp"
 #include "CNetwork.hpp"
 #include "CThread.hpp"
+#include "IInterfaces.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -61,6 +61,7 @@ class CTcp : public CNetwork
     mutable mutex poolerMutex_;
     map<int, unique_ptr<CThread>> connectionThreads_;
     mutex threadsMutex_;
+    std::shared_ptr<ILogger> logger_;
     void handleNewConnection(int clientSocket);
     void connectionWorker(int clientSocket);
     void cleanupConnection(int clientSocket);

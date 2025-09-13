@@ -157,48 +157,42 @@ class CDocumentProtocolHandler
     vector<uint8_t>
     createFindResponseFromPostgreSQL(const string& collectionName,
                                      int32_t requestID);
-    vector<uint8_t>
-    createFindResponseFromPostgreSQLWithFilters(const string& collectionName,
-                                                int32_t requestID,
-                                                const vector<uint8_t>& queryBuffer,
-                                                ssize_t bytesRead);
-    vector<uint8_t>
-    createFindResponseWithPostgreSQLBSON(const string& collectionName,
-                                         int32_t requestID,
-                                         const vector<uint8_t>& queryBuffer,
-                                         ssize_t bytesRead);
+    vector<uint8_t> createFindResponseFromPostgreSQLWithFilters(
+        const string& collectionName, int32_t requestID,
+        const vector<uint8_t>& queryBuffer, ssize_t bytesRead);
+    vector<uint8_t> createFindResponseWithPostgreSQLBSON(
+        const string& collectionName, int32_t requestID,
+        const vector<uint8_t>& queryBuffer, ssize_t bytesRead);
     vector<uint8_t>
     createCountResponseFromPostgreSQL(const string& collectionName,
                                       int32_t requestID);
+    vector<uint8_t> createUpdateResponseFromPostgreSQL(
+        const string& collectionName, int32_t requestID,
+        const vector<uint8_t>& queryBuffer, ssize_t bytesRead,
+        const string& commandName);
+    vector<uint8_t> createDeleteResponseFromPostgreSQL(
+        const string& collectionName, int32_t requestID,
+        const vector<uint8_t>& queryBuffer, ssize_t bytesRead,
+        const string& commandName);
+    vector<uint8_t> createDistinctResponseFromPostgreSQL(
+        const string& collectionName, int32_t requestID,
+        const vector<uint8_t>& queryBuffer, ssize_t bytesRead);
+    vector<uint8_t> createListCollectionsResponse(int32_t requestID);
     vector<uint8_t>
-    createUpdateResponseFromPostgreSQL(const string& collectionName,
-                                       int32_t requestID,
-                                       const vector<uint8_t>& queryBuffer,
-                                       ssize_t bytesRead,
-                                       const string& commandName);
+    createCreateIndexesResponse(const string& collectionName, int32_t requestID,
+                                const vector<uint8_t>& queryBuffer,
+                                ssize_t bytesRead);
     vector<uint8_t>
-    createDeleteResponseFromPostgreSQL(const string& collectionName,
-                                       int32_t requestID,
-                                       const vector<uint8_t>& queryBuffer,
-                                       ssize_t bytesRead,
-                                       const string& commandName);
-    vector<uint8_t>
-    createDistinctResponseFromPostgreSQL(const string& collectionName,
-                                         int32_t requestID,
-                                         const vector<uint8_t>& queryBuffer,
-                                         ssize_t bytesRead);
-    vector<uint8_t>
-    createListCollectionsResponse(int32_t requestID);
-    vector<uint8_t>
-    createCreateIndexesResponse(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead);
-    vector<uint8_t>
-    createDropIndexesResponse(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead);
-    vector<uint8_t>
-    createListIndexesResponse(const string& collectionName, int32_t requestID);
+    createDropIndexesResponse(const string& collectionName, int32_t requestID,
+                              const vector<uint8_t>& queryBuffer,
+                              ssize_t bytesRead);
+    vector<uint8_t> createListIndexesResponse(const string& collectionName,
+                                              int32_t requestID);
     vector<CBsonType> queryPostgreSQLCollection(const string& collectionName);
-    vector<CBsonType> queryPostgreSQLCollection(const string& collectionName,
-                                                const vector<uint8_t>& queryBuffer,
-                                                ssize_t bytesRead);
+    vector<CBsonType>
+    queryPostgreSQLCollection(const string& collectionName,
+                              const vector<uint8_t>& queryBuffer,
+                              ssize_t bytesRead);
 
     /* CRUD operation helper methods */
     vector<CBsonType> extractDocumentsFromInsert(const vector<uint8_t>& buffer,
@@ -227,7 +221,10 @@ class CDocumentProtocolHandler
     std::vector<uint8_t> createListDatabasesWireResponse(int32_t requestID);
     std::vector<uint8_t> createFindWireResponse(int32_t requestID);
     std::vector<uint8_t> createInsertWireResponse(int32_t requestID);
-    std::vector<uint8_t> createInsertWireResponse(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead);
+    std::vector<uint8_t>
+    createInsertWireResponse(const string& collectionName, int32_t requestID,
+                             const vector<uint8_t>& queryBuffer,
+                             ssize_t bytesRead);
     std::vector<uint8_t> createBuildInfoWireResponse(int32_t requestID);
     std::vector<uint8_t> createAggregateWireResponse(int32_t requestID);
     std::vector<uint8_t> createAtlasVersionWireResponse(int32_t requestID);
@@ -249,11 +246,15 @@ class CDocumentProtocolHandler
     std::string parseCommandFromBSON(const std::vector<uint8_t>& buffer,
                                      size_t offset, size_t remaining);
     std::string parseCollectionNameFromBSON(const std::vector<uint8_t>& buffer,
-                                            size_t offset, size_t remaining, const std::string& commandName);
-    
+                                            size_t offset, size_t remaining,
+                                            const std::string& commandName);
+
     /* MongoDB query parsing helpers */
-    MongoDBQuery parseMongoDBQuery(const vector<uint8_t>& buffer, ssize_t bytesRead, const std::string& commandName);
-    std::string buildSQLWhereClause(const std::map<std::string, std::string>& filters);
+    MongoDBQuery parseMongoDBQuery(const vector<uint8_t>& buffer,
+                                   ssize_t bytesRead,
+                                   const std::string& commandName);
+    std::string
+    buildSQLWhereClause(const std::map<std::string, std::string>& filters);
     std::string escapeSQLString(const std::string& value);
 };
 

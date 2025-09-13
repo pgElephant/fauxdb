@@ -14,15 +14,15 @@
  *-------------------------------------------------------------------------
  */
 
+#include "CConfig.hpp"
+
+#include "CLogger.hpp"
+
 #include <fstream>
 #include <iostream>
-#include <sstream>
-
 #include <nlohmann/json.hpp>
+#include <sstream>
 #include <yaml-cpp/yaml.h>
-
-#include "CConfig.hpp"
-#include "CLogger.hpp"
 
 namespace FauxDB
 {
@@ -32,15 +32,18 @@ namespace FauxDB
  *		Initialize configuration manager
  */
 CConfig::CConfig()
-	: logger_(nullptr),
-	  config_values_(std::make_unique<std::unordered_map<std::string, ConfigValue>>()),
-	  config_metadata_(std::make_unique<std::unordered_map<std::string, ConfigEntry>>()),
-	  initialized_(false),
-	  hot_reload_enabled_(false)
+    : logger_(nullptr),
+      config_values_(
+          std::make_unique<std::unordered_map<std::string, ConfigValue>>()),
+      config_metadata_(
+          std::make_unique<std::unordered_map<std::string, ConfigEntry>>()),
+      initialized_(false), hot_reload_enabled_(false)
 {
-	config_values_ = std::make_unique<std::unordered_map<std::string, ConfigValue>>();
-	config_metadata_ = std::make_unique<std::unordered_map<std::string, ConfigEntry>>();
-	initialized_ = true;
+    config_values_ =
+        std::make_unique<std::unordered_map<std::string, ConfigValue>>();
+    config_metadata_ =
+        std::make_unique<std::unordered_map<std::string, ConfigEntry>>();
+    initialized_ = true;
 }
 
 CConfig::~CConfig() = default;
@@ -49,225 +52,225 @@ CConfig::~CConfig() = default;
  * loadFromFile
  *		Load configuration from file based on extension
  */
-std::error_code
-CConfig::loadFromFile(const std::string& filename)
+std::error_code CConfig::loadFromFile(const std::string& filename)
 {
-	std::string		extension;
-	std::ifstream	file;
-	std::string		content;
+    std::string extension;
+    std::ifstream file;
+    std::string content;
 
-	if (!initialized_)
-		return std::make_error_code(std::errc::invalid_argument);
+    if (!initialized_)
+        return std::make_error_code(std::errc::invalid_argument);
 
-	extension = filename.substr(filename.find_last_of('.') + 1);
+    extension = filename.substr(filename.find_last_of('.') + 1);
 
-	file.open(filename);
-	if (!file.is_open())
-		return std::make_error_code(std::errc::no_such_file_or_directory);
+    file.open(filename);
+    if (!file.is_open())
+        return std::make_error_code(std::errc::no_such_file_or_directory);
 
-	content = std::string((std::istreambuf_iterator<char>(file)),
-						  std::istreambuf_iterator<char>());
-	file.close();
+    content = std::string((std::istreambuf_iterator<char>(file)),
+                          std::istreambuf_iterator<char>());
+    file.close();
 
-	if (extension == "json")
-		return loadFromJson(content);
-	else if (extension == "yaml" || extension == "yml")
-		return loadFromYaml(content);
-	else if (extension == "toml")
-		return loadFromToml(content);
-	else if (extension == "ini" || extension == "conf")
-		return loadFromIni(content);
+    if (extension == "json")
+        return loadFromJson(content);
+    else if (extension == "yaml" || extension == "yml")
+        return loadFromYaml(content);
+    else if (extension == "toml")
+        return loadFromToml(content);
+    else if (extension == "ini" || extension == "conf")
+        return loadFromIni(content);
 
-	return std::make_error_code(std::errc::invalid_argument);
+    return std::make_error_code(std::errc::invalid_argument);
 }
 
 /*
  * loadFromJson
  *		Parse JSON configuration content
  */
-std::error_code
-CConfig::loadFromJson(const std::string& jsonContent)
+std::error_code CConfig::loadFromJson(const std::string& jsonContent)
 {
-	if (jsonContent.empty())
-		return std::make_error_code(std::errc::invalid_argument);
+    if (jsonContent.empty())
+        return std::make_error_code(std::errc::invalid_argument);
 
-	try
-	{
-		nlohmann::json j = nlohmann::json::parse(jsonContent);
-		processJsonNode("", j);
-		return std::error_code{};
-	}
-	catch (const nlohmann::json::exception& e)
-	{
-		if (logger_)
-		{
-			logger_->log(CLogLevel::ERROR,
-						 std::string("JSON parsing error: '") + e.what() + "'.");
-		}
-		return std::make_error_code(std::errc::invalid_argument);
-	}
-	catch (const std::exception& e)
-	{
-		if (logger_)
-		{
-			logger_->log(CLogLevel::ERROR,
-						 std::string("JSON loading error: '") + e.what() + "'.");
-		}
-		return std::make_error_code(std::errc::invalid_argument);
-	}
+    try
+    {
+        nlohmann::json j = nlohmann::json::parse(jsonContent);
+        processJsonNode("", j);
+        return std::error_code{};
+    }
+    catch (const nlohmann::json::exception& e)
+    {
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         std::string("JSON parsing error: '") + e.what() +
+                             "'.");
+        }
+        return std::make_error_code(std::errc::invalid_argument);
+    }
+    catch (const std::exception& e)
+    {
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         std::string("JSON loading error: '") + e.what() +
+                             "'.");
+        }
+        return std::make_error_code(std::errc::invalid_argument);
+    }
 }
 
 /*
  * processJsonNode
  *		Recursively process JSON nodes to flatten nested structure
  */
-void
-CConfig::processJsonNode(const std::string& prefix, const nlohmann::json& node)
+void CConfig::processJsonNode(const std::string& prefix,
+                              const nlohmann::json& node)
 {
-	if (node.is_object())
-	{
-		for (auto it = node.begin(); it != node.end(); ++it)
-		{
-			std::string key = it.key();
-			std::string fullKey = prefix.empty() ? key : prefix + "." + key;
-			processJsonNode(fullKey, it.value());
-		}
-	}
-	else if (node.is_string())
-	{
-		set(prefix, node.get<std::string>());
-	}
-	else if (node.is_number_integer())
-	{
-		set(prefix, node.get<int>());
-	}
-	else if (node.is_number_float())
-	{
-		set(prefix, node.get<double>());
-	}
-	else if (node.is_boolean())
-	{
-		set(prefix, node.get<bool>());
-	}
-	else if (node.is_array())
-	{
-		std::vector<std::string> arrayValues;
-		for (const auto& item : node)
-		{
-			if (item.is_string())
-				arrayValues.push_back(item.get<std::string>());
-			else
-				arrayValues.push_back(item.dump());
-		}
-		set(prefix, arrayValues);
-	}
-	else
-	{
-		set(prefix, node.dump());
-	}
+    if (node.is_object())
+    {
+        for (auto it = node.begin(); it != node.end(); ++it)
+        {
+            std::string key = it.key();
+            std::string fullKey = prefix.empty() ? key : prefix + "." + key;
+            processJsonNode(fullKey, it.value());
+        }
+    }
+    else if (node.is_string())
+    {
+        set(prefix, node.get<std::string>());
+    }
+    else if (node.is_number_integer())
+    {
+        set(prefix, node.get<int>());
+    }
+    else if (node.is_number_float())
+    {
+        set(prefix, node.get<double>());
+    }
+    else if (node.is_boolean())
+    {
+        set(prefix, node.get<bool>());
+    }
+    else if (node.is_array())
+    {
+        std::vector<std::string> arrayValues;
+        for (const auto& item : node)
+        {
+            if (item.is_string())
+                arrayValues.push_back(item.get<std::string>());
+            else
+                arrayValues.push_back(item.dump());
+        }
+        set(prefix, arrayValues);
+    }
+    else
+    {
+        set(prefix, node.dump());
+    }
 }
 
 /*
  * loadFromYaml
  *		Parse YAML configuration content
  */
-std::error_code
-CConfig::loadFromYaml(const std::string& yamlContent)
+std::error_code CConfig::loadFromYaml(const std::string& yamlContent)
 {
-	if (yamlContent.empty())
-		return std::make_error_code(std::errc::invalid_argument);
+    if (yamlContent.empty())
+        return std::make_error_code(std::errc::invalid_argument);
 
-	try
-	{
-		YAML::Node config = YAML::Load(yamlContent);
-		processYamlNode("", config);
-		return std::error_code{};
-	}
-	catch (const YAML::Exception& e)
-	{
-		if (logger_)
-		{
-			logger_->log(CLogLevel::ERROR,
-						 std::string("YAML parsing error: '") + e.what() + "'.");
-		}
-		return std::make_error_code(std::errc::invalid_argument);
-	}
-	catch (const std::exception& e)
-	{
-		if (logger_)
-		{
-			logger_->log(CLogLevel::ERROR,
-						 std::string("YAML loading error: '") + e.what() + "'.");
-		}
-		return std::make_error_code(std::errc::invalid_argument);
-	}
+    try
+    {
+        YAML::Node config = YAML::Load(yamlContent);
+        processYamlNode("", config);
+        return std::error_code{};
+    }
+    catch (const YAML::Exception& e)
+    {
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         std::string("YAML parsing error: '") + e.what() +
+                             "'.");
+        }
+        return std::make_error_code(std::errc::invalid_argument);
+    }
+    catch (const std::exception& e)
+    {
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         std::string("YAML loading error: '") + e.what() +
+                             "'.");
+        }
+        return std::make_error_code(std::errc::invalid_argument);
+    }
 }
 
 /*
  * processYamlNode
  *		Recursively process YAML nodes
  */
-void
-CConfig::processYamlNode(const std::string& prefix, const YAML::Node& node)
+void CConfig::processYamlNode(const std::string& prefix, const YAML::Node& node)
 {
-	if (node.IsMap())
-	{
-		for (const auto& pair : node)
-		{
-			std::string key = pair.first.as<std::string>();
-			std::string fullKey = prefix.empty() ? key : prefix + "." + key;
-			processYamlNode(fullKey, pair.second);
-		}
-	}
-	else if (node.IsScalar())
-	{
-		if (node.IsNull())
-		{
-			set(prefix, std::string(""));
-		}
-		else
-		{
-			std::string strValue = node.as<std::string>();
+    if (node.IsMap())
+    {
+        for (const auto& pair : node)
+        {
+            std::string key = pair.first.as<std::string>();
+            std::string fullKey = prefix.empty() ? key : prefix + "." + key;
+            processYamlNode(fullKey, pair.second);
+        }
+    }
+    else if (node.IsScalar())
+    {
+        if (node.IsNull())
+        {
+            set(prefix, std::string(""));
+        }
+        else
+        {
+            std::string strValue = node.as<std::string>();
 
-			/* Check if it's a boolean */
-			if (strValue == "true" || strValue == "false")
-			{
-				set(prefix, strValue == "true");
-			}
-			else
-			{
-				try
-				{
-					if (strValue.find('.') != std::string::npos)
-						set(prefix, std::stod(strValue));
-					else
-						set(prefix, std::stoi(strValue));
-				}
-				catch (...)
-				{
-					set(prefix, strValue);
-				}
-			}
-		}
-	}
-	else if (node.IsSequence())
-	{
-		std::vector<std::string> arrayValues;
-		for (const auto& item : node)
-		{
-			if (item.IsScalar())
-			{
-				arrayValues.push_back(item.as<std::string>());
-			}
-			else
-			{
-				std::stringstream ss;
-				ss << item;
-				arrayValues.push_back(ss.str());
-			}
-		}
-		set(prefix, arrayValues);
-	}
+            /* Check if it's a boolean */
+            if (strValue == "true" || strValue == "false")
+            {
+                set(prefix, strValue == "true");
+            }
+            else
+            {
+                try
+                {
+                    if (strValue.find('.') != std::string::npos)
+                        set(prefix, std::stod(strValue));
+                    else
+                        set(prefix, std::stoi(strValue));
+                }
+                catch (...)
+                {
+                    set(prefix, strValue);
+                }
+            }
+        }
+    }
+    else if (node.IsSequence())
+    {
+        std::vector<std::string> arrayValues;
+        for (const auto& item : node)
+        {
+            if (item.IsScalar())
+            {
+                arrayValues.push_back(item.as<std::string>());
+            }
+            else
+            {
+                std::stringstream ss;
+                ss << item;
+                arrayValues.push_back(ss.str());
+            }
+        }
+        set(prefix, arrayValues);
+    }
 }
 
 std::error_code CConfig::loadFromToml(const std::string& tomlContent)

@@ -9,8 +9,6 @@
  *-------------------------------------------------------------------------
  */
 
-
-
 #include "CPGConnectionPooler.hpp"
 
 #include "CDatabase.hpp"

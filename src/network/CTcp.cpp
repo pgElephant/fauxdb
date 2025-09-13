@@ -9,12 +9,13 @@
  *-------------------------------------------------------------------------
  */
 
-
-
 #include "network/CTcp.hpp"
 
 #include "database/CPGConnectionPooler.hpp"
 #include "network/CThread.hpp"
+#include "CLogger.hpp"
+#include "CServerConfig.hpp"
+#include "CLogMacros.hpp"
 
 #include <algorithm>
 #include <arpa/inet.h>
@@ -28,7 +29,7 @@ using namespace std;
 using namespace FauxDB;
 
 CTcp::CTcp(const CServerConfig& config)
-    : CNetwork(config), connectionPooler_(nullptr)
+    : CNetwork(config), connectionPooler_(nullptr), logger_(std::make_shared<CLogger>(config))
 {
 }
 
@@ -205,7 +206,7 @@ void CTcp::listenerLoop()
     {
         sockaddr_in clientAddr{};
         socklen_t clientAddrLen = sizeof(clientAddr);
-        
+
         int clientSocket =
             accept(server_socket_, (sockaddr*)&clientAddr, &clientAddrLen);
         if (clientSocket < 0)
@@ -299,7 +300,7 @@ void CTcp::connectionWorker(int clientSocket)
     auto responseBuilder = make_unique<FauxDB::CBSONResponseBuilder>();
 
     vector<uint8_t> buffer(16384);
-    std::cerr << "DEBUG: Client connected: " << clientSocket << std::endl;
+    debug_log("Client connected: " + std::to_string(clientSocket));
 
     while (running_.load())
     {
@@ -370,13 +371,16 @@ void CTcp::connectionWorker(int clientSocket)
         }
 
         // Process complete message
-        std::cerr << "DEBUG: Processing message of length: " << messageLength << std::endl;
+        std::cerr << "DEBUG: Processing message of length: " << messageLength
+                  << std::endl;
         auto response = documentHandler->processDocumentMessage(
             buffer, messageLength, *responseBuilder);
-        std::cerr << "DEBUG: Got response from processDocumentMessage, size: " << response.size() << std::endl;
+        std::cerr << "DEBUG: Got response from processDocumentMessage, size: "
+                  << response.size() << std::endl;
         if (!response.empty())
         {
-            std::cerr << "DEBUG: About to send response, size: " << response.size() << std::endl;
+            std::cerr << "DEBUG: About to send response, size: "
+                      << response.size() << std::endl;
             ssize_t bytesSent =
                 send(clientSocket, response.data(), response.size(), 0);
             std::cerr << "DEBUG: Sent " << bytesSent

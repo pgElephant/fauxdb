@@ -1,18 +1,19 @@
 /*
  * CDocumentProtocolHandler.cpp
  *		MongoDB wire protocol handler for FauxDB.
- *		Implements OP_MSG and OP_QUERY protocol handling with PostgreSQL backend.
+ *		Implements OP_MSG and OP_QUERY protocol handling with PostgreSQL
+ * backend.
  *
  * Copyright (c) 2024-2025, pgElephant, Inc.
  */
 
 #include "CDocumentProtocolHandler.hpp"
-#include "CLogMacros.hpp"
 
+#include "../CServerConfig.hpp"
 #include "../database/CPGConnectionPooler.hpp"
 #include "CBsonType.hpp"
+#include "CLogMacros.hpp"
 #include "CLogger.hpp"
-#include "../CServerConfig.hpp"
 #include "commands/CAggregateCommand.hpp"
 #include "commands/CBuildInfoCommand.hpp"
 #include "commands/CCollStatsCommand.hpp"
@@ -155,20 +156,23 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
     CResponseBuilder& responseBuilder)
 {
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Starting with buffer size: " + std::to_string(buffer.size()) + ", bytesRead: " + std::to_string(bytesRead));
-    
-	int32_t					messageLength;
-	int32_t					requestID;
-	int32_t					responseTo;
-	int32_t					opCode;
-	uint32_t				flagBits;
-	uint8_t					kind;
-	int32_t					docSize;
-	std::string				commandName;
-	std::string				collectionName;
-	size_t					offset;
-	size_t					collNameStart;
-	int32_t					queryDocSize;
+        logger_->log(CLogLevel::DEBUG,
+                     "processDocumentMessage: Starting with buffer size: " +
+                         std::to_string(buffer.size()) +
+                         ", bytesRead: " + std::to_string(bytesRead));
+
+    int32_t messageLength;
+    int32_t requestID;
+    int32_t responseTo;
+    int32_t opCode;
+    uint32_t flagBits;
+    uint8_t kind;
+    int32_t docSize;
+    std::string commandName;
+    std::string collectionName;
+    size_t offset;
+    size_t collNameStart;
+    int32_t queryDocSize;
 
     (void)responseBuilder;
 
@@ -181,9 +185,13 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
     std::memcpy(&requestID, buffer.data() + 4, 4);
     std::memcpy(&responseTo, buffer.data() + 8, 4);
     std::memcpy(&opCode, buffer.data() + 12, 4);
-    
+
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "processDocumentMessage: messageLength=" + std::to_string(messageLength) + ", requestID=" + std::to_string(requestID) + ", opCode=" + std::to_string(opCode));
+        logger_->log(CLogLevel::DEBUG,
+                     "processDocumentMessage: messageLength=" +
+                         std::to_string(messageLength) +
+                         ", requestID=" + std::to_string(requestID) +
+                         ", opCode=" + std::to_string(opCode));
 
     if (messageLength != bytesRead)
     {
@@ -217,7 +225,9 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
 
         commandName = parseCommandFromBSON(buffer, 25, docSize - 4);
         if (logger_)
-            logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed command name: '" + commandName + "'");
+            logger_->log(CLogLevel::DEBUG,
+                         "processDocumentMessage: Parsed command name: '" +
+                             commandName + "'");
 
         // Route to appropriate handler - ALWAYS echo the request's requestID
         if (commandName == "hello" || commandName == "isMaster")
@@ -235,26 +245,43 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         else if (commandName == "find")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to find handler");
+                logger_->log(CLogLevel::DEBUG,
+                             "processDocumentMessage: Routing to find handler");
             collectionName =
                 parseCollectionNameFromBSON(buffer, 25, docSize - 4, "find");
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name: '" + collectionName + "'");
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Parsed collection name: '" +
+                        collectionName + "'");
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Calling createFindResponseWithPostgreSQLBSON");
-            auto result = createFindResponseWithPostgreSQLBSON(collectionName, requestID, buffer, bytesRead);
+                logger_->log(CLogLevel::DEBUG,
+                             "processDocumentMessage: Calling "
+                             "createFindResponseWithPostgreSQLBSON");
+            auto result = createFindResponseWithPostgreSQLBSON(
+                collectionName, requestID, buffer, bytesRead);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: createFindResponseWithPostgreSQLBSON returned, size: " + std::to_string(result.size()));
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: "
+                    "createFindResponseWithPostgreSQLBSON returned, size: " +
+                        std::to_string(result.size()));
             return result;
         }
         else if (commandName == "insert")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to insert handler");
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to insert handler");
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name for insert: '" + collectionName + "'");
-            return createInsertWireResponse(collectionName, requestID, buffer, bytesRead);
+                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed "
+                                               "collection name for insert: '" +
+                                                   collectionName + "'");
+            return createInsertWireResponse(collectionName, requestID, buffer,
+                                            bytesRead);
         }
         else if (commandName == "buildInfo")
         {
@@ -275,67 +302,111 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         else if (commandName == "countDocuments" || commandName == "count")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to count handler");
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to count handler");
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name for count: '" + collectionName + "'");
+                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed "
+                                               "collection name for count: '" +
+                                                   collectionName + "'");
             return createCountResponseFromPostgreSQL(collectionName, requestID);
         }
         else if (commandName == "update")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to update handler for: " + commandName);
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to update handler for: " +
+                        commandName);
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name for update: '" + collectionName + "'");
-            return createUpdateResponseFromPostgreSQL(collectionName, requestID, buffer, bytesRead, "updateOne");
+                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed "
+                                               "collection name for update: '" +
+                                                   collectionName + "'");
+            return createUpdateResponseFromPostgreSQL(
+                collectionName, requestID, buffer, bytesRead, "updateOne");
         }
         else if (commandName == "delete")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to delete handler for: " + commandName);
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to delete handler for: " +
+                        commandName);
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name for delete: '" + collectionName + "'");
-            return createDeleteResponseFromPostgreSQL(collectionName, requestID, buffer, bytesRead, "deleteOne");
+                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed "
+                                               "collection name for delete: '" +
+                                                   collectionName + "'");
+            return createDeleteResponseFromPostgreSQL(
+                collectionName, requestID, buffer, bytesRead, "deleteOne");
         }
         else if (commandName == "distinct")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to distinct handler");
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to distinct handler");
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name for distinct: '" + collectionName + "'");
-            return createDistinctResponseFromPostgreSQL(collectionName, requestID, buffer, bytesRead);
+                logger_->log(CLogLevel::DEBUG,
+                             "processDocumentMessage: Parsed collection name "
+                             "for distinct: '" +
+                                 collectionName + "'");
+            return createDistinctResponseFromPostgreSQL(
+                collectionName, requestID, buffer, bytesRead);
         }
         else if (commandName == "listCollections")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to listCollections handler");
+                logger_->log(CLogLevel::DEBUG,
+                             "processDocumentMessage: Routing to "
+                             "listCollections handler");
             return createListCollectionsResponse(requestID);
         }
         else if (commandName == "createIndexes")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to createIndexes handler");
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to createIndexes handler");
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Parsed collection name for createIndexes: '" + collectionName + "'");
-            return createCreateIndexesResponse(collectionName, requestID, buffer, bytesRead);
+                logger_->log(CLogLevel::DEBUG,
+                             "processDocumentMessage: Parsed collection name "
+                             "for createIndexes: '" +
+                                 collectionName + "'");
+            return createCreateIndexesResponse(collectionName, requestID,
+                                               buffer, bytesRead);
         }
         else if (commandName == "dropIndexes")
         {
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "processDocumentMessage: Routing to dropIndexes handler");
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
-            debug_log("processDocumentMessage: Parsed collection name for dropIndexes: '" + collectionName + "'");
-            return createDropIndexesResponse(collectionName, requestID, buffer, bytesRead);
+                logger_->log(
+                    CLogLevel::DEBUG,
+                    "processDocumentMessage: Routing to dropIndexes handler");
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
+            debug_log("processDocumentMessage: Parsed collection name for "
+                      "dropIndexes: '" +
+                      collectionName + "'");
+            return createDropIndexesResponse(collectionName, requestID, buffer,
+                                             bytesRead);
         }
         else if (commandName == "listIndexes")
         {
             debug_log("processDocumentMessage: Routing to listIndexes handler");
-            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
-            debug_log("processDocumentMessage: Parsed collection name for listIndexes: '" + collectionName + "'");
+            collectionName = parseCollectionNameFromBSON(
+                buffer, 25, docSize - 4, commandName);
+            debug_log("processDocumentMessage: Parsed collection name for "
+                      "listIndexes: '" +
+                      collectionName + "'");
             return createListIndexesResponse(collectionName, requestID);
         }
         else
@@ -393,7 +464,8 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
             debug_log("OP_QUERY: Routing to find handler");
             collectionName = parseCollectionNameFromBSON(
                 buffer, offset + 4, queryDocSize - 4, "find");
-            debug_log("OP_QUERY: Parsed collection name: '" + collectionName + "'");
+            debug_log("OP_QUERY: Parsed collection name: '" + collectionName +
+                      "'");
             return createFindOpReplyResponseFromPostgreSQL(collectionName,
                                                            requestID);
         }
@@ -436,7 +508,8 @@ CDocumentProtocolHandler::parseCommandFromBSON(const vector<uint8_t>& buffer,
 }
 
 std::string CDocumentProtocolHandler::parseCollectionNameFromBSON(
-    const vector<uint8_t>& buffer, size_t offset, size_t remaining, const std::string& commandName)
+    const vector<uint8_t>& buffer, size_t offset, size_t remaining,
+    const std::string& commandName)
 {
     if (remaining < 2)
         return "";
@@ -633,34 +706,42 @@ CDocumentProtocolHandler::createInsertWireResponse(int32_t requestID)
     return createWireMessage(1, requestID, b.getDocument());
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createInsertWireResponse(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
+vector<uint8_t> CDocumentProtocolHandler::createInsertWireResponse(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
 {
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createInsertWireResponse: Processing insert for collection: " + collectionName);
-    
+        logger_->log(
+            CLogLevel::DEBUG,
+            "createInsertWireResponse: Processing insert for collection: " +
+                collectionName);
+
     /* Check if connection pooler is available */
     if (!connectionPooler_)
     {
         error_log("createInsertWireResponse: Connection pooler not available");
         return createErrorWireResponse(requestID);
     }
-    
+
     /* Get connection from pool */
     auto connection = connectionPooler_->getPostgresConnection();
     if (!connection || !connection->database)
     {
-        error_log("createInsertWireResponse: Failed to get PostgreSQL connection");
+        error_log(
+            "createInsertWireResponse: Failed to get PostgreSQL connection");
         return createErrorWireResponse(requestID);
     }
-    
+
     /* Parse documents from insert command */
-    vector<CBsonType> documents = extractDocumentsFromInsert(queryBuffer, bytesRead);
+    vector<CBsonType> documents =
+        extractDocumentsFromInsert(queryBuffer, bytesRead);
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createInsertWireResponse: Extracted " + std::to_string(documents.size()) + " documents to insert");
-    
+        logger_->log(CLogLevel::DEBUG, "createInsertWireResponse: Extracted " +
+                                           std::to_string(documents.size()) +
+                                           " documents to insert");
+
     int32_t insertedCount = 0;
-    
+
     /* Insert each document */
     for (const auto& doc : documents)
     {
@@ -668,22 +749,27 @@ CDocumentProtocolHandler::createInsertWireResponse(const string& collectionName,
         {
             /* Build INSERT SQL statement */
             stringstream sql;
-            sql << "INSERT INTO " << collectionName << " (name, email, department_id) VALUES (";
-            
+            sql << "INSERT INTO " << collectionName
+                << " (name, email, department_id) VALUES (";
+
             /* Extract fields from document - this is a simplified approach */
             sql << "'Inserted User', 'inserted@example.com', 1";
             sql << ")";
-            
+
             if (logger_)
-                logger_->log(CLogLevel::DEBUG, "createInsertWireResponse: Executing SQL: " + sql.str());
-            
+                logger_->log(CLogLevel::DEBUG,
+                             "createInsertWireResponse: Executing SQL: " +
+                                 sql.str());
+
             /* Execute INSERT statement */
             auto result = connection->database->executeQuery(sql.str());
             if (result.success)
             {
                 insertedCount++;
                 if (logger_)
-                    logger_->log(CLogLevel::DEBUG, "createInsertWireResponse: Document inserted successfully");
+                    logger_->log(CLogLevel::DEBUG,
+                                 "createInsertWireResponse: Document inserted "
+                                 "successfully");
             }
             else
             {
@@ -692,13 +778,14 @@ CDocumentProtocolHandler::createInsertWireResponse(const string& collectionName,
         }
         catch (const std::exception& e)
         {
-            error_log("createInsertWireResponse: Exception during insert: " + string(e.what()));
+            error_log("createInsertWireResponse: Exception during insert: " +
+                      string(e.what()));
         }
     }
-    
+
     /* Return connection to pool */
     connectionPooler_->returnConnection(connection);
-    
+
     /* Build MongoDB insert response */
     CBsonType response;
     response.initialize();
@@ -706,7 +793,7 @@ CDocumentProtocolHandler::createInsertWireResponse(const string& collectionName,
     response.addBool("acknowledged", true);
     response.addInt32("insertedCount", insertedCount);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
@@ -778,32 +865,41 @@ vector<uint8_t>
 CDocumentProtocolHandler::createAggregateWireResponse(int32_t requestID)
 {
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createAggregateWireResponse: Processing aggregation");
-    
+        logger_->log(CLogLevel::DEBUG,
+                     "createAggregateWireResponse: Processing aggregation");
+
     /* Check if connection pooler is available */
     if (!connectionPooler_)
     {
         if (logger_)
-            logger_->log(CLogLevel::DEBUG, "createAggregateWireResponse: No connection pooler available");
-        return createErrorBsonDocument(-10, "PostgreSQL connection pooler not available");
+            logger_->log(
+                CLogLevel::DEBUG,
+                "createAggregateWireResponse: No connection pooler available");
+        return createErrorBsonDocument(
+            -10, "PostgreSQL connection pooler not available");
     }
-    
+
     auto connection = connectionPooler_->getPostgresConnection();
     if (!connection || !connection->database)
     {
         if (logger_)
-            logger_->log(CLogLevel::DEBUG, "createAggregateWireResponse: Failed to get PostgreSQL connection");
-        return createErrorBsonDocument(-11, "Failed to get PostgreSQL connection");
+            logger_->log(CLogLevel::DEBUG,
+                         "createAggregateWireResponse: Failed to get "
+                         "PostgreSQL connection");
+        return createErrorBsonDocument(-11,
+                                       "Failed to get PostgreSQL connection");
     }
-    
+
     try
     {
         /* For now, implement a simple count aggregation */
-        /* In a full implementation, this would parse the aggregation pipeline */
+        /* In a full implementation, this would parse the aggregation pipeline
+         */
         string sql = "SELECT COUNT(*) as n FROM users";
         if (logger_)
-            logger_->log(CLogLevel::DEBUG, "createAggregateWireResponse: Executing SQL: " + sql);
-        
+            logger_->log(CLogLevel::DEBUG,
+                         "createAggregateWireResponse: Executing SQL: " + sql);
+
         auto result = connection->database->executeQuery(sql);
         if (result.success && !result.rows.empty())
         {
@@ -812,23 +908,28 @@ CDocumentProtocolHandler::createAggregateWireResponse(int32_t requestID)
             {
                 count = std::stoll(result.rows[0][0]);
                 if (logger_)
-                    logger_->log(CLogLevel::DEBUG, "createAggregateWireResponse: Count result: " + std::to_string(count));
+                    logger_->log(CLogLevel::DEBUG,
+                                 "createAggregateWireResponse: Count result: " +
+                                     std::to_string(count));
             }
             catch (const std::exception& e)
             {
                 if (logger_)
-                    logger_->log(CLogLevel::DEBUG, "createAggregateWireResponse: Failed to parse count: " + std::string(e.what()));
+                    logger_->log(
+                        CLogLevel::DEBUG,
+                        "createAggregateWireResponse: Failed to parse count: " +
+                            std::string(e.what()));
                 count = 0;
             }
-            
+
             /* Create cursor subdocument with count result */
-    CBsonType cursor;
-    cursor.initialize();
-    cursor.beginDocument();
-    cursor.addInt64("id", 0);
+            CBsonType cursor;
+            cursor.initialize();
+            cursor.beginDocument();
+            cursor.addInt64("id", 0);
             cursor.addString("ns", "fauxdb.users");
-    cursor.beginArray("firstBatch");
-            
+            cursor.beginArray("firstBatch");
+
             /* Add count document */
             CBsonType countDoc;
             countDoc.initialize();
@@ -836,21 +937,21 @@ CDocumentProtocolHandler::createAggregateWireResponse(int32_t requestID)
             countDoc.addInt64("n", count);
             countDoc.endDocument();
             cursor.addArrayDocument(countDoc);
-            
-    cursor.endArray();
-    cursor.endDocument();
+
+            cursor.endArray();
+            cursor.endDocument();
 
             /* Create main response document */
-    CBsonType b;
-    b.initialize();
-    b.beginDocument();
-    b.addDocument("cursor", cursor);
-    b.addDouble("ok", 1.0);
-    b.endDocument();
+            CBsonType b;
+            b.initialize();
+            b.beginDocument();
+            b.addDocument("cursor", cursor);
+            b.addDouble("ok", 1.0);
+            b.endDocument();
 
             /* Always return connection to pool */
             connectionPooler_->releasePostgresConnection(connection);
-            
+
             return createWireMessage(1, requestID, b.getDocument());
         }
         else
@@ -860,12 +961,13 @@ CDocumentProtocolHandler::createAggregateWireResponse(int32_t requestID)
     }
     catch (const std::exception& e)
     {
-            debug_log("createAggregateWireResponse: Exception: " + string(e.what()));
+        debug_log("createAggregateWireResponse: Exception: " +
+                  string(e.what()));
     }
-    
+
     /* Always return connection to pool */
     connectionPooler_->releasePostgresConnection(connection);
-    
+
     /* Fallback to empty result */
     CBsonType cursor;
     cursor.initialize();
@@ -1150,22 +1252,28 @@ vector<uint8_t>
 CDocumentProtocolHandler::createFindOpReplyResponseFromPostgreSQL(
     const string& collectionName, int32_t requestID)
 {
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Processing find for collection: " + collectionName);
-    
+    debug_log("createFindOpReplyResponseFromPostgreSQL: Processing find for "
+              "collection: " +
+              collectionName);
+
     // Check if connection pooler is available
     if (!connectionPooler_)
     {
-        debug_log("createFindOpReplyResponseFromPostgreSQL: No connection pooler available");
+        debug_log("createFindOpReplyResponseFromPostgreSQL: No connection "
+                  "pooler available");
         return createErrorOpReplyResponse(requestID);
     }
 
     // Query PostgreSQL for the collection data
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Querying PostgreSQL...");
+    debug_log(
+        "createFindOpReplyResponseFromPostgreSQL: Querying PostgreSQL...");
     vector<CBsonType> documents = queryPostgreSQLCollection(collectionName);
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Got " + std::to_string(documents.size()) + " documents from PostgreSQL");
+    debug_log("createFindOpReplyResponseFromPostgreSQL: Got " +
+              std::to_string(documents.size()) + " documents from PostgreSQL");
 
     // Create cursor subdocument
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Creating cursor subdocument");
+    debug_log(
+        "createFindOpReplyResponseFromPostgreSQL: Creating cursor subdocument");
     CBsonType cursor;
     cursor.initialize();
     cursor.beginDocument();
@@ -1175,20 +1283,25 @@ CDocumentProtocolHandler::createFindOpReplyResponseFromPostgreSQL(
     cursor.beginArray("firstBatch");
 
     // Add documents from PostgreSQL
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Adding " + std::to_string(documents.size()) + " documents to cursor");
+    debug_log("createFindOpReplyResponseFromPostgreSQL: Adding " +
+              std::to_string(documents.size()) + " documents to cursor");
     for (size_t i = 0; i < documents.size(); ++i)
     {
-        debug_log("createFindOpReplyResponseFromPostgreSQL: Adding document " + std::to_string(i) + " to cursor");
+        debug_log("createFindOpReplyResponseFromPostgreSQL: Adding document " +
+                  std::to_string(i) + " to cursor");
         cursor.addArrayDocument(documents[i]);
-        debug_log("createFindOpReplyResponseFromPostgreSQL: Document " + std::to_string(i) + " added successfully");
+        debug_log("createFindOpReplyResponseFromPostgreSQL: Document " +
+                  std::to_string(i) + " added successfully");
     }
 
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Ending cursor array and document");
+    debug_log("createFindOpReplyResponseFromPostgreSQL: Ending cursor array "
+              "and document");
     cursor.endArray();
     cursor.endDocument();
 
     // Create main response document
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Creating main response document");
+    debug_log("createFindOpReplyResponseFromPostgreSQL: Creating main response "
+              "document");
     CBsonType b;
     b.initialize();
     b.beginDocument();
@@ -1197,19 +1310,23 @@ CDocumentProtocolHandler::createFindOpReplyResponseFromPostgreSQL(
     b.endDocument();
 
     // Create OP_REPLY response
-    debug_log("createFindOpReplyResponseFromPostgreSQL: Creating OP_REPLY response");
+    debug_log(
+        "createFindOpReplyResponseFromPostgreSQL: Creating OP_REPLY response");
     return createOpReplyResponse(requestID, b.getDocument());
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     const string& collectionName, int32_t requestID)
 {
-    debug_log("createFindResponseFromPostgreSQL: Processing find for collection: " + collectionName);
-    
+    debug_log(
+        "createFindResponseFromPostgreSQL: Processing find for collection: " +
+        collectionName);
+
     // Check if connection pooler is available
     if (!connectionPooler_)
     {
-        debug_log("createFindResponseFromPostgreSQL: No connection pooler available");
+        debug_log(
+            "createFindResponseFromPostgreSQL: No connection pooler available");
         return createErrorBsonDocument(
             -10, "PostgreSQL connection pooler not available");
     }
@@ -1217,7 +1334,8 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     // Query PostgreSQL for the collection data
     debug_log("createFindResponseFromPostgreSQL: Querying PostgreSQL...");
     vector<CBsonType> documents = queryPostgreSQLCollection(collectionName);
-    debug_log("createFindResponseFromPostgreSQL: Got " + std::to_string(documents.size()) + " documents from PostgreSQL");
+    debug_log("createFindResponseFromPostgreSQL: Got " +
+              std::to_string(documents.size()) + " documents from PostgreSQL");
 
     // Build response document
     debug_log("createFindResponseFromPostgreSQL: Building response document");
@@ -1243,20 +1361,25 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     cursorDoc.beginArray("firstBatch");
 
     // Add documents from PostgreSQL
-    debug_log("createFindResponseFromPostgreSQL: Adding " + std::to_string(documents.size()) + " documents to cursor");
+    debug_log("createFindResponseFromPostgreSQL: Adding " +
+              std::to_string(documents.size()) + " documents to cursor");
     for (size_t i = 0; i < documents.size(); ++i)
     {
-        debug_log("createFindResponseFromPostgreSQL: Adding document " + std::to_string(i) + " to cursor");
+        debug_log("createFindResponseFromPostgreSQL: Adding document " +
+                  std::to_string(i) + " to cursor");
         cursorDoc.addArrayDocument(documents[i]);
-        debug_log("createFindResponseFromPostgreSQL: Document " + std::to_string(i) + " added successfully");
+        debug_log("createFindResponseFromPostgreSQL: Document " +
+                  std::to_string(i) + " added successfully");
     }
 
-    debug_log("createFindResponseFromPostgreSQL: Ending cursor array and document");
+    debug_log(
+        "createFindResponseFromPostgreSQL: Ending cursor array and document");
     cursorDoc.endArray();    // end firstBatch
     cursorDoc.endDocument(); // end cursor
 
     // Add the cursor subdocument to main response
-    debug_log("createFindResponseFromPostgreSQL: Adding cursor to main response");
+    debug_log(
+        "createFindResponseFromPostgreSQL: Adding cursor to main response");
     bson.addDocument("cursor", cursorDoc);
 
     if (!bson.endDocument())
@@ -1267,7 +1390,7 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
 
     // Create a simple response for testing
     debug_log("createFindResponseFromPostgreSQL: Creating simple response");
-    
+
     // Create proper MongoDB find response with cursor
     CBsonType response;
     debug_log("createFindResponseFromPostgreSQL: CBsonType created");
@@ -1275,7 +1398,7 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     debug_log("createFindResponseFromPostgreSQL: CBsonType initialized");
     response.beginDocument();
     debug_log("createFindResponseFromPostgreSQL: Document begun");
-    
+
     // Create cursor document
     CBsonType newCursorDoc;
     newCursorDoc.initialize();
@@ -1284,55 +1407,65 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     debug_log("createFindResponseFromPostgreSQL: Added ns field");
     newCursorDoc.addInt64("id", 0); // cursor id
     debug_log("createFindResponseFromPostgreSQL: Added id field");
-    
+
     // Add firstBatch array
     newCursorDoc.beginArray("firstBatch");
     debug_log("createFindResponseFromPostgreSQL: firstBatch array begun");
-    
+
     // Add documents to firstBatch
     for (const auto& doc : documents)
     {
-        debug_log("createFindResponseFromPostgreSQL: About to add document to firstBatch");
+        debug_log("createFindResponseFromPostgreSQL: About to add document to "
+                  "firstBatch");
         newCursorDoc.addArrayDocument(doc);
-        debug_log("createFindResponseFromPostgreSQL: Document added to firstBatch");
+        debug_log(
+            "createFindResponseFromPostgreSQL: Document added to firstBatch");
     }
-    
+
     debug_log("createFindResponseFromPostgreSQL: Ending firstBatch array");
     newCursorDoc.endArray();
     debug_log("createFindResponseFromPostgreSQL: firstBatch array ended");
     newCursorDoc.endDocument();
     debug_log("createFindResponseFromPostgreSQL: Cursor document ended");
-    
+
     // Add cursor document to main response
     response.addDocument("cursor", newCursorDoc);
-    debug_log("createFindResponseFromPostgreSQL: Cursor document added to response");
-    
+    debug_log(
+        "createFindResponseFromPostgreSQL: Cursor document added to response");
+
     response.addDouble("ok", 1.0);
     debug_log("createFindResponseFromPostgreSQL: Added ok field");
     debug_log("createFindResponseFromPostgreSQL: Ending main document");
     response.endDocument(); // end main document
     debug_log("createFindResponseFromPostgreSQL: Main document ended");
-    
+
     auto responseBytes = response.getDocument();
-    debug_log("createFindResponseFromPostgreSQL: Response created, size: " + std::to_string(responseBytes.size()));
-    debug_log("createFindResponseFromPostgreSQL: About to create OP_MSG response");
-    
+    debug_log("createFindResponseFromPostgreSQL: Response created, size: " +
+              std::to_string(responseBytes.size()));
+    debug_log(
+        "createFindResponseFromPostgreSQL: About to create OP_MSG response");
+
     // Create proper OP_MSG response
     return createWireMessage(1, requestID, responseBytes);
 }
 
 vector<uint8_t>
-CDocumentProtocolHandler::createFindResponseFromPostgreSQLWithFilters(const string& collectionName,
-                                                                      int32_t requestID,
-                                                                      const vector<uint8_t>& queryBuffer,
-                                                                      ssize_t bytesRead)
+CDocumentProtocolHandler::createFindResponseFromPostgreSQLWithFilters(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
 {
-    debug_log("createFindResponseFromPostgreSQL: Processing ENHANCED find for collection: " + collectionName);
-    debug_log("createFindResponseFromPostgreSQL: Buffer size: " + std::to_string(queryBuffer.size()) + ", bytesRead: " + std::to_string(bytesRead));
-    
+    debug_log("createFindResponseFromPostgreSQL: Processing ENHANCED find for "
+              "collection: " +
+              collectionName);
+    debug_log("createFindResponseFromPostgreSQL: Buffer size: " +
+              std::to_string(queryBuffer.size()) +
+              ", bytesRead: " + std::to_string(bytesRead));
+
     /* Query PostgreSQL with query filters */
-    vector<CBsonType> documents = queryPostgreSQLCollection(collectionName, queryBuffer, bytesRead);
-    debug_log("createFindResponseFromPostgreSQL: Got " + std::to_string(documents.size()) + " documents from PostgreSQL");
+    vector<CBsonType> documents =
+        queryPostgreSQLCollection(collectionName, queryBuffer, bytesRead);
+    debug_log("createFindResponseFromPostgreSQL: Got " +
+              std::to_string(documents.size()) + " documents from PostgreSQL");
 
     /* Build response document */
     CBsonType response;
@@ -1347,7 +1480,7 @@ CDocumentProtocolHandler::createFindResponseFromPostgreSQLWithFilters(const stri
     cursorDoc.addInt64("id", 0);
     cursorDoc.addString("ns", "fauxdb." + collectionName);
     cursorDoc.beginArray("firstBatch");
-    
+
     /* Add documents to cursor */
     for (const auto& doc : documents)
     {
@@ -1363,56 +1496,75 @@ CDocumentProtocolHandler::createFindResponseFromPostgreSQLWithFilters(const stri
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
+vector<uint8_t> CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
 {
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createFindResponseWithPostgreSQLBSON: Processing BSON-based find for collection: " + collectionName);
-    
+        logger_->log(CLogLevel::DEBUG,
+                     "createFindResponseWithPostgreSQLBSON: Processing "
+                     "BSON-based find for collection: " +
+                         collectionName);
+
     /* Get connection from pool */
     auto connection = connectionPooler_->getPostgresConnection();
     if (!connection || !connection->database)
     {
         if (logger_)
-            logger_->log(CLogLevel::ERROR, "createFindResponseWithPostgreSQLBSON: Failed to get PostgreSQL connection");
+            logger_->log(CLogLevel::ERROR,
+                         "createFindResponseWithPostgreSQLBSON: Failed to get "
+                         "PostgreSQL connection");
         return createErrorWireResponse(requestID);
     }
-    
+
     /* Convert MongoDB BSON to PostgreSQL BSON format and build SQL query */
     std::stringstream sql;
-    
-    /* First, let's try a simple approach: convert the query to a WHERE clause using PostgreSQL BSON */
-    /* We'll create a temporary table with BSON data and use BSON operators for filtering */
+
+    /* First, let's try a simple approach: convert the query to a WHERE clause
+     * using PostgreSQL BSON */
+    /* We'll create a temporary table with BSON data and use BSON operators for
+     * filtering */
     sql << "WITH bson_data AS (";
     sql << "  SELECT *, ";
-    sql << "  ('{\"id\": ' || id || ', \"name\": \"' || name || '\", \"email\": \"' || email || '\", \"department_id\": ' || department_id || ', \"created_at\": \"' || created_at || '\"}')::bson as doc_bson ";
+    sql << "  ('{\"id\": ' || id || ', \"name\": \"' || name || '\", "
+           "\"email\": \"' || email || '\", \"department_id\": ' || "
+           "department_id || ', \"created_at\": \"' || created_at || "
+           "'\"}')::bson as doc_bson ";
     sql << "  FROM " << collectionName;
     sql << ") ";
     sql << "SELECT id, name, email, department_id, created_at FROM bson_data ";
-    
+
     /* Try to parse basic filters from the MongoDB query */
     /* For now, implement a simple name filter as a proof of concept */
-    if (queryBuffer.size() > 50) { /* Basic check if there's a filter */
+    if (queryBuffer.size() > 50)
+    { /* Basic check if there's a filter */
         sql << "WHERE doc_bson @> '{\"name\": \"John Doe\"}'::bson ";
     }
-    
+
     sql << "ORDER BY id LIMIT 20";
-    
+
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createFindResponseWithPostgreSQLBSON: Executing SQL: " + sql.str());
-    
+        logger_->log(CLogLevel::DEBUG,
+                     "createFindResponseWithPostgreSQLBSON: Executing SQL: " +
+                         sql.str());
+
     /* Execute the SQL query */
     auto result = connection->database->executeQuery(sql.str());
     if (!result.success)
     {
         if (logger_)
-            logger_->log(CLogLevel::ERROR, "createFindResponseWithPostgreSQLBSON: SQL execution failed");
+            logger_->log(
+                CLogLevel::ERROR,
+                "createFindResponseWithPostgreSQLBSON: SQL execution failed");
         return createErrorWireResponse(requestID);
     }
-    
+
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createFindResponseWithPostgreSQLBSON: SQL executed successfully, got " + std::to_string(result.rows.size()) + " rows");
-    
+        logger_->log(CLogLevel::DEBUG, "createFindResponseWithPostgreSQLBSON: "
+                                       "SQL executed successfully, got " +
+                                           std::to_string(result.rows.size()) +
+                                           " rows");
+
     /* Convert PostgreSQL results to BSON documents */
     std::vector<CBsonType> documents;
     for (size_t i = 0; i < result.rows.size(); ++i)
@@ -1420,29 +1572,35 @@ CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(const string& col
         CBsonType doc;
         doc.initialize();
         doc.beginDocument();
-        
+
         /* Add all fields from the result */
         for (size_t j = 0; j < result.columnNames.size(); ++j)
         {
             std::string fieldName = result.columnNames[j];
             std::string fieldValue = result.rows[i][j];
-            
+
             /* Convert field value to appropriate BSON type */
             if (fieldName == "id")
             {
-                try {
+                try
+                {
                     int id = std::stoi(fieldValue);
                     doc.addInt32(fieldName, id);
-                } catch (...) {
+                }
+                catch (...)
+                {
                     doc.addString(fieldName, fieldValue);
                 }
             }
             else if (fieldName == "department_id")
             {
-                try {
+                try
+                {
                     int deptId = std::stoi(fieldValue);
                     doc.addInt32(fieldName, deptId);
-                } catch (...) {
+                }
+                catch (...)
+                {
                     doc.addString(fieldName, fieldValue);
                 }
             }
@@ -1451,24 +1609,24 @@ CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(const string& col
                 doc.addString(fieldName, fieldValue);
             }
         }
-        
+
         doc.endDocument();
         documents.push_back(doc);
     }
-    
+
     /* Build MongoDB response */
     CBsonType response;
     response.initialize();
     response.beginDocument();
     response.addDouble("ok", 1.0);
-    
+
     /* Create cursor subdocument */
     CBsonType cursorDoc;
     cursorDoc.initialize();
     cursorDoc.beginDocument();
     cursorDoc.addInt64("id", 0);
     cursorDoc.addString("ns", collectionName + ".$cmd.find");
-    
+
     /* Add firstBatch array */
     cursorDoc.beginArray("firstBatch");
     for (size_t i = 0; i < documents.size(); ++i)
@@ -1477,93 +1635,118 @@ CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(const string& col
     }
     cursorDoc.endArray();
     cursorDoc.endDocument();
-    
+
     response.addDocument("cursor", cursorDoc);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createFindResponseWithPostgreSQLBSON: Built response with " + std::to_string(documents.size()) + " documents");
-    
+        logger_->log(
+            CLogLevel::DEBUG,
+            "createFindResponseWithPostgreSQLBSON: Built response with " +
+                std::to_string(documents.size()) + " documents");
+
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createCountResponseFromPostgreSQL(const string& collectionName, int32_t requestID)
+vector<uint8_t> CDocumentProtocolHandler::createCountResponseFromPostgreSQL(
+    const string& collectionName, int32_t requestID)
 {
-    debug_log("createCountResponseFromPostgreSQL: Processing count for collection: " + collectionName);
-    
+    debug_log(
+        "createCountResponseFromPostgreSQL: Processing count for collection: " +
+        collectionName);
+
     int64_t count = 0;
-    
+
     if (!connectionPooler_)
     {
-        debug_log("createCountResponseFromPostgreSQL: No connection pooler available");
+        debug_log("createCountResponseFromPostgreSQL: No connection pooler "
+                  "available");
         if (logger_)
         {
-            logger_->log(CLogLevel::ERROR, "No connection pooler available for count query");
+            logger_->log(CLogLevel::ERROR,
+                         "No connection pooler available for count query");
         }
     }
     else
     {
-        debug_log("createCountResponseFromPostgreSQL: Getting PostgreSQL connection");
+        debug_log(
+            "createCountResponseFromPostgreSQL: Getting PostgreSQL connection");
         auto connection = connectionPooler_->getPostgresConnection();
-        
+
         if (!connection || !connection->database)
         {
-            debug_log("createCountResponseFromPostgreSQL: Failed to get connection or database");
+            debug_log("createCountResponseFromPostgreSQL: Failed to get "
+                      "connection or database");
             if (logger_)
             {
-                logger_->log(CLogLevel::ERROR, "Failed to get PostgreSQL connection for count query");
+                logger_->log(
+                    CLogLevel::ERROR,
+                    "Failed to get PostgreSQL connection for count query");
             }
         }
         else
         {
-            debug_log("createCountResponseFromPostgreSQL: Connection acquired successfully");
-            
+            debug_log("createCountResponseFromPostgreSQL: Connection acquired "
+                      "successfully");
+
             try
             {
                 stringstream sql;
                 sql << "SELECT COUNT(*) FROM " << collectionName;
-                debug_log("createCountResponseFromPostgreSQL: About to execute SQL: " + sql.str());
-                
+                debug_log("createCountResponseFromPostgreSQL: About to execute "
+                          "SQL: " +
+                          sql.str());
+
                 auto result = connection->database->executeQuery(sql.str());
-                debug_log("createCountResponseFromPostgreSQL: SQL executed successfully");
-                debug_log("createCountResponseFromPostgreSQL: Query success=" + string(result.success ? "true" : "false") + ", rows=" + std::to_string(result.rows.size()));
-                
+                debug_log("createCountResponseFromPostgreSQL: SQL executed "
+                          "successfully");
+                debug_log("createCountResponseFromPostgreSQL: Query success=" +
+                          string(result.success ? "true" : "false") +
+                          ", rows=" + std::to_string(result.rows.size()));
+
                 if (result.success && !result.rows.empty())
                 {
                     try
                     {
                         count = std::stoll(result.rows[0][0]);
-                        debug_log("createCountResponseFromPostgreSQL: Count result: " + std::to_string(count));
+                        debug_log("createCountResponseFromPostgreSQL: Count "
+                                  "result: " +
+                                  std::to_string(count));
                     }
                     catch (const std::exception& e)
                     {
-                        debug_log("createCountResponseFromPostgreSQL: Failed to parse count result");
+                        debug_log("createCountResponseFromPostgreSQL: Failed "
+                                  "to parse count result");
                         count = 0;
                     }
                 }
                 else
                 {
-                    debug_log("createCountResponseFromPostgreSQL: Query failed or no results");
+                    debug_log("createCountResponseFromPostgreSQL: Query failed "
+                              "or no results");
                     count = 0;
                 }
             }
             catch (const std::exception& e)
             {
-                debug_log("createCountResponseFromPostgreSQL: Exception during query: " + string(e.what()));
+                debug_log("createCountResponseFromPostgreSQL: Exception during "
+                          "query: " +
+                          string(e.what()));
                 if (logger_)
                 {
-                    logger_->log(CLogLevel::ERROR, "Exception during count query: " + string(e.what()));
+                    logger_->log(CLogLevel::ERROR,
+                                 "Exception during count query: " +
+                                     string(e.what()));
                 }
                 count = 0;
             }
-            
+
             connectionPooler_->releasePostgresConnection(connection);
             debug_log("createCountResponseFromPostgreSQL: Connection released");
         }
     }
-    
+
     // Create MongoDB count response
     debug_log("createCountResponseFromPostgreSQL: Creating count response");
     CBsonType response;
@@ -1572,59 +1755,71 @@ CDocumentProtocolHandler::createCountResponseFromPostgreSQL(const string& collec
     response.addDouble("ok", 1.0);
     response.addInt64("n", count);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
-    debug_log("createCountResponseFromPostgreSQL: Count response created, size: " + std::to_string(responseBytes.size()));
-    
+    debug_log(
+        "createCountResponseFromPostgreSQL: Count response created, size: " +
+        std::to_string(responseBytes.size()));
+
     // Create proper OP_MSG response
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createUpdateResponseFromPostgreSQL(const string& collectionName,
-                                                            int32_t requestID,
-                                                            const vector<uint8_t>& queryBuffer,
-                                                            ssize_t bytesRead,
-                                                            const string& commandName)
+vector<uint8_t> CDocumentProtocolHandler::createUpdateResponseFromPostgreSQL(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead,
+    const string& commandName)
 {
-    debug_log("createUpdateResponseFromPostgreSQL: Processing " + commandName + " for collection: " + collectionName);
-    
+    debug_log("createUpdateResponseFromPostgreSQL: Processing " + commandName +
+              " for collection: " + collectionName);
+
     /* Parse update parameters from BSON */
     MongoDBQuery query = parseMongoDBQuery(queryBuffer, bytesRead, commandName);
-    
+
     int32_t modifiedCount = 0;
-    
+
     /* Check if connection pooler is available */
     if (!connectionPooler_)
     {
-        debug_log("createUpdateResponseFromPostgreSQL: No connection pooler available");
-        return createErrorBsonDocument(-10, "PostgreSQL connection pooler not available");
+        debug_log("createUpdateResponseFromPostgreSQL: No connection pooler "
+                  "available");
+        return createErrorBsonDocument(
+            -10, "PostgreSQL connection pooler not available");
     }
-    
+
     auto connection = connectionPooler_->getPostgresConnection();
     if (!connection || !connection->database)
     {
-        debug_log("createUpdateResponseFromPostgreSQL: Failed to get PostgreSQL connection");
-        return createErrorBsonDocument(-11, "Failed to get PostgreSQL connection");
+        debug_log("createUpdateResponseFromPostgreSQL: Failed to get "
+                  "PostgreSQL connection");
+        return createErrorBsonDocument(-11,
+                                       "Failed to get PostgreSQL connection");
     }
-    
+
     try
     {
-        /* For now, implement a simple update that works with the existing data structure */
-        /* This is a placeholder - in a real implementation, you'd parse the update document */
+        /* For now, implement a simple update that works with the existing data
+         * structure */
+        /* This is a placeholder - in a real implementation, you'd parse the
+         * update document */
         stringstream sql;
-        
+
         if (commandName == "updateOne")
         {
-            /* Update one document - for now just update the first matching document */
-            sql << "UPDATE " << collectionName << " SET name = 'Updated Name' WHERE id = 1";
-            debug_log("createUpdateResponseFromPostgreSQL: Executing SQL: " + sql.str());
-            
+            /* Update one document - for now just update the first matching
+             * document */
+            sql << "UPDATE " << collectionName
+                << " SET name = 'Updated Name' WHERE id = 1";
+            debug_log("createUpdateResponseFromPostgreSQL: Executing SQL: " +
+                      sql.str());
+
             auto result = connection->database->executeQuery(sql.str());
             if (result.success)
             {
                 modifiedCount = 1; /* Assume one document was modified */
-                debug_log("createUpdateResponseFromPostgreSQL: Update successful, modified count: " + std::to_string(modifiedCount));
+                debug_log("createUpdateResponseFromPostgreSQL: Update "
+                          "successful, modified count: " +
+                          std::to_string(modifiedCount));
             }
             else
             {
@@ -1634,31 +1829,42 @@ CDocumentProtocolHandler::createUpdateResponseFromPostgreSQL(const string& colle
         else if (commandName == "updateMany")
         {
             /* Update multiple documents */
-            sql << "UPDATE " << collectionName << " SET name = 'Updated Many' WHERE id > 0";
-            debug_log("createUpdateResponseFromPostgreSQL: Executing SQL: " + sql.str());
-            
+            sql << "UPDATE " << collectionName
+                << " SET name = 'Updated Many' WHERE id > 0";
+            debug_log("createUpdateResponseFromPostgreSQL: Executing SQL: " +
+                      sql.str());
+
             auto result = connection->database->executeQuery(sql.str());
             if (result.success)
             {
-                modifiedCount = 5; /* Placeholder - would need to get actual count */
-                debug_log("createUpdateResponseFromPostgreSQL: Update many successful, modified count: " + std::to_string(modifiedCount));
+                modifiedCount =
+                    5; /* Placeholder - would need to get actual count */
+                debug_log("createUpdateResponseFromPostgreSQL: Update many "
+                          "successful, modified count: " +
+                          std::to_string(modifiedCount));
             }
             else
             {
-                debug_log("createUpdateResponseFromPostgreSQL: Update many failed");
+                debug_log(
+                    "createUpdateResponseFromPostgreSQL: Update many failed");
             }
         }
         else if (commandName == "replaceOne")
         {
             /* Replace one document */
-            sql << "UPDATE " << collectionName << " SET name = 'Replaced Name', email = 'replaced@example.com' WHERE id = 1";
-            debug_log("createUpdateResponseFromPostgreSQL: Executing SQL: " + sql.str());
-            
+            sql << "UPDATE " << collectionName
+                << " SET name = 'Replaced Name', email = "
+                   "'replaced@example.com' WHERE id = 1";
+            debug_log("createUpdateResponseFromPostgreSQL: Executing SQL: " +
+                      sql.str());
+
             auto result = connection->database->executeQuery(sql.str());
             if (result.success)
             {
                 modifiedCount = 1;
-                debug_log("createUpdateResponseFromPostgreSQL: Replace successful, modified count: " + std::to_string(modifiedCount));
+                debug_log("createUpdateResponseFromPostgreSQL: Replace "
+                          "successful, modified count: " +
+                          std::to_string(modifiedCount));
             }
             else
             {
@@ -1668,12 +1874,13 @@ CDocumentProtocolHandler::createUpdateResponseFromPostgreSQL(const string& colle
     }
     catch (const std::exception& e)
     {
-        debug_log("createUpdateResponseFromPostgreSQL: Exception: " + string(e.what()));
+        debug_log("createUpdateResponseFromPostgreSQL: Exception: " +
+                  string(e.what()));
     }
-    
+
     /* Always return connection to pool */
     connectionPooler_->releasePostgresConnection(connection);
-    
+
     /* Build MongoDB update response */
     CBsonType response;
     response.initialize();
@@ -1685,87 +1892,101 @@ CDocumentProtocolHandler::createUpdateResponseFromPostgreSQL(const string& colle
     response.addInt32("modifiedCount", modifiedCount);
     response.addInt32("upsertedCount", 0);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createDeleteResponseFromPostgreSQL(const string& collectionName,
-                                                            int32_t requestID,
-                                                            const vector<uint8_t>& queryBuffer,
-                                                            ssize_t bytesRead,
-                                                            const string& commandName)
+vector<uint8_t> CDocumentProtocolHandler::createDeleteResponseFromPostgreSQL(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead,
+    const string& commandName)
 {
-    debug_log("createDeleteResponseFromPostgreSQL: Processing " + commandName + " for collection: " + collectionName);
-    
+    debug_log("createDeleteResponseFromPostgreSQL: Processing " + commandName +
+              " for collection: " + collectionName);
+
     /* Parse delete parameters from BSON */
     MongoDBQuery query = parseMongoDBQuery(queryBuffer, bytesRead, commandName);
-    
+
     int32_t deletedCount = 0;
-    
+
     /* Check if connection pooler is available */
     if (!connectionPooler_)
     {
-        debug_log("createDeleteResponseFromPostgreSQL: No connection pooler available");
-        return createErrorBsonDocument(-10, "PostgreSQL connection pooler not available");
+        debug_log("createDeleteResponseFromPostgreSQL: No connection pooler "
+                  "available");
+        return createErrorBsonDocument(
+            -10, "PostgreSQL connection pooler not available");
     }
-    
+
     auto connection = connectionPooler_->getPostgresConnection();
     if (!connection || !connection->database)
     {
-        debug_log("createDeleteResponseFromPostgreSQL: Failed to get PostgreSQL connection");
-        return createErrorBsonDocument(-11, "Failed to get PostgreSQL connection");
+        debug_log("createDeleteResponseFromPostgreSQL: Failed to get "
+                  "PostgreSQL connection");
+        return createErrorBsonDocument(-11,
+                                       "Failed to get PostgreSQL connection");
     }
-    
+
     try
     {
-        /* For now, implement a simple delete that works with the existing data structure */
+        /* For now, implement a simple delete that works with the existing data
+         * structure */
         stringstream sql;
-        
+
         if (commandName == "deleteOne")
         {
             /* Delete one document - for now just delete a specific document */
             sql << "DELETE FROM " << collectionName << " WHERE id = 105";
-            debug_log("createDeleteResponseFromPostgreSQL: Executing SQL: " + sql.str());
-            
+            debug_log("createDeleteResponseFromPostgreSQL: Executing SQL: " +
+                      sql.str());
+
             auto result = connection->database->executeQuery(sql.str());
             if (result.success)
             {
                 deletedCount = 1; /* Assume one document was deleted */
-                debug_log("createDeleteResponseFromPostgreSQL: Delete one successful, deleted count: " + std::to_string(deletedCount));
+                debug_log("createDeleteResponseFromPostgreSQL: Delete one "
+                          "successful, deleted count: " +
+                          std::to_string(deletedCount));
             }
             else
             {
-                debug_log("createDeleteResponseFromPostgreSQL: Delete one failed");
+                debug_log(
+                    "createDeleteResponseFromPostgreSQL: Delete one failed");
             }
         }
         else if (commandName == "deleteMany")
         {
             /* Delete multiple documents */
             sql << "DELETE FROM " << collectionName << " WHERE id > 100";
-            debug_log("createDeleteResponseFromPostgreSQL: Executing SQL: " + sql.str());
-            
+            debug_log("createDeleteResponseFromPostgreSQL: Executing SQL: " +
+                      sql.str());
+
             auto result = connection->database->executeQuery(sql.str());
             if (result.success)
             {
-                deletedCount = 5; /* Placeholder - would need to get actual count */
-                debug_log("createDeleteResponseFromPostgreSQL: Delete many successful, deleted count: " + std::to_string(deletedCount));
+                deletedCount =
+                    5; /* Placeholder - would need to get actual count */
+                debug_log("createDeleteResponseFromPostgreSQL: Delete many "
+                          "successful, deleted count: " +
+                          std::to_string(deletedCount));
             }
             else
             {
-                debug_log("createDeleteResponseFromPostgreSQL: Delete many failed");
+                debug_log(
+                    "createDeleteResponseFromPostgreSQL: Delete many failed");
             }
         }
     }
     catch (const std::exception& e)
     {
-        debug_log("createDeleteResponseFromPostgreSQL: Exception: " + string(e.what()));
+        debug_log("createDeleteResponseFromPostgreSQL: Exception: " +
+                  string(e.what()));
     }
-    
+
     /* Always return connection to pool */
     connectionPooler_->releasePostgresConnection(connection);
-    
+
     /* Build MongoDB delete response */
     CBsonType response;
     response.initialize();
@@ -1774,54 +1995,63 @@ CDocumentProtocolHandler::createDeleteResponseFromPostgreSQL(const string& colle
     response.addBool("acknowledged", true);
     response.addInt32("deletedCount", deletedCount);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createDistinctResponseFromPostgreSQL(const string& collectionName,
-                                                              int32_t requestID,
-                                                              const vector<uint8_t>& queryBuffer,
-                                                              ssize_t bytesRead)
+vector<uint8_t> CDocumentProtocolHandler::createDistinctResponseFromPostgreSQL(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
 {
-    debug_log("createDistinctResponseFromPostgreSQL: Processing distinct for collection: " + collectionName);
-    
+    debug_log("createDistinctResponseFromPostgreSQL: Processing distinct for "
+              "collection: " +
+              collectionName);
+
     /* Parse distinct parameters from BSON */
     MongoDBQuery query = parseMongoDBQuery(queryBuffer, bytesRead, "distinct");
-    
+
     /* Check if connection pooler is available */
     if (!connectionPooler_)
     {
-        debug_log("createDistinctResponseFromPostgreSQL: No connection pooler available");
-        return createErrorBsonDocument(-10, "PostgreSQL connection pooler not available");
+        debug_log("createDistinctResponseFromPostgreSQL: No connection pooler "
+                  "available");
+        return createErrorBsonDocument(
+            -10, "PostgreSQL connection pooler not available");
     }
-    
+
     auto connection = connectionPooler_->getPostgresConnection();
     if (!connection || !connection->database)
     {
-        debug_log("createDistinctResponseFromPostgreSQL: Failed to get PostgreSQL connection");
-        return createErrorBsonDocument(-11, "Failed to get PostgreSQL connection");
+        debug_log("createDistinctResponseFromPostgreSQL: Failed to get "
+                  "PostgreSQL connection");
+        return createErrorBsonDocument(-11,
+                                       "Failed to get PostgreSQL connection");
     }
-    
+
     try
     {
-        /* For now, implement a simple distinct that returns department_id values */
+        /* For now, implement a simple distinct that returns department_id
+         * values */
         stringstream sql;
-        sql << "SELECT DISTINCT department_id FROM " << collectionName << " ORDER BY department_id";
-        debug_log("createDistinctResponseFromPostgreSQL: Executing SQL: " + sql.str());
-        
+        sql << "SELECT DISTINCT department_id FROM " << collectionName
+            << " ORDER BY department_id";
+        debug_log("createDistinctResponseFromPostgreSQL: Executing SQL: " +
+                  sql.str());
+
         auto result = connection->database->executeQuery(sql.str());
         if (result.success && !result.rows.empty())
         {
-            debug_log("createDistinctResponseFromPostgreSQL: Query successful, got " + std::to_string(result.rows.size()) + " distinct values");
-            
+            debug_log(
+                "createDistinctResponseFromPostgreSQL: Query successful, got " +
+                std::to_string(result.rows.size()) + " distinct values");
+
             /* Build MongoDB distinct response */
             CBsonType response;
             response.initialize();
             response.beginDocument();
             response.addDouble("ok", 1.0);
-            
+
             /* Add values array */
             response.beginArray("values");
             for (const auto& row : result.rows)
@@ -1832,26 +2062,28 @@ CDocumentProtocolHandler::createDistinctResponseFromPostgreSQL(const string& col
                 }
             }
             response.endArray();
-            
+
             response.endDocument();
-            
+
             auto responseBytes = response.getDocument();
             connectionPooler_->releasePostgresConnection(connection);
             return createWireMessage(1, requestID, responseBytes);
         }
         else
         {
-            debug_log("createDistinctResponseFromPostgreSQL: Query failed or no results");
+            debug_log("createDistinctResponseFromPostgreSQL: Query failed or "
+                      "no results");
         }
     }
     catch (const std::exception& e)
     {
-        debug_log("createDistinctResponseFromPostgreSQL: Exception: " + string(e.what()));
+        debug_log("createDistinctResponseFromPostgreSQL: Exception: " +
+                  string(e.what()));
     }
-    
+
     /* Always return connection to pool */
     connectionPooler_->releasePostgresConnection(connection);
-    
+
     /* Build error response */
     CBsonType response;
     response.initialize();
@@ -1860,7 +2092,7 @@ CDocumentProtocolHandler::createDistinctResponseFromPostgreSQL(const string& col
     response.beginArray("values");
     response.endArray();
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
@@ -1868,7 +2100,8 @@ CDocumentProtocolHandler::createDistinctResponseFromPostgreSQL(const string& col
 vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
     const string& collectionName)
 {
-    debug_log("queryPostgreSQLCollection: Starting query for collection: " + collectionName);
+    debug_log("queryPostgreSQLCollection: Starting query for collection: " +
+              collectionName);
     vector<CBsonType> documents;
 
     if (logger_)
@@ -1889,7 +2122,8 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
     }
 
     auto connection = connectionPooler_->getPostgresConnection();
-    debug_log("queryPostgreSQLCollection: Got connection: " + string(connection ? "YES" : "NO"));
+    debug_log("queryPostgreSQLCollection: Got connection: " +
+              string(connection ? "YES" : "NO"));
     if (!connection || !connection->database)
     {
         debug_log("queryPostgreSQLCollection: Connection or database is null");
@@ -1900,7 +2134,7 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
         }
         return documents;
     }
-    
+
     debug_log("queryPostgreSQLCollection: Connection and database are valid");
 
     try
@@ -1908,44 +2142,51 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
         // Execute SQL query
         stringstream sql;
         sql << "SELECT * FROM " << collectionName;
-        debug_log("queryPostgreSQLCollection: About to execute SQL: " + sql.str());
+        debug_log("queryPostgreSQLCollection: About to execute SQL: " +
+                  sql.str());
 
-    if (logger_)
-    {
-        logger_->log(CLogLevel::INFO,
-                         "Executing SQL: " + sql.str());
+        if (logger_)
+        {
+            logger_->log(CLogLevel::INFO, "Executing SQL: " + sql.str());
         }
 
         auto result = connection->database->executeQuery(sql.str());
         debug_log("queryPostgreSQLCollection: SQL executed successfully");
-        
+
         if (logger_)
         {
-            logger_->log(CLogLevel::INFO,
-                         "Query success=" + string(result.success ? "true" : "false") + 
-                         ", rows returned=" + to_string(result.rows.size()));
+            logger_->log(
+                CLogLevel::INFO,
+                "Query success=" + string(result.success ? "true" : "false") +
+                    ", rows returned=" + to_string(result.rows.size()));
         }
-        
-        debug_log("queryPostgreSQLCollection: Query success=" + string(result.success ? "true" : "false") + ", rows=" + std::to_string(result.rows.size()));
+
+        debug_log("queryPostgreSQLCollection: Query success=" +
+                  string(result.success ? "true" : "false") +
+                  ", rows=" + std::to_string(result.rows.size()));
 
         if (result.success && !result.rows.empty())
         {
-            debug_log("queryPostgreSQLCollection: Processing " + std::to_string(result.rows.size()) + " rows");
+            debug_log("queryPostgreSQLCollection: Processing " +
+                      std::to_string(result.rows.size()) + " rows");
             // Process all rows
             for (size_t rowIndex = 0; rowIndex < result.rows.size(); ++rowIndex)
             {
-                debug_log("queryPostgreSQLCollection: Processing row " + std::to_string(rowIndex));
+                debug_log("queryPostgreSQLCollection: Processing row " +
+                          std::to_string(rowIndex));
                 const auto& row = result.rows[rowIndex];
                 CBsonType doc;
                 doc.initialize();
                 doc.beginDocument();
-                
-                for (size_t i = 0; i < row.size() && i < result.columnNames.size(); ++i)
+
+                for (size_t i = 0;
+                     i < row.size() && i < result.columnNames.size(); ++i)
                 {
                     const string& columnName = result.columnNames[i];
                     const string& value = row[i];
-                    debug_log("queryPostgreSQLCollection: Processing field " + columnName + " = '" + value + "'");
-                    
+                    debug_log("queryPostgreSQLCollection: Processing field " +
+                              columnName + " = '" + value + "'");
+
                     // Try to determine data type and add appropriately
                     if (columnName == "id" && !value.empty())
                     {
@@ -1964,12 +2205,18 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
                         doc.addString(columnName, value);
                     }
                 }
-                
-                debug_log("queryPostgreSQLCollection: Ending document for row " + std::to_string(rowIndex));
+
+                debug_log(
+                    "queryPostgreSQLCollection: Ending document for row " +
+                    std::to_string(rowIndex));
                 doc.endDocument();
-                debug_log("queryPostgreSQLCollection: Adding document to vector for row " + std::to_string(rowIndex));
+                debug_log("queryPostgreSQLCollection: Adding document to "
+                          "vector for row " +
+                          std::to_string(rowIndex));
                 documents.push_back(doc);
-                debug_log("queryPostgreSQLCollection: Document added successfully for row " + std::to_string(rowIndex));
+                debug_log("queryPostgreSQLCollection: Document added "
+                          "successfully for row " +
+                          std::to_string(rowIndex));
             }
         }
     }
@@ -1978,7 +2225,8 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
         if (logger_)
         {
             logger_->log(CLogLevel::ERROR,
-                         "Exception during PostgreSQL query: " + string(e.what()));
+                         "Exception during PostgreSQL query: " +
+                             string(e.what()));
         }
     }
 
@@ -1988,29 +2236,31 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
     if (logger_)
     {
         logger_->log(CLogLevel::INFO,
-                     "Returning " + to_string(documents.size()) + 
-                     " documents for collection: " + collectionName);
+                     "Returning " + to_string(documents.size()) +
+                         " documents for collection: " + collectionName);
     }
 
     return documents;
 }
 
-vector<CBsonType>
-CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName,
-                                                    const vector<uint8_t>& queryBuffer,
-                                                    ssize_t bytesRead)
+vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
+    const string& collectionName, const vector<uint8_t>& queryBuffer,
+    ssize_t bytesRead)
 {
-    debug_log("queryPostgreSQLCollection: Starting enhanced query for collection: " + collectionName);
-    
+    debug_log(
+        "queryPostgreSQLCollection: Starting enhanced query for collection: " +
+        collectionName);
+
     /* Parse MongoDB query parameters */
     MongoDBQuery query = parseMongoDBQuery(queryBuffer, bytesRead, "find");
     std::string actualCollectionName = collectionName;
     if (!query.collection.empty())
     {
         actualCollectionName = query.collection;
-        debug_log("queryPostgreSQLCollection: Using parsed collection name: " + actualCollectionName);
+        debug_log("queryPostgreSQLCollection: Using parsed collection name: " +
+                  actualCollectionName);
     }
-    
+
     vector<CBsonType> documents;
 
     if (logger_)
@@ -2031,7 +2281,8 @@ CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName
     }
 
     auto connection = connectionPooler_->getPostgresConnection();
-    debug_log("queryPostgreSQLCollection: Got connection: " + string(connection ? "YES" : "NO"));
+    debug_log("queryPostgreSQLCollection: Got connection: " +
+              string(connection ? "YES" : "NO"));
     if (!connection || !connection->database)
     {
         debug_log("queryPostgreSQLCollection: Connection or database is null");
@@ -2042,7 +2293,7 @@ CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName
         }
         return documents;
     }
-    
+
     debug_log("queryPostgreSQLCollection: Connection and database are valid");
 
     try
@@ -2050,69 +2301,79 @@ CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName
         /* Build SQL query with filters, limit, and skip */
         stringstream sql;
         sql << "SELECT * FROM " << actualCollectionName;
-        
+
         /* Add WHERE clause if filters exist */
         std::string whereClause = buildSQLWhereClause(query.filters);
         if (!whereClause.empty())
         {
             sql << whereClause;
-            debug_log("queryPostgreSQLCollection: Added WHERE clause: " + whereClause);
+            debug_log("queryPostgreSQLCollection: Added WHERE clause: " +
+                      whereClause);
         }
-        
+
         /* Add ORDER BY for consistent results */
         sql << " ORDER BY id";
-        
+
         /* Add LIMIT and OFFSET */
         if (query.limit > 0)
         {
             sql << " LIMIT " << query.limit;
-            debug_log("queryPostgreSQLCollection: Added LIMIT: " + std::to_string(query.limit));
+            debug_log("queryPostgreSQLCollection: Added LIMIT: " +
+                      std::to_string(query.limit));
         }
-        
+
         if (query.skip > 0)
         {
             sql << " OFFSET " << query.skip;
-            debug_log("queryPostgreSQLCollection: Added OFFSET: " + std::to_string(query.skip));
+            debug_log("queryPostgreSQLCollection: Added OFFSET: " +
+                      std::to_string(query.skip));
         }
-        
-        debug_log("queryPostgreSQLCollection: About to execute SQL: " + sql.str());
+
+        debug_log("queryPostgreSQLCollection: About to execute SQL: " +
+                  sql.str());
 
         if (logger_)
         {
-            logger_->log(CLogLevel::INFO,
-                         "Executing SQL: " + sql.str());
+            logger_->log(CLogLevel::INFO, "Executing SQL: " + sql.str());
         }
 
         auto result = connection->database->executeQuery(sql.str());
         debug_log("queryPostgreSQLCollection: SQL executed successfully");
-        
+
         if (logger_)
         {
-            logger_->log(CLogLevel::INFO,
-                         "Query success=" + string(result.success ? "true" : "false") + 
-                         ", rows returned=" + to_string(result.rows.size()));
+            logger_->log(
+                CLogLevel::INFO,
+                "Query success=" + string(result.success ? "true" : "false") +
+                    ", rows returned=" + to_string(result.rows.size()));
         }
-        
-        debug_log("queryPostgreSQLCollection: Query success=" + string(result.success ? "true" : "false") + ", rows=" + std::to_string(result.rows.size()));
+
+        debug_log("queryPostgreSQLCollection: Query success=" +
+                  string(result.success ? "true" : "false") +
+                  ", rows=" + std::to_string(result.rows.size()));
 
         if (result.success && !result.rows.empty())
         {
-            debug_log("queryPostgreSQLCollection: Processing " + std::to_string(result.rows.size()) + " rows");
+            debug_log("queryPostgreSQLCollection: Processing " +
+                      std::to_string(result.rows.size()) + " rows");
             /* Process all rows */
             for (size_t rowIndex = 0; rowIndex < result.rows.size(); ++rowIndex)
             {
-                debug_log("queryPostgreSQLCollection: Processing row " + std::to_string(rowIndex));
+                debug_log("queryPostgreSQLCollection: Processing row " +
+                          std::to_string(rowIndex));
                 const auto& row = result.rows[rowIndex];
                 CBsonType doc;
                 doc.initialize();
                 doc.beginDocument();
-                
-                for (size_t i = 0; i < row.size() && i < result.columnNames.size(); ++i)
+
+                for (size_t i = 0;
+                     i < row.size() && i < result.columnNames.size(); ++i)
                 {
                     const string& columnName = result.columnNames[i];
                     const string& value = row[i];
-                    debug_log("queryPostgreSQLCollection: Processing field " + columnName + " = '" + value + "'");
-                    
+                    debug_log("queryPostgreSQLCollection: Processing field " +
+                              columnName + " = '" + value + "'");
+
                     /* Try to determine data type and add appropriately */
                     if (columnName == "id" && !value.empty())
                     {
@@ -2131,12 +2392,18 @@ CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName
                         doc.addString(columnName, value);
                     }
                 }
-                
-                debug_log("queryPostgreSQLCollection: Ending document for row " + std::to_string(rowIndex));
+
+                debug_log(
+                    "queryPostgreSQLCollection: Ending document for row " +
+                    std::to_string(rowIndex));
                 doc.endDocument();
-                debug_log("queryPostgreSQLCollection: Adding document to vector for row " + std::to_string(rowIndex));
+                debug_log("queryPostgreSQLCollection: Adding document to "
+                          "vector for row " +
+                          std::to_string(rowIndex));
                 documents.push_back(doc);
-                debug_log("queryPostgreSQLCollection: Document added successfully for row " + std::to_string(rowIndex));
+                debug_log("queryPostgreSQLCollection: Document added "
+                          "successfully for row " +
+                          std::to_string(rowIndex));
             }
         }
     }
@@ -2145,7 +2412,8 @@ CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName
         if (logger_)
         {
             logger_->log(CLogLevel::ERROR,
-                         "Exception during PostgreSQL query: " + string(e.what()));
+                         "Exception during PostgreSQL query: " +
+                             string(e.what()));
         }
     }
 
@@ -2155,8 +2423,8 @@ CDocumentProtocolHandler::queryPostgreSQLCollection(const string& collectionName
     if (logger_)
     {
         logger_->log(CLogLevel::INFO,
-                     "Returning " + to_string(documents.size()) + 
-                     " documents for collection: " + actualCollectionName);
+                     "Returning " + to_string(documents.size()) +
+                         " documents for collection: " + actualCollectionName);
     }
 
     return documents;
@@ -2851,19 +3119,21 @@ CDocumentProtocolHandler::convertDeleteToSQL(const string& collectionName,
 }
 
 MongoDBQuery
-CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize_t bytesRead, const std::string& commandName)
+CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer,
+                                            ssize_t bytesRead,
+                                            const std::string& commandName)
 {
     MongoDBQuery query;
-    
+
     if (buffer.size() < 4 || bytesRead < 4)
     {
         return query;
     }
-    
+
     try
     {
         size_t offset = 4; /* Skip document length */
-        
+
         /* Debug: Print first few bytes of BSON document */
         string hexBytes = "parseMongoDBQuery: BSON document bytes: ";
         for (size_t i = 0; i < std::min((size_t)50, buffer.size()); ++i)
@@ -2873,60 +3143,79 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
             hexBytes += hex;
         }
         debug_log(hexBytes);
-        
+
         /* Look for the find command subdocument */
         while (offset < buffer.size() && offset < (size_t)bytesRead)
         {
-            debug_log("parseMongoDBQuery: Loop iteration, offset=" + std::to_string(offset) + ", buffer.size()=" + std::to_string(buffer.size()) + ", bytesRead=" + std::to_string(bytesRead));
+            debug_log("parseMongoDBQuery: Loop iteration, offset=" +
+                      std::to_string(offset) +
+                      ", buffer.size()=" + std::to_string(buffer.size()) +
+                      ", bytesRead=" + std::to_string(bytesRead));
             uint8_t type = buffer[offset++];
-            debug_log("parseMongoDBQuery: Found type=" + std::to_string((int)type) + " at offset=" + std::to_string(offset-1));
-            
+            debug_log(
+                "parseMongoDBQuery: Found type=" + std::to_string((int)type) +
+                " at offset=" + std::to_string(offset - 1));
+
             /* End of document */
             if (type == 0)
             {
-                debug_log("parseMongoDBQuery: End of document marker found, breaking");
+                debug_log("parseMongoDBQuery: End of document marker found, "
+                          "breaking");
                 break;
             }
-            
+
             /* Read field name */
             std::string fieldName;
             while (offset < buffer.size() && buffer[offset] != 0)
             {
                 fieldName += static_cast<char>(buffer[offset++]);
             }
-            
+
             if (offset >= buffer.size())
             {
                 break;
             }
-            
+
             offset++; /* Skip null terminator */
-            
-            debug_log("parseMongoDBQuery: Found field '" + fieldName + "' type=" + std::to_string((int)type) + " at offset=" + std::to_string(offset));
-            
-            /* Skip null fields and look for the find command document (type 3) */
+
+            debug_log("parseMongoDBQuery: Found field '" + fieldName +
+                      "' type=" + std::to_string((int)type) +
+                      " at offset=" + std::to_string(offset));
+
+            /* Skip null fields and look for the find command document (type 3)
+             */
             if (type == 10 && fieldName.empty())
             {
-                debug_log("parseMongoDBQuery: Skipping null field, continuing...");
+                debug_log(
+                    "parseMongoDBQuery: Skipping null field, continuing...");
                 offset += 8; /* Skip null value */
-                debug_log("parseMongoDBQuery: After skipping null, offset=" + std::to_string(offset) + ", buffer.size()=" + std::to_string(buffer.size()) + ", bytesRead=" + std::to_string(bytesRead));
+                debug_log("parseMongoDBQuery: After skipping null, offset=" +
+                          std::to_string(offset) +
+                          ", buffer.size()=" + std::to_string(buffer.size()) +
+                          ", bytesRead=" + std::to_string(bytesRead));
                 continue;
             }
-            else if (type == 2 && fieldName == commandName) /* Direct command field */
+            else if (type == 2 &&
+                     fieldName == commandName) /* Direct command field */
             {
-                debug_log("parseMongoDBQuery: Found direct " + commandName + " command field");
-                
+                debug_log("parseMongoDBQuery: Found direct " + commandName +
+                          " command field");
+
                 /* Read string length and value */
                 if (offset + 4 <= buffer.size())
                 {
                     uint32_t stringLength;
                     memcpy(&stringLength, &buffer[offset], 4);
                     offset += 4;
-                    
-                    if (stringLength > 0 && offset + stringLength <= buffer.size())
+
+                    if (stringLength > 0 &&
+                        offset + stringLength <= buffer.size())
                     {
-                        query.collection = std::string(reinterpret_cast<const char*>(&buffer[offset]), stringLength - 1);
-                        debug_log("parseMongoDBQuery: Collection name: '" + query.collection + "'");
+                        query.collection = std::string(
+                            reinterpret_cast<const char*>(&buffer[offset]),
+                            stringLength - 1);
+                        debug_log("parseMongoDBQuery: Collection name: '" +
+                                  query.collection + "'");
                     }
                     offset += stringLength;
                 }
@@ -2938,43 +3227,60 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
                 {
                     uint32_t filterDocLength;
                     memcpy(&filterDocLength, &buffer[offset], 4);
-                    
-                    if (filterDocLength > 4 && offset + filterDocLength <= buffer.size())
+
+                    if (filterDocLength > 4 &&
+                        offset + filterDocLength <= buffer.size())
                     {
                         /* Parse the filter document */
                         size_t filterOffset = offset + 4;
-                        size_t filterEnd = offset + filterDocLength - 1; /* -1 for null terminator */
-                        
+                        size_t filterEnd = offset + filterDocLength -
+                                           1; /* -1 for null terminator */
+
                         while (filterOffset < filterEnd)
                         {
                             uint8_t filterType = buffer[filterOffset++];
-                            if (filterType == 0) break;
-                            
+                            if (filterType == 0)
+                                break;
+
                             /* Read filter field name */
                             std::string filterFieldName;
-                            while (filterOffset < filterEnd && buffer[filterOffset] != 0)
+                            while (filterOffset < filterEnd &&
+                                   buffer[filterOffset] != 0)
                             {
-                                filterFieldName += static_cast<char>(buffer[filterOffset++]);
+                                filterFieldName +=
+                                    static_cast<char>(buffer[filterOffset++]);
                             }
-                            if (filterOffset >= filterEnd) break;
+                            if (filterOffset >= filterEnd)
+                                break;
                             filterOffset++;
-                            
-                            debug_log("parseMongoDBQuery: Filter field '" + filterFieldName + "'");
-                            
+
+                            debug_log("parseMongoDBQuery: Filter field '" +
+                                      filterFieldName + "'");
+
                             /* Read filter field value */
                             if (filterType == 2) /* String value */
                             {
                                 if (filterOffset + 4 <= filterEnd)
                                 {
                                     uint32_t stringLength;
-                                    memcpy(&stringLength, &buffer[filterOffset], 4);
+                                    memcpy(&stringLength, &buffer[filterOffset],
+                                           4);
                                     filterOffset += 4;
-                                    
-                                    if (stringLength > 0 && filterOffset + stringLength <= filterEnd)
+
+                                    if (stringLength > 0 &&
+                                        filterOffset + stringLength <=
+                                            filterEnd)
                                     {
-                                        std::string filterValue = std::string(reinterpret_cast<const char*>(&buffer[filterOffset]), stringLength - 1);
-                                        query.filters[filterFieldName] = filterValue;
-                                        debug_log("parseMongoDBQuery: Filter '" + filterFieldName + "' = '" + filterValue + "'");
+                                        std::string filterValue = std::string(
+                                            reinterpret_cast<const char*>(
+                                                &buffer[filterOffset]),
+                                            stringLength - 1);
+                                        query.filters[filterFieldName] =
+                                            filterValue;
+                                        debug_log(
+                                            "parseMongoDBQuery: Filter '" +
+                                            filterFieldName + "' = '" +
+                                            filterValue + "'");
                                     }
                                     filterOffset += stringLength;
                                 }
@@ -2986,7 +3292,9 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
                                     int32_t intValue;
                                     memcpy(&intValue, &buffer[filterOffset], 4);
                                     query.filters[filterFieldName] = intValue;
-                                        debug_log("parseMongoDBQuery: Filter '" + filterFieldName + "' = " + std::to_string(intValue));
+                                    debug_log("parseMongoDBQuery: Filter '" +
+                                              filterFieldName + "' = " +
+                                              std::to_string(intValue));
                                     filterOffset += 4;
                                 }
                             }
@@ -3007,7 +3315,8 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
                     int32_t limitValue;
                     memcpy(&limitValue, &buffer[offset], 4);
                     query.limit = limitValue;
-                    debug_log("parseMongoDBQuery: Limit: " + std::to_string(query.limit));
+                    debug_log("parseMongoDBQuery: Limit: " +
+                              std::to_string(query.limit));
                     offset += 4;
                 }
             }
@@ -3018,152 +3327,230 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
                     int32_t skipValue;
                     memcpy(&skipValue, &buffer[offset], 4);
                     query.skip = skipValue;
-                    debug_log("parseMongoDBQuery: Skip: " + std::to_string(query.skip));
+                    debug_log("parseMongoDBQuery: Skip: " +
+                              std::to_string(query.skip));
                     offset += 4;
                 }
             }
             else if (type == 3 && fieldName.empty())
             {
                 debug_log("parseMongoDBQuery: Found find command subdocument");
-                
+
                 /* Read document length */
                 if (offset + 4 <= buffer.size())
                 {
                     uint32_t docLength;
                     memcpy(&docLength, &buffer[offset], 4);
                     offset += 4;
-                    
-        debug_log("parseMongoDBQuery: Subdocument length: " + std::to_string(docLength));
-                    
+
+                    debug_log("parseMongoDBQuery: Subdocument length: " +
+                              std::to_string(docLength));
+
                     if (docLength > 4 && offset + docLength <= buffer.size())
                     {
                         /* Parse the find command subdocument */
                         size_t subdocOffset = offset;
-                        size_t subdocEnd = offset + docLength - 1; /* -1 for null terminator */
-                        
-                        debug_log("parseMongoDBQuery: Parsing find subdocument from " + std::to_string(subdocOffset) + " to " + std::to_string(subdocEnd));
-                        
+                        size_t subdocEnd =
+                            offset + docLength - 1; /* -1 for null terminator */
+
+                        debug_log("parseMongoDBQuery: Parsing find subdocument "
+                                  "from " +
+                                  std::to_string(subdocOffset) + " to " +
+                                  std::to_string(subdocEnd));
+
                         while (subdocOffset < subdocEnd)
                         {
                             uint8_t subType = buffer[subdocOffset++];
-                            if (subType == 0) break;
-                            
+                            if (subType == 0)
+                                break;
+
                             /* Read subdocument field name */
                             std::string subFieldName;
-                            while (subdocOffset < subdocEnd && buffer[subdocOffset] != 0)
+                            while (subdocOffset < subdocEnd &&
+                                   buffer[subdocOffset] != 0)
                             {
-                                subFieldName += static_cast<char>(buffer[subdocOffset++]);
+                                subFieldName +=
+                                    static_cast<char>(buffer[subdocOffset++]);
                             }
-                            if (subdocOffset >= subdocEnd) break;
+                            if (subdocOffset >= subdocEnd)
+                                break;
                             subdocOffset++;
-                            
-                            debug_log("parseMongoDBQuery: Subdocument field '" + subFieldName + "' type=" + std::to_string((int)subType));
-                            
+
+                            debug_log("parseMongoDBQuery: Subdocument field '" +
+                                      subFieldName +
+                                      "' type=" + std::to_string((int)subType));
+
                             /* Handle find command fields */
-                            if (subFieldName == commandName && subType == 2) /* Collection name field */
+                            if (subFieldName == commandName &&
+                                subType == 2) /* Collection name field */
                             {
                                 if (subdocOffset + 4 <= subdocEnd)
                                 {
                                     uint32_t stringLength;
-                                    memcpy(&stringLength, &buffer[subdocOffset], 4);
+                                    memcpy(&stringLength, &buffer[subdocOffset],
+                                           4);
                                     subdocOffset += 4;
-                                    
-                                    if (stringLength > 0 && subdocOffset + stringLength <= subdocEnd)
+
+                                    if (stringLength > 0 &&
+                                        subdocOffset + stringLength <=
+                                            subdocEnd)
                                     {
-                                        query.collection = std::string(reinterpret_cast<const char*>(&buffer[subdocOffset]), stringLength - 1);
-                        debug_log("parseMongoDBQuery: Collection name: '" + query.collection + "'");
+                                        query.collection = std::string(
+                                            reinterpret_cast<const char*>(
+                                                &buffer[subdocOffset]),
+                                            stringLength - 1);
+                                        debug_log("parseMongoDBQuery: "
+                                                  "Collection name: '" +
+                                                  query.collection + "'");
                                     }
                                     subdocOffset += stringLength;
                                 }
                             }
-                            else if (subFieldName == "filter" && subType == 3) /* Filter document */
+                            else if (subFieldName == "filter" &&
+                                     subType == 3) /* Filter document */
                             {
-                                debug_log("parseMongoDBQuery: Found filter document");
+                                debug_log(
+                                    "parseMongoDBQuery: Found filter document");
                                 if (subdocOffset + 4 <= subdocEnd)
                                 {
                                     uint32_t filterDocLength;
-                                    memcpy(&filterDocLength, &buffer[subdocOffset], 4);
-                                    
-                                    if (filterDocLength > 4 && subdocOffset + filterDocLength <= subdocEnd)
+                                    memcpy(&filterDocLength,
+                                           &buffer[subdocOffset], 4);
+
+                                    if (filterDocLength > 4 &&
+                                        subdocOffset + filterDocLength <=
+                                            subdocEnd)
                                     {
                                         /* Parse the filter document */
                                         size_t filterOffset = subdocOffset + 4;
-                                        size_t filterEnd = subdocOffset + filterDocLength - 1; /* -1 for null terminator */
-                                        
+                                        size_t filterEnd =
+                                            subdocOffset + filterDocLength -
+                                            1; /* -1 for null terminator */
+
                                         while (filterOffset < filterEnd)
                                         {
-                                            uint8_t filterType = buffer[filterOffset++];
-                                            if (filterType == 0) break;
-                                            
+                                            uint8_t filterType =
+                                                buffer[filterOffset++];
+                                            if (filterType == 0)
+                                                break;
+
                                             /* Read filter field name */
                                             std::string filterFieldName;
-                                            while (filterOffset < filterEnd && buffer[filterOffset] != 0)
+                                            while (filterOffset < filterEnd &&
+                                                   buffer[filterOffset] != 0)
                                             {
-                                                filterFieldName += static_cast<char>(buffer[filterOffset++]);
+                                                filterFieldName +=
+                                                    static_cast<char>(
+                                                        buffer[filterOffset++]);
                                             }
-                                            if (filterOffset >= filterEnd) break;
+                                            if (filterOffset >= filterEnd)
+                                                break;
                                             filterOffset++;
-                                            
-                            debug_log("parseMongoDBQuery: Filter field '" + filterFieldName + "'");
-                                            
+
+                                            debug_log("parseMongoDBQuery: "
+                                                      "Filter field '" +
+                                                      filterFieldName + "'");
+
                                             /* Read filter field value */
-                                            if (filterType == 2) /* String value */
+                                            if (filterType ==
+                                                2) /* String value */
                                             {
-                                                if (filterOffset + 4 <= filterEnd)
+                                                if (filterOffset + 4 <=
+                                                    filterEnd)
                                                 {
                                                     uint32_t stringLength;
-                                                    memcpy(&stringLength, &buffer[filterOffset], 4);
+                                                    memcpy(
+                                                        &stringLength,
+                                                        &buffer[filterOffset],
+                                                        4);
                                                     filterOffset += 4;
-                                                    
-                                                    if (stringLength > 0 && filterOffset + stringLength <= filterEnd)
+
+                                                    if (stringLength > 0 &&
+                                                        filterOffset +
+                                                                stringLength <=
+                                                            filterEnd)
                                                     {
-                                                        std::string filterValue = std::string(reinterpret_cast<const char*>(&buffer[filterOffset]), stringLength - 1);
-                                                        query.filters[filterFieldName] = filterValue;
-                                        debug_log("parseMongoDBQuery: Filter '" + filterFieldName + "' = '" + filterValue + "'");
+                                                        std::string filterValue =
+                                                            std::string(
+                                                                reinterpret_cast<
+                                                                    const char*>(
+                                                                    &buffer
+                                                                        [filterOffset]),
+                                                                stringLength -
+                                                                    1);
+                                                        query.filters
+                                                            [filterFieldName] =
+                                                            filterValue;
+                                                        debug_log(
+                                                            "parseMongoDBQuery:"
+                                                            " Filter '" +
+                                                            filterFieldName +
+                                                            "' = '" +
+                                                            filterValue + "'");
                                                     }
-                                                    filterOffset += stringLength;
+                                                    filterOffset +=
+                                                        stringLength;
                                                 }
                                             }
-                                            else if (filterType == 16) /* Int32 value */
+                                            else if (filterType ==
+                                                     16) /* Int32 value */
                                             {
-                                                if (filterOffset + 4 <= filterEnd)
+                                                if (filterOffset + 4 <=
+                                                    filterEnd)
                                                 {
                                                     int32_t intValue;
-                                                    memcpy(&intValue, &buffer[filterOffset], 4);
-                                                    query.filters[filterFieldName] = intValue;
-                                        debug_log("parseMongoDBQuery: Filter '" + filterFieldName + "' = " + std::to_string(intValue));
+                                                    memcpy(
+                                                        &intValue,
+                                                        &buffer[filterOffset],
+                                                        4);
+                                                    query.filters
+                                                        [filterFieldName] =
+                                                        intValue;
+                                                    debug_log("parseMongoDBQuer"
+                                                              "y: Filter '" +
+                                                              filterFieldName +
+                                                              "' = " +
+                                                              std::to_string(
+                                                                  intValue));
                                                     filterOffset += 4;
                                                 }
                                             }
                                             else
                                             {
                                                 /* Skip other types for now */
-                                                filterOffset += 8; /* Approximate skip */
+                                                filterOffset +=
+                                                    8; /* Approximate skip */
                                             }
                                         }
                                     }
                                     subdocOffset += filterDocLength;
                                 }
                             }
-                            else if (subFieldName == "limit" && subType == 16) /* Limit field */
+                            else if (subFieldName == "limit" &&
+                                     subType == 16) /* Limit field */
                             {
                                 if (subdocOffset + 4 <= subdocEnd)
                                 {
                                     int32_t limitValue;
-                                    memcpy(&limitValue, &buffer[subdocOffset], 4);
+                                    memcpy(&limitValue, &buffer[subdocOffset],
+                                           4);
                                     query.limit = limitValue;
-                    debug_log("parseMongoDBQuery: Limit: " + std::to_string(query.limit));
+                                    debug_log("parseMongoDBQuery: Limit: " +
+                                              std::to_string(query.limit));
                                     subdocOffset += 4;
                                 }
                             }
-                            else if (subFieldName == "skip" && subType == 16) /* Skip field */
+                            else if (subFieldName == "skip" &&
+                                     subType == 16) /* Skip field */
                             {
                                 if (subdocOffset + 4 <= subdocEnd)
                                 {
                                     int32_t skipValue;
-                                    memcpy(&skipValue, &buffer[subdocOffset], 4);
+                                    memcpy(&skipValue, &buffer[subdocOffset],
+                                           4);
                                     query.skip = skipValue;
-                    debug_log("parseMongoDBQuery: Skip: " + std::to_string(query.skip));
+                                    debug_log("parseMongoDBQuery: Skip: " +
+                                              std::to_string(query.skip));
                                     subdocOffset += 4;
                                 }
                             }
@@ -3179,7 +3566,8 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
                                     if (subdocOffset + 4 <= subdocEnd)
                                     {
                                         uint32_t stringLength;
-                                        memcpy(&stringLength, &buffer[subdocOffset], 4);
+                                        memcpy(&stringLength,
+                                               &buffer[subdocOffset], 4);
                                         subdocOffset += 4 + stringLength;
                                     }
                                     break;
@@ -3203,9 +3591,10 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
                 }
                 continue; /* Skip the rest of the main document parsing */
             }
-            
+
             /* Skip other fields in the main document */
-                debug_log("parseMongoDBQuery: Skipping field '" + fieldName + "' type=" + std::to_string((int)type));
+            debug_log("parseMongoDBQuery: Skipping field '" + fieldName +
+                      "' type=" + std::to_string((int)type));
             switch (type)
             {
             case 1: /* Double */
@@ -3236,23 +3625,23 @@ CDocumentProtocolHandler::parseMongoDBQuery(const vector<uint8_t>& buffer, ssize
     }
     catch (const std::exception& e)
     {
-    debug_log("parseMongoDBQuery: Exception: " + string(e.what()));
+        debug_log("parseMongoDBQuery: Exception: " + string(e.what()));
     }
-    
+
     return query;
 }
 
-std::string
-CDocumentProtocolHandler::buildSQLWhereClause(const std::map<std::string, std::string>& filters)
+std::string CDocumentProtocolHandler::buildSQLWhereClause(
+    const std::map<std::string, std::string>& filters)
 {
     if (filters.empty())
     {
         return "";
     }
-    
+
     std::stringstream whereClause;
     whereClause << " WHERE ";
-    
+
     bool first = true;
     for (const auto& filter : filters)
     {
@@ -3263,15 +3652,14 @@ CDocumentProtocolHandler::buildSQLWhereClause(const std::map<std::string, std::s
         whereClause << filter.first << " = " << escapeSQLString(filter.second);
         first = false;
     }
-    
+
     return whereClause.str();
 }
 
-std::string
-CDocumentProtocolHandler::escapeSQLString(const std::string& value)
+std::string CDocumentProtocolHandler::escapeSQLString(const std::string& value)
 {
     std::string escaped = value;
-    
+
     /* Replace single quotes with double single quotes for SQL escaping */
     size_t pos = 0;
     while ((pos = escaped.find("'", pos)) != std::string::npos)
@@ -3279,7 +3667,7 @@ CDocumentProtocolHandler::escapeSQLString(const std::string& value)
         escaped.replace(pos, 1, "''");
         pos += 2;
     }
-    
+
     return "'" + escaped + "'";
 }
 
@@ -3287,23 +3675,23 @@ vector<uint8_t>
 CDocumentProtocolHandler::createListCollectionsResponse(int32_t requestID)
 {
     debug_log("createListCollectionsResponse: Processing listCollections");
-    
+
     /* Build MongoDB listCollections response */
     CBsonType response;
     response.initialize();
     response.beginDocument();
     response.addDouble("ok", 1.0);
-    
+
     /* Create cursor subdocument */
     CBsonType cursorDoc;
     cursorDoc.initialize();
     cursorDoc.beginDocument();
     cursorDoc.addInt64("id", 0);
     cursorDoc.addString("ns", "fauxdb.$cmd.listCollections");
-    
+
     /* Add firstBatch array with collections */
     cursorDoc.beginArray("firstBatch");
-    
+
     /* Add known collections */
     CBsonType usersCollection;
     usersCollection.initialize();
@@ -3312,7 +3700,7 @@ CDocumentProtocolHandler::createListCollectionsResponse(int32_t requestID)
     usersCollection.addString("type", "collection");
     usersCollection.endDocument();
     cursorDoc.addArrayDocument(usersCollection);
-    
+
     CBsonType departmentCollection;
     departmentCollection.initialize();
     departmentCollection.beginDocument();
@@ -3320,22 +3708,25 @@ CDocumentProtocolHandler::createListCollectionsResponse(int32_t requestID)
     departmentCollection.addString("type", "collection");
     departmentCollection.endDocument();
     cursorDoc.addArrayDocument(departmentCollection);
-    
+
     cursorDoc.endArray();
     cursorDoc.endDocument();
-    
+
     response.addDocument("cursor", cursorDoc);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createCreateIndexesResponse(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
+vector<uint8_t> CDocumentProtocolHandler::createCreateIndexesResponse(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
 {
-    debug_log("createCreateIndexesResponse: Processing createIndexes for collection: " + collectionName);
-    
+    debug_log("createCreateIndexesResponse: Processing createIndexes for "
+              "collection: " +
+              collectionName);
+
     /* Build MongoDB createIndexes response */
     CBsonType response;
     response.initialize();
@@ -3344,7 +3735,7 @@ CDocumentProtocolHandler::createCreateIndexesResponse(const string& collectionNa
     response.addString("createdCollectionAutomatically", "false");
     response.addInt32("numIndexesBefore", 0);
     response.addInt32("numIndexesAfter", 1);
-    
+
     /* Add created indexes array */
     response.beginArray("createdIndexes");
     CBsonType indexDoc;
@@ -3355,18 +3746,21 @@ CDocumentProtocolHandler::createCreateIndexesResponse(const string& collectionNa
     indexDoc.endDocument();
     response.addArrayDocument(indexDoc);
     response.endArray();
-    
+
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createDropIndexesResponse(const string& collectionName, int32_t requestID, const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
+vector<uint8_t> CDocumentProtocolHandler::createDropIndexesResponse(
+    const string& collectionName, int32_t requestID,
+    const vector<uint8_t>& queryBuffer, ssize_t bytesRead)
 {
-    debug_log("createDropIndexesResponse: Processing dropIndexes for collection: " + collectionName);
-    
+    debug_log(
+        "createDropIndexesResponse: Processing dropIndexes for collection: " +
+        collectionName);
+
     /* Build MongoDB dropIndexes response */
     CBsonType response;
     response.initialize();
@@ -3374,32 +3768,34 @@ CDocumentProtocolHandler::createDropIndexesResponse(const string& collectionName
     response.addDouble("ok", 1.0);
     response.addInt32("nIndexesWas", 1);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }
 
-vector<uint8_t>
-CDocumentProtocolHandler::createListIndexesResponse(const string& collectionName, int32_t requestID)
+vector<uint8_t> CDocumentProtocolHandler::createListIndexesResponse(
+    const string& collectionName, int32_t requestID)
 {
-    debug_log("createListIndexesResponse: Processing listIndexes for collection: " + collectionName);
-    
+    debug_log(
+        "createListIndexesResponse: Processing listIndexes for collection: " +
+        collectionName);
+
     /* Build MongoDB listIndexes response */
     CBsonType response;
     response.initialize();
     response.beginDocument();
     response.addDouble("ok", 1.0);
-    
+
     /* Create cursor subdocument */
     CBsonType cursorDoc;
     cursorDoc.initialize();
     cursorDoc.beginDocument();
     cursorDoc.addInt64("id", 0);
     cursorDoc.addString("ns", "fauxdb." + collectionName);
-    
+
     /* Add firstBatch array with indexes */
     cursorDoc.beginArray("firstBatch");
-    
+
     /* Add default _id index */
     CBsonType idIndex;
     idIndex.initialize();
@@ -3409,13 +3805,13 @@ CDocumentProtocolHandler::createListIndexesResponse(const string& collectionName
     idIndex.addString("v", "2");
     idIndex.endDocument();
     cursorDoc.addArrayDocument(idIndex);
-    
+
     cursorDoc.endArray();
     cursorDoc.endDocument();
-    
+
     response.addDocument("cursor", cursorDoc);
     response.endDocument();
-    
+
     auto responseBytes = response.getDocument();
     return createWireMessage(1, requestID, responseBytes);
 }

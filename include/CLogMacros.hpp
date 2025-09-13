@@ -13,12 +13,14 @@
 #include "CLogger.hpp"
 
 /* Global logging macro that handles logger null checks */
-#define elog(loglevel, ...) \
-    do { \
-        if (logger_) { \
-            logger_->log(loglevel, __VA_ARGS__); \
-        } \
-    } while(0)
+#define elog(loglevel, ...)                                                    \
+    do                                                                         \
+    {                                                                          \
+        if (logger_)                                                           \
+        {                                                                      \
+            logger_->log(loglevel, __VA_ARGS__);                               \
+        }                                                                      \
+    } while (0)
 
 /* Convenience macros for common log levels */
 #define debug_log(...) elog(CLogLevel::DEBUG, __VA_ARGS__)

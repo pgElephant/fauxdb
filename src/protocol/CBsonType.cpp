@@ -45,7 +45,7 @@ CBsonType::CBsonType(const CBsonType& other)
     {
         bsonDoc_ = bson_new();
     }
-    
+
     // Copy the array if it exists
     if (other.bsonArray_)
     {
@@ -55,7 +55,7 @@ CBsonType::CBsonType(const CBsonType& other)
             setError("Failed to copy BSON array");
         }
     }
-    
+
     // Copy other state
     lastError_ = other.lastError_;
     hasErrors_ = other.hasErrors_;
@@ -68,13 +68,13 @@ CBsonType& CBsonType::operator=(const CBsonType& other)
 {
     if (this == &other)
         return *this;
-    
+
     // Clean up existing resources
     if (bsonArray_)
         bson_destroy(bsonArray_);
     if (bsonDoc_)
         bson_destroy(bsonDoc_);
-    
+
     // Copy the main document
     if (other.bsonDoc_)
     {
@@ -88,7 +88,7 @@ CBsonType& CBsonType::operator=(const CBsonType& other)
     {
         bsonDoc_ = bson_new();
     }
-    
+
     // Copy the array if it exists
     if (other.bsonArray_)
     {
@@ -102,14 +102,14 @@ CBsonType& CBsonType::operator=(const CBsonType& other)
     {
         bsonArray_ = nullptr;
     }
-    
+
     // Copy other state
     lastError_ = other.lastError_;
     hasErrors_ = other.hasErrors_;
     inArray_ = other.inArray_;
     currentArrayKey_ = other.currentArrayKey_;
     currentArrayIndex_ = other.currentArrayIndex_;
-    
+
     return *this;
 }
 

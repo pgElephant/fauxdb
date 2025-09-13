@@ -697,8 +697,8 @@ std::vector<std::string> CServer::getComponentInfo() const
 
 std::string CServer::getDatabaseStatus() const
 {
-	CConnectionPoolStats			stats;
-	std::string						status;
+    CConnectionPoolStats stats;
+    std::string status;
 
     if (!connectionPooler_)
     {
@@ -745,7 +745,7 @@ std::string CServer::getNetworkStatus() const
 
 bool CServer::isDatabaseHealthy() const
 {
-	CConnectionPoolStats			stats;
+    CConnectionPoolStats stats;
 
     if (!connectionPooler_)
     {
@@ -782,8 +782,8 @@ bool CServer::isNetworkHealthy() const
 
 std::string CServer::getServerStatistics() const
 {
-	std::string				stats = "Server Statistics:\n";
-	CConnectionPoolStats	poolStats;
+    std::string stats = "Server Statistics:\n";
+    CConnectionPoolStats poolStats;
 
     stats +=
         "  Status: " + std::to_string(static_cast<int>(status_.load())) + "\n";

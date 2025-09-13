@@ -1118,7 +1118,6 @@ std::string CPostgresDatabase::getServerVersion() const
     }
     catch (const std::exception& e)
     {
-
     }
 
     return "";

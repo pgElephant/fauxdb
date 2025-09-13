@@ -23,28 +23,28 @@
  * These constants define the binary format identifiers used in
  * BSON documents, ensuring full compatibility with the BSON standard.
  */
-#define BSON_TYPE_EOO					0x00	/* End of Object */
-#define BSON_TYPE_DOUBLE				0x01	/* 64-bit floating point */
-#define BSON_TYPE_STRING				0x02	/* UTF-8 string */
-#define BSON_TYPE_OBJECT				0x03	/* Embedded document */
-#define BSON_TYPE_ARRAY					0x04	/* Array of values */
-#define BSON_TYPE_BINARY				0x05	/* Binary data */
-#define BSON_TYPE_UNDEFINED				0x06	/* Undefined (deprecated) */
-#define BSON_TYPE_OBJECTID				0x07	/* 12-byte unique ID */
-#define BSON_TYPE_BOOL					0x08	/* Boolean */
-#define BSON_TYPE_DATE					0x09	/* UTC datetime (ms precision) */
-#define BSON_TYPE_NULL					0x0A	/* Null */
-#define BSON_TYPE_REGEX					0x0B	/* Regular expression */
-#define BSON_TYPE_DBPOINTER				0x0C	/* DBPointer (deprecated) */
-#define BSON_TYPE_JAVASCRIPT			0x0D	/* JavaScript code */
-#define BSON_TYPE_SYMBOL				0x0E	/* Symbol (deprecated) */
-#define BSON_TYPE_JAVASCRIPT_WITH_SCOPE	0x0F	/* JavaScript with scope */
-#define BSON_TYPE_INT32					0x10	/* 32-bit integer */
-#define BSON_TYPE_TIMESTAMP				0x11	/* Special internal type */
-#define BSON_TYPE_INT64					0x12	/* 64-bit integer */
-#define BSON_TYPE_DECIMAL128			0x13	/* High-precision decimal */
-#define BSON_TYPE_MINKEY				0xFF	/* Sorts lower than all */
-#define BSON_TYPE_MAXKEY				0x7F	/* Sorts higher than all */
+#define BSON_TYPE_EOO 0x00                   /* End of Object */
+#define BSON_TYPE_DOUBLE 0x01                /* 64-bit floating point */
+#define BSON_TYPE_STRING 0x02                /* UTF-8 string */
+#define BSON_TYPE_OBJECT 0x03                /* Embedded document */
+#define BSON_TYPE_ARRAY 0x04                 /* Array of values */
+#define BSON_TYPE_BINARY 0x05                /* Binary data */
+#define BSON_TYPE_UNDEFINED 0x06             /* Undefined (deprecated) */
+#define BSON_TYPE_OBJECTID 0x07              /* 12-byte unique ID */
+#define BSON_TYPE_BOOL 0x08                  /* Boolean */
+#define BSON_TYPE_DATE 0x09                  /* UTC datetime (ms precision) */
+#define BSON_TYPE_NULL 0x0A                  /* Null */
+#define BSON_TYPE_REGEX 0x0B                 /* Regular expression */
+#define BSON_TYPE_DBPOINTER 0x0C             /* DBPointer (deprecated) */
+#define BSON_TYPE_JAVASCRIPT 0x0D            /* JavaScript code */
+#define BSON_TYPE_SYMBOL 0x0E                /* Symbol (deprecated) */
+#define BSON_TYPE_JAVASCRIPT_WITH_SCOPE 0x0F /* JavaScript with scope */
+#define BSON_TYPE_INT32 0x10                 /* 32-bit integer */
+#define BSON_TYPE_TIMESTAMP 0x11             /* Special internal type */
+#define BSON_TYPE_INT64 0x12                 /* 64-bit integer */
+#define BSON_TYPE_DECIMAL128 0x13            /* High-precision decimal */
+#define BSON_TYPE_MINKEY 0xFF                /* Sorts lower than all */
+#define BSON_TYPE_MAXKEY 0x7F                /* Sorts higher than all */
 
 /*
  * Core BSON function declarations
@@ -84,4 +84,4 @@ extern Datum bson_cmp(PG_FUNCTION_ARGS);
 /* Hash function */
 extern Datum bson_hash(PG_FUNCTION_ARGS);
 
-#endif							/* BSON_H */
+#endif /* BSON_H */

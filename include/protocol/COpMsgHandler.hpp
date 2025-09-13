@@ -12,8 +12,8 @@
 #pragma once
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
-#include "database/CPGConnectionPooler.hpp"
 #include "IInterfaces.hpp"
+#include "database/CPGConnectionPooler.hpp"
 
 #include <memory>
 #include <string>

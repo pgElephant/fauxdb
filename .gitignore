@@ -15,6 +15,7 @@ Makefile.cmake
 *.so
 *.dylib
 *.dll
+*.log
 
 # Executables
 fauxdb

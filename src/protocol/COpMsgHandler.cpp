@@ -10,14 +10,14 @@
  */
 
 #include "COpMsgHandler.hpp"
-#include "CLogMacros.hpp"
-#include "CLogger.hpp"
-#include "../CServerConfig.hpp"
 
+#include "../CServerConfig.hpp"
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
-#include "FindCommand.hpp"
+#include "CLogMacros.hpp"
+#include "CLogger.hpp"
 #include "CollectionNameParser.hpp"
+#include "FindCommand.hpp"
 
 #include <cstring>
 #include <iostream>
@@ -27,7 +27,8 @@ using namespace std;
 namespace FauxDB
 {
 COpMsgHandler::COpMsgHandler()
-    : connectionPooler_(nullptr), logger_(std::make_shared<CLogger>(CServerConfig{}))
+    : connectionPooler_(nullptr),
+      logger_(std::make_shared<CLogger>(CServerConfig{}))
 {
 }
 vector<uint8_t> COpMsgHandler::processMessage(const vector<uint8_t>& message)
@@ -59,7 +60,8 @@ OpMsgCommand COpMsgHandler::parseMessage(const vector<uint8_t>& message)
          static_cast<int32_t>(CDocumentMsgFlags::CHECKSUM_PRESENT)) != 0;
     if (!parseSections(data, remaining, command.sections))
         throw runtime_error("Failed to parse sections");
-    debug_log("parseMessage: Parsed " + std::to_string(command.sections.size()) + " sections");
+    debug_log("parseMessage: Parsed " +
+              std::to_string(command.sections.size()) + " sections");
     if (!command.sections.empty() &&
         command.sections[0].kind == SectionKind::DOCUMENT)
     {
@@ -186,29 +188,35 @@ vector<uint8_t> COpMsgHandler::handleGetParameter(const OpMsgCommand& command)
 vector<uint8_t> COpMsgHandler::handleFind(const OpMsgCommand& command)
 {
     debug_log("COpMsgHandler::handleFind: Starting find command");
-    
+
     /* Extract collection name from command using CollectionNameParser */
     debug_log("COpMsgHandler::handleFind: Extracting collection name...");
     string collection = CollectionNameParser::extractCollectionName(
         command.commandBody, command.commandBody.size(), command.commandName);
-    
-    debug_log("COpMsgHandler::handleFind: Collection name: '" + collection + "'");
-    
+
+    debug_log("COpMsgHandler::handleFind: Collection name: '" + collection +
+              "'");
+
     /* If no collection name found, default to users */
     if (collection.empty())
     {
         collection = "users";
-        debug_log("COpMsgHandler::handleFind: Using default collection: 'users'");
+        debug_log(
+            "COpMsgHandler::handleFind: Using default collection: 'users'");
     }
-    
+
     /* Use FindCommand to execute the query */
     debug_log("COpMsgHandler::handleFind: Creating FindCommand...");
     FindCommand findCmd;
-    
+
     debug_log("COpMsgHandler::handleFind: Calling FindCommand::execute...");
-    auto result = findCmd.execute(collection, command.commandBody, command.commandBody.size(), connectionPooler_);
-    
-    debug_log("COpMsgHandler::handleFind: FindCommand::execute completed, result size: " + std::to_string(result.size()));
+    auto result =
+        findCmd.execute(collection, command.commandBody,
+                        command.commandBody.size(), connectionPooler_);
+
+    debug_log("COpMsgHandler::handleFind: FindCommand::execute completed, "
+              "result size: " +
+              std::to_string(result.size()));
     return result;
 }
 vector<uint8_t> COpMsgHandler::handleInsert(const OpMsgCommand& command)
@@ -383,7 +391,8 @@ OpMsgSection COpMsgHandler::parseDocumentSequenceSection(const uint8_t*& data,
 }
 vector<uint8_t> COpMsgHandler::routeCommand(const OpMsgCommand& command)
 {
-    debug_log("routeCommand: Routing command '" + command.commandName + "' to database '" + command.database + "'");
+    debug_log("routeCommand: Routing command '" + command.commandName +
+              "' to database '" + command.database + "'");
     if (command.commandName == "hello" || command.commandName == "isMaster")
         return handleHello(command);
     else if (command.commandName == "ping")
@@ -427,7 +436,8 @@ vector<uint8_t> COpMsgHandler::serializeBsonDocument(const vector<uint8_t>& doc)
     return doc;
 }
 
-void COpMsgHandler::setConnectionPooler(std::shared_ptr<CPGConnectionPooler> pooler)
+void COpMsgHandler::setConnectionPooler(
+    std::shared_ptr<CPGConnectionPooler> pooler)
 {
     connectionPooler_ = pooler;
 }
@@ -435,101 +445,117 @@ void COpMsgHandler::setConnectionPooler(std::shared_ptr<CPGConnectionPooler> poo
 void COpMsgHandler::parseCommandFromSections(OpMsgCommand& command)
 {
     debug_log("parseCommandFromSections: Starting command parsing");
-    
+
     /* Default values */
     command.database = "admin";
     command.commandName = "hello";
     command.commandBody.clear();
-    
+
     /* Parse the first document section to extract command name and database */
-    debug_log("parseCommandFromSections: Sections count: " + std::to_string(command.sections.size()));
-    if (!command.sections.empty() && 
+    debug_log("parseCommandFromSections: Sections count: " +
+              std::to_string(command.sections.size()));
+    if (!command.sections.empty() &&
         command.sections[0].kind == SectionKind::DOCUMENT &&
         !command.sections[0].documents.empty())
     {
         const auto& bsonDoc = command.sections[0].documents[0];
         command.commandBody = bsonDoc;
-        debug_log("parseCommandFromSections: BSON document size: " + std::to_string(bsonDoc.size()));
-        
+        debug_log("parseCommandFromSections: BSON document size: " +
+                  std::to_string(bsonDoc.size()));
+
         /* Parse BSON to extract command name and database */
         if (bsonDoc.size() > 4)
         {
             size_t offset = 4; /* Skip document size */
-            
+
             while (offset < bsonDoc.size())
             {
-                if (offset >= bsonDoc.size()) break;
-                
+                if (offset >= bsonDoc.size())
+                    break;
+
                 uint8_t type = bsonDoc[offset++];
-                if (type == 0x00) break; /* End of document */
-                
+                if (type == 0x00)
+                    break; /* End of document */
+
                 /* Read key name */
                 size_t keyStart = offset;
                 while (offset < bsonDoc.size() && bsonDoc[offset] != 0x00)
                     offset++;
-                if (offset >= bsonDoc.size()) break;
-                
-                string key(reinterpret_cast<const char*>(&bsonDoc[keyStart]), 
-                          offset - keyStart);
+                if (offset >= bsonDoc.size())
+                    break;
+
+                string key(reinterpret_cast<const char*>(&bsonDoc[keyStart]),
+                           offset - keyStart);
                 offset++; /* Skip null terminator */
-                
+
                 /* Handle different field types */
                 if (type == 0x02) /* String */
                 {
-                    if (offset + 4 >= bsonDoc.size()) break;
-                    
+                    if (offset + 4 >= bsonDoc.size())
+                        break;
+
                     int32_t strLen;
                     memcpy(&strLen, &bsonDoc[offset], sizeof(int32_t));
                     offset += 4;
-                    
-                    if (offset + strLen - 1 >= bsonDoc.size()) break;
-                    
-                    string value(reinterpret_cast<const char*>(&bsonDoc[offset]), 
-                                strLen - 1); /* -1 to exclude null terminator */
+
+                    if (offset + strLen - 1 >= bsonDoc.size())
+                        break;
+
+                    string value(
+                        reinterpret_cast<const char*>(&bsonDoc[offset]),
+                        strLen - 1); /* -1 to exclude null terminator */
                     offset += strLen;
-                    
+
                     if (key == "$db")
                     {
                         command.database = value;
-                        debug_log("parseCommandFromSections: Found database: " + value);
+                        debug_log("parseCommandFromSections: Found database: " +
+                                  value);
                     }
                     else if (key != "$db" && command.commandName == "hello")
                     {
                         /* First non-$db field is the command name */
                         command.commandName = key;
-                        debug_log("parseCommandFromSections: Found command: " + key);
+                        debug_log("parseCommandFromSections: Found command: " +
+                                  key);
                     }
                 }
                 else if (type == 0x01) /* Double */
                 {
-                    if (offset + 8 > bsonDoc.size()) break;
+                    if (offset + 8 > bsonDoc.size())
+                        break;
                     offset += 8;
                 }
                 else if (type == 0x08) /* Boolean */
                 {
-                    if (offset >= bsonDoc.size()) break;
+                    if (offset >= bsonDoc.size())
+                        break;
                     offset++;
                 }
                 else if (type == 0x10) /* Int32 */
                 {
-                    if (offset + 4 > bsonDoc.size()) break;
+                    if (offset + 4 > bsonDoc.size())
+                        break;
                     offset += 4;
                 }
                 else if (type == 0x12) /* Int64 */
                 {
-                    if (offset + 8 > bsonDoc.size()) break;
+                    if (offset + 8 > bsonDoc.size())
+                        break;
                     offset += 8;
                 }
                 else if (type == 0x05) /* Binary */
                 {
-                    if (offset + 5 >= bsonDoc.size()) break;
+                    if (offset + 5 >= bsonDoc.size())
+                        break;
                     int32_t binLen;
                     memcpy(&binLen, &bsonDoc[offset], sizeof(int32_t));
                     offset += 4 + 1 + binLen; /* subtype + data */
                 }
                 else if (type == 0x03 || type == 0x04) /* Document or Array */
                 {
-                    if (offset + 4 >= bsonDoc.size()) break;
+                    if (offset + 4 >= bsonDoc.size())
+                        break;
                     int32_t docLen;
                     memcpy(&docLen, &bsonDoc[offset], sizeof(int32_t));
                     offset += docLen;

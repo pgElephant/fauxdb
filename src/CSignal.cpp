@@ -15,6 +15,7 @@
  */
 
 #include "CSignal.hpp"
+
 #include "CLogger.hpp"
 
 #include <algorithm>
@@ -29,18 +30,16 @@ using namespace std;
 namespace FauxDB
 {
 
-std::unordered_map<int, CSignal *> CSignal::g_signalInstances;
+std::unordered_map<int, CSignal*> CSignal::g_signalInstances;
 std::mutex CSignal::g_signalMutex;
 
 /*
  * CSignal constructor
  *		Initialize signal handler with defaults
  */
-CSignal::CSignal()
-	: initialized_(false),
-	  monitoringEnabled_(false)
+CSignal::CSignal() : initialized_(false), monitoringEnabled_(false)
 {
-	initializeDefaults();
+    initializeDefaults();
 }
 
 /*
@@ -49,131 +48,123 @@ CSignal::CSignal()
  */
 CSignal::~CSignal()
 {
-	shutdown();
+    shutdown();
 }
 
 /*
  * initializeDefaults
  *		Set up default configuration and clear state
  */
-void
-CSignal::initializeDefaults()
+void CSignal::initializeDefaults()
 {
-	config_ = CSignalConfig{};
-	handlers_.clear();
-	defaultHandlers_.clear();
-	blockedSignals_.clear();
-	signalCounts_.clear();
-	lastError_.clear();
+    config_ = CSignalConfig{};
+    handlers_.clear();
+    defaultHandlers_.clear();
+    blockedSignals_.clear();
+    signalCounts_.clear();
+    lastError_.clear();
 }
 
 /*
  * initialize
  *		Set up signal handling with given configuration
  */
-bool
-CSignal::initialize(const CSignalConfig& config)
+bool CSignal::initialize(const CSignalConfig& config)
 {
-	if (initialized_)
-		return true;
+    if (initialized_)
+        return true;
 
-	try
-	{
-		config_ = config;
-		initialized_ = true;
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		setError("Initialization failed: " + std::string(e.what()));
-		return false;
-	}
+    try
+    {
+        config_ = config;
+        initialized_ = true;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        setError("Initialization failed: " + std::string(e.what()));
+        return false;
+    }
 }
 
 /*
  * shutdown
  *		Clean up signal handling resources
  */
-void
-CSignal::shutdown()
+void CSignal::shutdown()
 {
-	if (!initialized_)
-		return;
+    if (!initialized_)
+        return;
 
-	try
-	{
-		handlers_.clear();
-		defaultHandlers_.clear();
-		blockedSignals_.clear();
-		initialized_ = false;
-	}
-	catch (const std::exception& e)
-	{
-		setError("Shutdown failed: " + std::string(e.what()));
-	}
+    try
+    {
+        handlers_.clear();
+        defaultHandlers_.clear();
+        blockedSignals_.clear();
+        initialized_ = false;
+    }
+    catch (const std::exception& e)
+    {
+        setError("Shutdown failed: " + std::string(e.what()));
+    }
 }
 
 /*
  * shouldExit
  *		Check if exit signal has been received
  */
-bool
-CSignal::shouldExit() const
+bool CSignal::shouldExit() const
 {
-	return getSignalCount(CSignalType::Interrupt) > 0 ||
-		   getSignalCount(CSignalType::Terminate) > 0;
+    return getSignalCount(CSignalType::Interrupt) > 0 ||
+           getSignalCount(CSignalType::Terminate) > 0;
 }
 
 /*
  * shouldReload
  *		Check if reload signal has been received
  */
-bool
-CSignal::shouldReload() const
+bool CSignal::shouldReload() const
 {
-	return getSignalCount(CSignalType::User1) > 0;
+    return getSignalCount(CSignalType::User1) > 0;
 }
 
 /*
  * clearReloadFlag
  *		Reset reload signal count
  */
-void
-CSignal::clearReloadFlag()
+void CSignal::clearReloadFlag()
 {
-	resetSignalCount(CSignalType::User1);
+    resetSignalCount(CSignalType::User1);
 }
 
 /*
  * isInitialized
  *		Return initialization status
  */
-bool
-CSignal::isInitialized() const
+bool CSignal::isInitialized() const
 {
-	return initialized_;
+    return initialized_;
 }
 
 /*
  * registerHandler
  *		Register signal handler for specific signal type
  */
-bool
-CSignal::registerHandler(CSignalType signalType, CSignalHandler handler)
+bool CSignal::registerHandler(CSignalType signalType, CSignalHandler handler)
 {
-	if (!initialized_ || !validateSignalType(signalType))
-		return false;
+    if (!initialized_ || !validateSignalType(signalType))
+        return false;
 
-	try
-	{
-		handlers_[signalType] = handler;
-		return true;
-	}
-	catch (const std::exception& e)
-	{
-		setError("Failed to register handler: " + std::string(e.what()));
-		return false;
-	}
+    try
+    {
+        handlers_[signalType] = handler;
+        return true;
+    }
+    catch (const std::exception& e)
+    {
+        setError("Failed to register handler: " + std::string(e.what()));
+        return false;
+    }
 }
 
 bool CSignal::unregisterHandler(CSignalType signalType)

@@ -9,7 +9,6 @@
  *-------------------------------------------------------------------------
  */
 
-
 #include "protocol/CQueryTranslator.hpp"
 
 #include <sstream>

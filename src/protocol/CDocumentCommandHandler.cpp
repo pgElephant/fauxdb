@@ -9,7 +9,6 @@
  *-------------------------------------------------------------------------
  */
 
-
 #include "CDocumentCommandHandler.hpp"
 
 #include "CDocumentWireProtocol.hpp"

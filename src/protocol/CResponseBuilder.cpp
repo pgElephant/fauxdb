@@ -9,7 +9,6 @@
  *-------------------------------------------------------------------------
  */
 
-
 #include "protocol/CResponseBuilder.hpp"
 
 using namespace FauxDB;

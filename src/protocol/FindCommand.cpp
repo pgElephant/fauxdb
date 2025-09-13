@@ -11,6 +11,7 @@
 
 /* MongoDB Find Command Implementation */
 #include "protocol/FindCommand.hpp"
+
 #include "CLogMacros.hpp"
 
 #include <iostream>
@@ -44,23 +45,29 @@ FindCommand::execute(const string& collection, const vector<uint8_t>& buffer,
     {
         debug_log("FauxDB FindCommand: Getting PostgreSQL connection...");
         auto pgConnection = connectionPooler->getPostgresConnection();
-        debug_log("FauxDB FindCommand: Got connection: " + string(pgConnection ? "YES" : "NO"));
-        
+        debug_log("FauxDB FindCommand: Got connection: " +
+                  string(pgConnection ? "YES" : "NO"));
+
         if (pgConnection)
         {
-            debug_log("FauxDB FindCommand: Database pointer: " + string(pgConnection->database ? "YES" : "NO"));
+            debug_log("FauxDB FindCommand: Database pointer: " +
+                      string(pgConnection->database ? "YES" : "NO"));
         }
-        
+
         if (pgConnection && pgConnection->database)
         {
             try
             {
                 stringstream sql;
-                sql << "SELECT * FROM " << collection << " LIMIT " << DEFAULT_LIMIT;
+                sql << "SELECT * FROM " << collection << " LIMIT "
+                    << DEFAULT_LIMIT;
                 debug_log("FauxDB FindCommand: Executing SQL: " + sql.str());
 
                 auto result = pgConnection->database->executeQuery(sql.str());
-                debug_log("FauxDB FindCommand: Query success=" + string(result.success ? "true" : "false") + ", rows returned=" + std::to_string(result.rows.size()));
+                debug_log(
+                    "FauxDB FindCommand: Query success=" +
+                    string(result.success ? "true" : "false") +
+                    ", rows returned=" + std::to_string(result.rows.size()));
 
                 if (result.success && !result.rows.empty())
                 {
@@ -70,7 +77,8 @@ FindCommand::execute(const string& collection, const vector<uint8_t>& buffer,
                         documents.push_back(
                             rowToBsonDocument(row, result.columnNames));
                     }
-                    debug_log("FauxDB FindCommand: Converted " + std::to_string(documents.size()) + " documents");
+                    debug_log("FauxDB FindCommand: Converted " +
+                              std::to_string(documents.size()) + " documents");
                 }
             }
             catch (const std::exception& e)

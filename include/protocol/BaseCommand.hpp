@@ -14,6 +14,7 @@
 
 #include "../database/CPostgresDatabase.hpp"
 #include "ICommand.hpp"
+#include "IInterfaces.hpp"
 
 namespace FauxDB
 {
@@ -24,6 +25,11 @@ namespace FauxDB
 class BaseCommand : public ICommand
 {
   protected:
+    std::shared_ptr<ILogger> logger_;
+
+  public:
+    BaseCommand();
+
     /**
      * @brief Create a basic BSON response with ok field
      * @param success Success status

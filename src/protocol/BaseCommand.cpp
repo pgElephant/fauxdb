@@ -11,6 +11,8 @@
 
 /* Base MongoDB Command Implementation */
 #include "protocol/BaseCommand.hpp"
+#include "CLogger.hpp"
+#include "../CServerConfig.hpp"
 
 #include "database/CPGConnectionPooler.hpp"
 
@@ -18,6 +20,11 @@
 
 namespace FauxDB
 {
+
+BaseCommand::BaseCommand()
+    : logger_(std::make_shared<CLogger>(CServerConfig{}))
+{
+}
 
 CBsonType BaseCommand::createBaseResponse(bool success)
 {

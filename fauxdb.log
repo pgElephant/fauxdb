@@ -3850,3 +3850,791 @@ connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection re
 [32m✓ - 29947  ibrarahmed 2025-09-13 17:14:02 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
 [32m✓ - 29947  ibrarahmed 2025-09-13 17:14:02 FauxDB: Connection acquired from pool. Ptr: 5418017944.[0m
 [32m✓ - 29947  ibrarahmed 2025-09-13 17:14:02 FauxDB: Connection returned to pool. Ptr: 5418017944.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Logger set on server.[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Starting network component.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: TCP server started successfully.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Protocol component started successfully[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Parsing component started successfully[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Query component started successfully[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Response component started successfully[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Logging component started successfully[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: Configuration component started successfully[0m
+[34mℹ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: All components started successfully[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:33 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: New connection added to pool.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: Connection acquired from pool. Ptr: 5543856680.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:40 FauxDB: Connection returned to pool. Ptr: 5543856680.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:54 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:54 FauxDB: Connection acquired from pool. Ptr: 5543856680.[0m
+[32m✓ - 34495  ibrarahmed 2025-09-13 17:20:54 FauxDB: Connection returned to pool. Ptr: 5543856680.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Logger set on server.[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Starting network component.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: TCP server started successfully.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Protocol component started successfully[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Parsing component started successfully[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Query component started successfully[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Response component started successfully[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Logging component started successfully[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: Configuration component started successfully[0m
+[34mℹ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: All components started successfully[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:45 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: New connection added to pool.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: Connection acquired from pool. Ptr: 5359302088.[0m
+[32m✓ - 35462  ibrarahmed 2025-09-13 17:21:50 FauxDB: Connection returned to pool. Ptr: 5359302088.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Logger set on server.[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Starting network component.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: TCP server started successfully.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Protocol component started successfully[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Parsing component started successfully[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Query component started successfully[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Response component started successfully[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Logging component started successfully[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: Configuration component started successfully[0m
+[34mℹ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: All components started successfully[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:09 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: New connection added to pool.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: Connection acquired from pool. Ptr: 5450570808.[0m
+[32m✓ - 35975  ibrarahmed 2025-09-13 17:23:14 FauxDB: Connection returned to pool. Ptr: 5450570808.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Logger set on server.[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Starting network component.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: TCP server started successfully.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Protocol component started successfully[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Parsing component started successfully[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Query component started successfully[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Response component started successfully[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Logging component started successfully[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: Configuration component started successfully[0m
+[34mℹ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: All components started successfully[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:52 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: New connection added to pool.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: Connection acquired from pool. Ptr: 5081455192.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:23:58 FauxDB: Connection returned to pool. Ptr: 5081455192.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:24:16 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:24:16 FauxDB: Connection acquired from pool. Ptr: 5081455192.[0m
+[32m✓ - 36543  ibrarahmed 2025-09-13 17:24:16 FauxDB: Connection returned to pool. Ptr: 5081455192.[0m
+[32m✓ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Logger set on server.[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Starting network component.[0m
+[32m✓ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: TCP server started successfully.[0m
+[32m✓ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Protocol component started successfully[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Parsing component started successfully[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Query component started successfully[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Response component started successfully[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Logging component started successfully[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: Configuration component started successfully[0m
+[34mℹ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: All components started successfully[0m
+[32m✓ - 38041  ibrarahmed 2025-09-13 17:39:13 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Logger set on server.[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Starting network component.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: TCP server started successfully.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Protocol component started successfully[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Parsing component started successfully[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Query component started successfully[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Response component started successfully[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Logging component started successfully[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: Configuration component started successfully[0m
+[34mℹ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: All components started successfully[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:50 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: New connection added to pool.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: Connection acquired from pool. Ptr: 4931490920.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:55 FauxDB: Connection returned to pool. Ptr: 4931490920.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:59 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:59 FauxDB: Connection acquired from pool. Ptr: 4931490920.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:39:59 FauxDB: Connection returned to pool. Ptr: 4931490920.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:40:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:40:03 FauxDB: Connection acquired from pool. Ptr: 4931490920.[0m
+[32m✓ - 38678  ibrarahmed 2025-09-13 17:40:03 FauxDB: Connection returned to pool. Ptr: 4931490920.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Logger set on server.[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Starting network component.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: TCP server started successfully.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Protocol component started successfully[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Parsing component started successfully[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Query component started successfully[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Response component started successfully[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Logging component started successfully[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: Configuration component started successfully[0m
+[34mℹ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: All components started successfully[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:41:55 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: New connection added to pool.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: Connection acquired from pool. Ptr: 5117081800.[0m
+[32m✓ - 40042  ibrarahmed 2025-09-13 17:42:12 FauxDB: Connection returned to pool. Ptr: 5117081800.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Logger set on server.[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Starting network component.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: TCP server started successfully.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Protocol component started successfully[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Parsing component started successfully[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Query component started successfully[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Response component started successfully[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Logging component started successfully[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: Configuration component started successfully[0m
+[34mℹ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: All components started successfully[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:44 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: New connection added to pool.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: Connection acquired from pool. Ptr: 5527061064.[0m
+[32m✓ - 40687  ibrarahmed 2025-09-13 17:42:51 FauxDB: Connection returned to pool. Ptr: 5527061064.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Logger set on server.[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Starting network component.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: TCP server started successfully.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Protocol component started successfully[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Parsing component started successfully[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Query component started successfully[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Response component started successfully[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Logging component started successfully[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: Configuration component started successfully[0m
+[34mℹ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: All components started successfully[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:21 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: New connection added to pool.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: Connection acquired from pool. Ptr: 5400237896.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:26 FauxDB: Connection returned to pool. Ptr: 5400237896.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:30 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:30 FauxDB: Connection acquired from pool. Ptr: 5400237896.[0m
+[32m✓ - 41523  ibrarahmed 2025-09-13 17:43:30 FauxDB: Connection returned to pool. Ptr: 5400237896.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Logger set on server.[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Starting network component.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: TCP server started successfully.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Protocol component started successfully[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Parsing component started successfully[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Query component started successfully[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Response component started successfully[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Logging component started successfully[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: Configuration component started successfully[0m
+[34mℹ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: All components started successfully[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:53 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: New connection added to pool.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: Connection acquired from pool. Ptr: 4973413480.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:43:58 FauxDB: Connection returned to pool. Ptr: 4973413480.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:44:02 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:44:02 FauxDB: Connection acquired from pool. Ptr: 4973413480.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:44:02 FauxDB: Connection returned to pool. Ptr: 4973413480.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:44:19 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:44:19 FauxDB: Connection acquired from pool. Ptr: 4973413480.[0m
+[32m✓ - 42166  ibrarahmed 2025-09-13 17:44:19 FauxDB: Connection returned to pool. Ptr: 4973413480.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Logger set on server.[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Starting network component.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: TCP server started successfully.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Protocol component started successfully[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Parsing component started successfully[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Query component started successfully[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Response component started successfully[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Logging component started successfully[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: Configuration component started successfully[0m
+[34mℹ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: All components started successfully[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:49 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: New connection added to pool.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connection acquired from pool. Ptr: 5014326200.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: New connection added to pool.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connection acquired from pool. Ptr: 5283809320.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connection returned to pool. Ptr: 5014326200.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:48:54 FauxDB: Connection returned to pool. Ptr: 5283809320.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:49:01 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:49:01 FauxDB: Connection acquired from pool. Ptr: 5283809320.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:49:01 FauxDB: Connection returned to pool. Ptr: 5283809320.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:49:01 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:49:01 FauxDB: Connection acquired from pool. Ptr: 5283809320.[0m
+[32m✓ - 44030  ibrarahmed 2025-09-13 17:49:01 FauxDB: Connection returned to pool. Ptr: 5283809320.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Logger set on server.[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Starting network component.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: TCP server started successfully.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Protocol component started successfully[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Parsing component started successfully[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Query component started successfully[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Response component started successfully[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Logging component started successfully[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: Configuration component started successfully[0m
+[34mℹ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: All components started successfully[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:41 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: New connection added to pool.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connection acquired from pool. Ptr: 5386555880.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: New connection added to pool.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connection acquired from pool. Ptr: 5386570456.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connection returned to pool. Ptr: 5386555880.[0m
+[32m✓ - 45013  ibrarahmed 2025-09-13 17:49:47 FauxDB: Connection returned to pool. Ptr: 5386570456.[0m
+[32m✓ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Logger set on server.[0m
+[34mℹ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Starting network component.[0m
+[31m✗ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Network component startup failed[0m
+[31m✗ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: FauxDB failed to start server process[0m
+[32m✓ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Connection pool shutdown complete.[0m
+[32m✓ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Connection pool shutdown complete.[0m
+[32m✓ - 47539  ibrarahmed 2025-09-13 17:54:21 FauxDB: Connection pool shutdown complete.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Logger set on server.[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Starting network component.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: TCP server started successfully.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Protocol component started successfully[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Parsing component started successfully[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Query component started successfully[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Response component started successfully[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Logging component started successfully[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: Configuration component started successfully[0m
+[34mℹ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: All components started successfully[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:26 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: New connection added to pool.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connection acquired from pool. Ptr: 5235574824.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: New connection added to pool.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connection acquired from pool. Ptr: 5238706504.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connection returned to pool. Ptr: 5235574824.[0m
+[32m✓ - 47845  ibrarahmed 2025-09-13 17:54:31 FauxDB: Connection returned to pool. Ptr: 5238706504.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Logger set on server.[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Starting network component.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: TCP server started successfully.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Protocol component started successfully[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Parsing component started successfully[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Query component started successfully[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Response component started successfully[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Logging component started successfully[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: Configuration component started successfully[0m
+[34mℹ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: All components started successfully[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:35 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: New connection added to pool.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connection acquired from pool. Ptr: 5714761016.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: New connection added to pool.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connection acquired from pool. Ptr: 5715807528.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connection returned to pool. Ptr: 5714761016.[0m
+[32m✓ - 48983  ibrarahmed 2025-09-13 17:55:40 FauxDB: Connection returned to pool. Ptr: 5715807528.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Logger set on server.[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Starting network component.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: TCP server started successfully.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Protocol component started successfully[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Parsing component started successfully[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Query component started successfully[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Response component started successfully[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Logging component started successfully[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: Configuration component started successfully[0m
+[34mℹ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: All components started successfully[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:13 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: New connection added to pool.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connection acquired from pool. Ptr: 5461016840.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: New connection added to pool.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connection acquired from pool. Ptr: 5465200792.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connection returned to pool. Ptr: 5461016840.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:20 FauxDB: Connection returned to pool. Ptr: 5465200792.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:57 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:57 FauxDB: Connection acquired from pool. Ptr: 5465200792.[0m
+[32m✓ - 49713  ibrarahmed 2025-09-13 17:56:57 FauxDB: Connection returned to pool. Ptr: 5465200792.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Logger set on server.[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Starting network component.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: TCP server started successfully.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Protocol component started successfully[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Parsing component started successfully[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Query component started successfully[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Response component started successfully[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Logging component started successfully[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: Configuration component started successfully[0m
+[34mℹ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: All components started successfully[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:12 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: New connection added to pool.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: Connection acquired from pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:15 FauxDB: Connection returned to pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:19 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:19 FauxDB: Connection acquired from pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:19 FauxDB: Connection returned to pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:28 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:28 FauxDB: Connection acquired from pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:28 FauxDB: Connection returned to pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:31 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:31 FauxDB: Connection acquired from pool. Ptr: 5183131960.[0m
+[32m✓ - 56726  ibrarahmed 2025-09-14 00:15:31 FauxDB: Connection returned to pool. Ptr: 5183131960.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Logger set on server.[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Starting network component.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: TCP server started successfully.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Protocol component started successfully[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Parsing component started successfully[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Query component started successfully[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Response component started successfully[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Logging component started successfully[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: Configuration component started successfully[0m
+[34mℹ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: All components started successfully[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:14 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: New connection added to pool.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connection acquired from pool. Ptr: 4847619656.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: New connection added to pool.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connection acquired from pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connection returned to pool. Ptr: 4847619656.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:20 FauxDB: Connection returned to pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:35 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:35 FauxDB: Connection acquired from pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:35 FauxDB: Connection returned to pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:35 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:35 FauxDB: Connection acquired from pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:17:35 FauxDB: Connection returned to pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:18:26 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:18:26 FauxDB: Connection acquired from pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:18:26 FauxDB: Connection returned to pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:18:27 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '2'.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:18:27 FauxDB: Connection acquired from pool. Ptr: 4847619800.[0m
+[32m✓ - 59350  ibrarahmed 2025-09-14 00:18:27 FauxDB: Connection returned to pool. Ptr: 4847619800.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Logger set on server.[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Starting network component.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: TCP server started successfully.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Protocol component started successfully[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Parsing component started successfully[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Query component started successfully[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Response component started successfully[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Logging component started successfully[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: Configuration component started successfully[0m
+[34mℹ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: All components started successfully[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:20:57 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: New connection added to pool.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connection acquired from pool. Ptr: 5500894056.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: New connection added to pool.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connection acquired from pool. Ptr: 5500909560.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connection returned to pool. Ptr: 5500894056.[0m
+[32m✓ - 62248  ibrarahmed 2025-09-14 00:21:03 FauxDB: Connection returned to pool. Ptr: 5500909560.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Logger set on server.[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Starting network component.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: TCP server started successfully.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Protocol component started successfully[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Parsing component started successfully[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Query component started successfully[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Response component started successfully[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Logging component started successfully[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: Configuration component started successfully[0m
+[34mℹ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: All components started successfully[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:29 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: New connection added to pool.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connection acquired from pool. Ptr: 5555373304.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: New connection added to pool.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connection acquired from pool. Ptr: 5555377064.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connection returned to pool. Ptr: 5555373304.[0m
+[32m✓ - 62892  ibrarahmed 2025-09-14 00:21:35 FauxDB: Connection returned to pool. Ptr: 5555377064.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Logger set on server.[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Starting network component.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: TCP server started successfully.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Protocol component started successfully[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Parsing component started successfully[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Query component started successfully[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Response component started successfully[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Logging component started successfully[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: Configuration component started successfully[0m
+[34mℹ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: All components started successfully[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:51 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: New connection added to pool.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connection acquired from pool. Ptr: 5365594584.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: New connection added to pool.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connection acquired from pool. Ptr: 5365594968.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connection returned to pool. Ptr: 5365594584.[0m
+[32m✓ - 63436  ibrarahmed 2025-09-14 00:21:57 FauxDB: Connection returned to pool. Ptr: 5365594968.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Logger set on server.[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Starting network component.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: TCP server started successfully.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Protocol component started successfully[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Parsing component started successfully[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Query component started successfully[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Response component started successfully[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Logging component started successfully[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: Configuration component started successfully[0m
+[34mℹ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: All components started successfully[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:22 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: New connection added to pool.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:31 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:38 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:38 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:38 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:45 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:45 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:45 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:49 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:49 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:49 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:49 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:49 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:23:49 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:24:05 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:24:05 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:24:05 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:24:05 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:24:05 FauxDB: Connection acquired from pool. Ptr: 4982853000.[0m
+[32m✓ - 64739  ibrarahmed 2025-09-14 00:24:05 FauxDB: Connection returned to pool. Ptr: 4982853000.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Logger set on server.[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Starting network component.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: TCP server started successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Protocol component started successfully[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Parsing component started successfully[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Query component started successfully[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Response component started successfully[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Logging component started successfully[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: Configuration component started successfully[0m
+[34mℹ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: All components started successfully[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:10 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:15 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:15 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: New connection added to pool.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connection acquired from pool. Ptr: 4717560440.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: New connection added to pool.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connection acquired from pool. Ptr: 4830824056.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:16 FauxDB: Connection returned to pool. Ptr: 4717560440.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '2'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Connection acquired from pool. Ptr: 4717560440.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '2'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: New connection added to pool.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Connection acquired from pool. Ptr: 4829802712.[0m
+[32m✓ - 70010  ibrarahmed 2025-09-14 00:28:32 FauxDB: Connection returned to pool. Ptr: 4829802712.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Logger set on server.[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Starting network component.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: TCP server started successfully.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Protocol component started successfully[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Parsing component started successfully[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Query component started successfully[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Response component started successfully[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Logging component started successfully[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: Configuration component started successfully[0m
+[34mℹ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: All components started successfully[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:28:58 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: New connection added to pool.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connection acquired from pool. Ptr: 5330986488.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: New connection added to pool.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connection acquired from pool. Ptr: 5330985304.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:03 FauxDB: Connection returned to pool. Ptr: 5330985304.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:16 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '2'.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:16 FauxDB: Connection acquired from pool. Ptr: 5330985304.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:16 FauxDB: Connection returned to pool. Ptr: 5330985304.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:16 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '2'.[0m
+[32m✓ - 70964  ibrarahmed 2025-09-14 00:29:16 FauxDB: Connection acquired from pool. Ptr: 5330985304.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Logger set on server.[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Starting network component.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: TCP server started successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Protocol component started successfully[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Parsing component started successfully[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Query component started successfully[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Response component started successfully[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Logging component started successfully[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: Configuration component started successfully[0m
+[34mℹ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: All components started successfully[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:22 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: New connection added to pool.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: Connection acquired from pool. Ptr: 5842688744.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:31 FauxDB: Connection returned to pool. Ptr: 5842688744.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:35 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:35 FauxDB: Connection acquired from pool. Ptr: 5842688744.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:35 FauxDB: Connection returned to pool. Ptr: 5842688744.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:35 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '1'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:35 FauxDB: Connection acquired from pool. Ptr: 5842688744.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: New connection added to pool.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connection acquired from pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '2'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: New connection added to pool.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connection acquired from pool. Ptr: 5842693240.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connection returned to pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:44 FauxDB: Connection returned to pool. Ptr: 5842693240.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:49 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:49 FauxDB: Connection acquired from pool. Ptr: 5842693240.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:45:49 FauxDB: Connection returned to pool. Ptr: 5842693240.[0m
+[32m✓ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Logger set on server.[0m
+[34mℹ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Starting network component.[0m
+[31m✗ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Network component startup failed[0m
+[31m✗ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: FauxDB failed to start server process[0m
+[32m✓ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Connection pool shutdown complete.[0m
+[32m✓ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Connection pool shutdown complete.[0m
+[32m✓ - 3113  ibrarahmed 2025-09-14 00:52:54 FauxDB: Connection pool shutdown complete.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:52:59 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:52:59 FauxDB: Connection acquired from pool. Ptr: 5842693240.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:52:59 FauxDB: Connection returned to pool. Ptr: 5842693240.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '2', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:03 FauxDB: Connection acquired from pool. Ptr: 5842693240.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:03 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:03 FauxDB: Connection acquired from pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:03 FauxDB: Connection returned to pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:11 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:11 FauxDB: Connection acquired from pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:11 FauxDB: Connection returned to pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:11 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:11 FauxDB: Connection acquired from pool. Ptr: 5839536456.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '3'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: New connection added to pool.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: Connection acquired from pool. Ptr: 5842689512.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:16 FauxDB: Connection returned to pool. Ptr: 5842689512.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:24 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '4'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:24 FauxDB: Connection acquired from pool. Ptr: 5842689512.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:24 FauxDB: Connection returned to pool. Ptr: 5842689512.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:24 FauxDB: Requesting PostgreSQL connection from pool. Available: '1', Total: '4'.[0m
+[32m✓ - 91034  ibrarahmed 2025-09-14 00:53:24 FauxDB: Connection acquired from pool. Ptr: 5842689512.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Logger set on server.[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Starting network component.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: TCP server started successfully.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Protocol component started successfully[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Parsing component started successfully[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Query component started successfully[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Response component started successfully[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Logging component started successfully[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: Configuration component started successfully[0m
+[34mℹ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: All components started successfully[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:36 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: New connection added to pool.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connection acquired from pool. Ptr: 5383410888.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: New connection added to pool.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connection acquired from pool. Ptr: 5377116728.[0m
+[32m✓ - 4787  ibrarahmed 2025-09-14 00:53:42 FauxDB: Connection returned to pool. Ptr: 5383410888.[0m
+[32m✓ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Logger set on server.[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Starting network component.[0m
+[32m✓ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: TCP server started successfully.[0m
+[32m✓ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Protocol component started successfully[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Parsing component started successfully[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Query component started successfully[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Response component started successfully[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Logging component started successfully[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: Configuration component started successfully[0m
+[34mℹ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: All components started successfully[0m
+[32m✓ - 7308  ibrarahmed 2025-09-14 00:57:38 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Logger set on server.[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Creating TCP server for network component.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: TCP server initialized successfully.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Starting network component.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: TCP server started successfully.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Connection pool started successfully.[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Protocol component started successfully[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Parsing component started successfully[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Query component started successfully[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Response component started successfully[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Logging component started successfully[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: Configuration component started successfully[0m
+[34mℹ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: All components started successfully[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:08:56 FauxDB: FauxDB started on 0.0.0.0:27018[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '0'.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: New connection added to pool.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connection acquired from pool. Ptr: 4864370424.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Requesting PostgreSQL connection from pool. Available: '0', Total: '1'.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Attempting to connect to PostgreSQL with config. Host: 'localhost', Port: '5432', Database: 'fauxdb', User: 'fauxdb'.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connected to PostgreSQL successfully.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: New connection added to pool.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connection acquired from pool. Ptr: 4877998808.[0m
+[32m✓ - 24066  ibrarahmed 2025-09-14 01:09:01 FauxDB: Connection returned to pool. Ptr: 4877998808.[0m

@@ -10,6 +10,9 @@
  */
 
 #include "COpMsgHandler.hpp"
+#include "CLogMacros.hpp"
+#include "CLogger.hpp"
+#include "../CServerConfig.hpp"
 
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
@@ -24,7 +27,7 @@ using namespace std;
 namespace FauxDB
 {
 COpMsgHandler::COpMsgHandler()
-    : connectionPooler_(nullptr)
+    : connectionPooler_(nullptr), logger_(std::make_shared<CLogger>(CServerConfig{}))
 {
 }
 vector<uint8_t> COpMsgHandler::processMessage(const vector<uint8_t>& message)
@@ -56,17 +59,17 @@ OpMsgCommand COpMsgHandler::parseMessage(const vector<uint8_t>& message)
          static_cast<int32_t>(CDocumentMsgFlags::CHECKSUM_PRESENT)) != 0;
     if (!parseSections(data, remaining, command.sections))
         throw runtime_error("Failed to parse sections");
-    std::cout << "[DEBUG] parseMessage: Parsed " << command.sections.size() << " sections" << std::endl;
+    debug_log("parseMessage: Parsed " + std::to_string(command.sections.size()) + " sections");
     if (!command.sections.empty() &&
         command.sections[0].kind == SectionKind::DOCUMENT)
     {
-        std::cout << "[DEBUG] parseMessage: Found document section, parsing command..." << std::endl;
+        debug_log("parseMessage: Found document section, parsing command...");
         /* Parse the actual command from the BSON document */
         parseCommandFromSections(command);
     }
     else
     {
-        std::cout << "[DEBUG] parseMessage: No document section found" << std::endl;
+        debug_log("parseMessage: No document section found");
     }
     return command;
 }
@@ -182,30 +185,30 @@ vector<uint8_t> COpMsgHandler::handleGetParameter(const OpMsgCommand& command)
 }
 vector<uint8_t> COpMsgHandler::handleFind(const OpMsgCommand& command)
 {
-    std::cout << "[DEBUG] COpMsgHandler::handleFind: Starting find command" << std::endl;
+    debug_log("COpMsgHandler::handleFind: Starting find command");
     
     /* Extract collection name from command using CollectionNameParser */
-    std::cout << "[DEBUG] COpMsgHandler::handleFind: Extracting collection name..." << std::endl;
+    debug_log("COpMsgHandler::handleFind: Extracting collection name...");
     string collection = CollectionNameParser::extractCollectionName(
         command.commandBody, command.commandBody.size(), command.commandName);
     
-    std::cout << "[DEBUG] COpMsgHandler::handleFind: Collection name: '" << collection << "'" << std::endl;
+    debug_log("COpMsgHandler::handleFind: Collection name: '" + collection + "'");
     
     /* If no collection name found, default to users */
     if (collection.empty())
     {
         collection = "users";
-        std::cout << "[DEBUG] COpMsgHandler::handleFind: Using default collection: 'users'" << std::endl;
+        debug_log("COpMsgHandler::handleFind: Using default collection: 'users'");
     }
     
     /* Use FindCommand to execute the query */
-    std::cout << "[DEBUG] COpMsgHandler::handleFind: Creating FindCommand..." << std::endl;
+    debug_log("COpMsgHandler::handleFind: Creating FindCommand...");
     FindCommand findCmd;
     
-    std::cout << "[DEBUG] COpMsgHandler::handleFind: Calling FindCommand::execute..." << std::endl;
+    debug_log("COpMsgHandler::handleFind: Calling FindCommand::execute...");
     auto result = findCmd.execute(collection, command.commandBody, command.commandBody.size(), connectionPooler_);
     
-    std::cout << "[DEBUG] COpMsgHandler::handleFind: FindCommand::execute completed, result size: " << result.size() << std::endl;
+    debug_log("COpMsgHandler::handleFind: FindCommand::execute completed, result size: " + std::to_string(result.size()));
     return result;
 }
 vector<uint8_t> COpMsgHandler::handleInsert(const OpMsgCommand& command)
@@ -380,7 +383,7 @@ OpMsgSection COpMsgHandler::parseDocumentSequenceSection(const uint8_t*& data,
 }
 vector<uint8_t> COpMsgHandler::routeCommand(const OpMsgCommand& command)
 {
-    std::cout << "[DEBUG] routeCommand: Routing command '" << command.commandName << "' to database '" << command.database << "'" << std::endl;
+    debug_log("routeCommand: Routing command '" + command.commandName + "' to database '" + command.database + "'");
     if (command.commandName == "hello" || command.commandName == "isMaster")
         return handleHello(command);
     else if (command.commandName == "ping")
@@ -431,7 +434,7 @@ void COpMsgHandler::setConnectionPooler(std::shared_ptr<CPGConnectionPooler> poo
 
 void COpMsgHandler::parseCommandFromSections(OpMsgCommand& command)
 {
-    std::cout << "[DEBUG] parseCommandFromSections: Starting command parsing" << std::endl;
+    debug_log("parseCommandFromSections: Starting command parsing");
     
     /* Default values */
     command.database = "admin";
@@ -439,14 +442,14 @@ void COpMsgHandler::parseCommandFromSections(OpMsgCommand& command)
     command.commandBody.clear();
     
     /* Parse the first document section to extract command name and database */
-    std::cout << "[DEBUG] parseCommandFromSections: Sections count: " << command.sections.size() << std::endl;
+    debug_log("parseCommandFromSections: Sections count: " + std::to_string(command.sections.size()));
     if (!command.sections.empty() && 
         command.sections[0].kind == SectionKind::DOCUMENT &&
         !command.sections[0].documents.empty())
     {
         const auto& bsonDoc = command.sections[0].documents[0];
         command.commandBody = bsonDoc;
-        std::cout << "[DEBUG] parseCommandFromSections: BSON document size: " << bsonDoc.size() << std::endl;
+        debug_log("parseCommandFromSections: BSON document size: " + std::to_string(bsonDoc.size()));
         
         /* Parse BSON to extract command name and database */
         if (bsonDoc.size() > 4)
@@ -488,13 +491,13 @@ void COpMsgHandler::parseCommandFromSections(OpMsgCommand& command)
                     if (key == "$db")
                     {
                         command.database = value;
-                        std::cout << "[DEBUG] parseCommandFromSections: Found database: " << value << std::endl;
+                        debug_log("parseCommandFromSections: Found database: " + value);
                     }
                     else if (key != "$db" && command.commandName == "hello")
                     {
                         /* First non-$db field is the command name */
                         command.commandName = key;
-                        std::cout << "[DEBUG] parseCommandFromSections: Found command: " << key << std::endl;
+                        debug_log("parseCommandFromSections: Found command: " + key);
                     }
                 }
                 else if (type == 0x01) /* Double */

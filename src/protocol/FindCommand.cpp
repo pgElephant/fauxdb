@@ -11,6 +11,7 @@
 
 /* MongoDB Find Command Implementation */
 #include "protocol/FindCommand.hpp"
+#include "CLogMacros.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -37,17 +38,17 @@ FindCommand::execute(const string& collection, const vector<uint8_t>& buffer,
     /* Try PostgreSQL integration */
     if (!connectionPooler)
     {
-        std::cout << "[DEBUG] FauxDB FindCommand: No connection pooler provided" << std::endl;
+        debug_log("FauxDB FindCommand: No connection pooler provided");
     }
     else
     {
-        std::cout << "[DEBUG] FauxDB FindCommand: Getting PostgreSQL connection..." << std::endl;
+        debug_log("FauxDB FindCommand: Getting PostgreSQL connection...");
         auto pgConnection = connectionPooler->getPostgresConnection();
-        std::cout << "[DEBUG] FauxDB FindCommand: Got connection: " << (pgConnection ? "YES" : "NO") << std::endl;
+        debug_log("FauxDB FindCommand: Got connection: " + string(pgConnection ? "YES" : "NO"));
         
         if (pgConnection)
         {
-            std::cout << "[DEBUG] FauxDB FindCommand: Database pointer: " << (pgConnection->database ? "YES" : "NO") << std::endl;
+            debug_log("FauxDB FindCommand: Database pointer: " + string(pgConnection->database ? "YES" : "NO"));
         }
         
         if (pgConnection && pgConnection->database)
@@ -56,36 +57,36 @@ FindCommand::execute(const string& collection, const vector<uint8_t>& buffer,
             {
                 stringstream sql;
                 sql << "SELECT * FROM " << collection << " LIMIT " << DEFAULT_LIMIT;
-                std::cout << "[DEBUG] FauxDB FindCommand: Executing SQL: " << sql.str() << std::endl;
+                debug_log("FauxDB FindCommand: Executing SQL: " + sql.str());
 
                 auto result = pgConnection->database->executeQuery(sql.str());
-                std::cout << "[DEBUG] FauxDB FindCommand: Query success=" << result.success << ", rows returned=" << result.rows.size() << std::endl;
+                debug_log("FauxDB FindCommand: Query success=" + string(result.success ? "true" : "false") + ", rows returned=" + std::to_string(result.rows.size()));
 
                 if (result.success && !result.rows.empty())
                 {
-                    std::cout << "[DEBUG] FauxDB FindCommand: Converting rows to BSON..." << std::endl;
+                    debug_log("FauxDB FindCommand: Converting rows to BSON...");
                     for (const auto& row : result.rows)
                     {
                         documents.push_back(
                             rowToBsonDocument(row, result.columnNames));
                     }
-                    std::cout << "[DEBUG] FauxDB FindCommand: Converted " << documents.size() << " documents" << std::endl;
+                    debug_log("FauxDB FindCommand: Converted " + std::to_string(documents.size()) + " documents");
                 }
             }
             catch (const std::exception& e)
             {
-                std::cout << "[DEBUG] FauxDB FindCommand: Exception: " << e.what() << std::endl;
+                debug_log("FauxDB FindCommand: Exception: " + string(e.what()));
                 /* Query failed - return empty results */
             }
 
-            std::cout << "[DEBUG] FauxDB FindCommand: Releasing connection..." << std::endl;
+            debug_log("FauxDB FindCommand: Releasing connection...");
             /* Always release the connection */
             connectionPooler->releasePostgresConnection(pgConnection);
-            std::cout << "[DEBUG] FauxDB FindCommand: Connection released" << std::endl;
+            debug_log("FauxDB FindCommand: Connection released");
         }
         else
         {
-            std::cout << "[DEBUG] FauxDB FindCommand: Failed to get database connection" << std::endl;
+            debug_log("FauxDB FindCommand: Failed to get database connection");
         }
     }
 

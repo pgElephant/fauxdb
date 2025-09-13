@@ -13,6 +13,7 @@
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
 #include "database/CPGConnectionPooler.hpp"
+#include "IInterfaces.hpp"
 
 #include <memory>
 #include <string>
@@ -95,6 +96,7 @@ class COpMsgHandler
     std::vector<uint8_t> serializeBsonDocument(const std::vector<uint8_t>& doc);
 
     std::shared_ptr<CPGConnectionPooler> connectionPooler_;
+    std::shared_ptr<ILogger> logger_;
 };
 
 } /* namespace FauxDB */

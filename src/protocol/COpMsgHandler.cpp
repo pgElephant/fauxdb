@@ -18,6 +18,7 @@
 #include "CLogger.hpp"
 #include "CollectionNameParser.hpp"
 #include "FindCommand.hpp"
+#include "CDocumentProtocolHandler.hpp"
 
 #include <cstring>
 #include <iostream>
@@ -205,16 +206,18 @@ vector<uint8_t> COpMsgHandler::handleFind(const OpMsgCommand& command)
             "COpMsgHandler::handleFind: Using default collection: 'users'");
     }
 
-    /* Use FindCommand to execute the query */
-    debug_log("COpMsgHandler::handleFind: Creating FindCommand...");
-    FindCommand findCmd;
+    /* Use CDocumentProtocolHandler's working find implementation */
+    debug_log("COpMsgHandler::handleFind: Using CDocumentProtocolHandler's createFindResponseWithPostgreSQLBSON...");
+    
+    /* Create a temporary CDocumentProtocolHandler to use its working find method */
+    CDocumentProtocolHandler handler;
+    handler.setConnectionPooler(connectionPooler_);
+    
+    /* Call the working find response method */
+    auto result = handler.createFindResponseWithPostgreSQLBSON(
+        collection, 1, command.commandBody, command.commandBody.size());
 
-    debug_log("COpMsgHandler::handleFind: Calling FindCommand::execute...");
-    auto result =
-        findCmd.execute(collection, command.commandBody,
-                        command.commandBody.size(), connectionPooler_);
-
-    debug_log("COpMsgHandler::handleFind: FindCommand::execute completed, "
+    debug_log("COpMsgHandler::handleFind: createFindResponseWithPostgreSQLBSON completed, "
               "result size: " +
               std::to_string(result.size()));
     return result;

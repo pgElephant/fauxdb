@@ -22,6 +22,7 @@
 // Project headers
 #include "CConfiguration.hpp"
 #include "CLogger.hpp"
+#include "CLogMacros.hpp"
 #include "CServer.hpp"
 #include "database/CDatabase.hpp"
 #include "network/CNetwork.hpp"
@@ -940,9 +941,7 @@ bool CServer::initializeNetworkComponent()
             }
             else
             {
-                std::cerr << "DEBUG: Connection pooler already exists, "
-                             "checking if it's running"
-                          << std::endl;
+                debug_log("Connection pooler already exists, checking if it's running");
             }
         }
 
@@ -1744,7 +1743,7 @@ void CServer::setLogger(std::shared_ptr<CLogger> logger)
     }
     else
     {
-        std::cerr << "DEBUG: Logger set on server (null)" << std::endl;
+        debug_log("Logger set on server (null)");
     }
 }
 

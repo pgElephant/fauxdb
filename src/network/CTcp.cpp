@@ -315,8 +315,7 @@ void CTcp::connectionWorker(int clientSocket)
                 recv(clientSocket, headerBytes + totalRead, 16 - totalRead, 0);
             if (bytesRead <= 0)
             {
-                std::cerr << "DEBUG: Client disconnected: " << clientSocket
-                          << std::endl;
+                debug_log("Client disconnected: " + std::to_string(clientSocket));
                 goto cleanup; // Connection closed or error
             }
             totalRead += bytesRead;
@@ -325,13 +324,12 @@ void CTcp::connectionWorker(int clientSocket)
         // Extract message length (little endian)
         int32_t messageLength;
         std::memcpy(&messageLength, headerBytes, 4);
-        std::cerr << "DEBUG: Message length: " << messageLength << std::endl;
+        debug_log("Message length: " + std::to_string(messageLength));
 
         // Sanity check message length
         if (messageLength < 16 || messageLength > 48000000)
         {
-            std::cerr << "DEBUG: Invalid message length: " << messageLength
-                      << std::endl;
+            debug_log("Invalid message length: " + std::to_string(messageLength));
             break; // Invalid message length
         }
 
@@ -354,8 +352,7 @@ void CTcp::connectionWorker(int clientSocket)
                                      remainingBytes, 0);
             if (bytesRead <= 0)
             {
-                std::cerr << "DEBUG: Connection error during body read"
-                          << std::endl;
+                debug_log("Connection error during body read");
                 goto cleanup; // Connection closed or error
             }
             totalRead += bytesRead;
@@ -365,37 +362,30 @@ void CTcp::connectionWorker(int clientSocket)
         // Assert: we read exactly messageLength bytes
         if (totalRead != messageLength)
         {
-            std::cerr << "DEBUG: Read mismatch: expected " << messageLength
-                      << ", got " << totalRead << std::endl;
+            debug_log("Read mismatch: expected " + std::to_string(messageLength) + ", got " + std::to_string(totalRead));
             break; // Something went wrong
         }
 
         // Process complete message
-        std::cerr << "DEBUG: Processing message of length: " << messageLength
-                  << std::endl;
+        debug_log("Processing message of length: " + std::to_string(messageLength));
         auto response = documentHandler->processDocumentMessage(
             buffer, messageLength, *responseBuilder);
-        std::cerr << "DEBUG: Got response from processDocumentMessage, size: "
-                  << response.size() << std::endl;
+        debug_log("Got response from processDocumentMessage, size: " + std::to_string(response.size()));
         if (!response.empty())
         {
-            std::cerr << "DEBUG: About to send response, size: "
-                      << response.size() << std::endl;
+            debug_log("About to send response, size: " + std::to_string(response.size()));
             ssize_t bytesSent =
                 send(clientSocket, response.data(), response.size(), 0);
-            std::cerr << "DEBUG: Sent " << bytesSent
-                      << " bytes (response size: " << response.size() << ")"
-                      << std::endl;
+            debug_log("Sent " + std::to_string(bytesSent) + " bytes (response size: " + std::to_string(response.size()) + ")");
         }
         else
         {
-            std::cerr << "DEBUG: Response is empty, not sending" << std::endl;
+            debug_log("Response is empty, not sending");
         }
     }
 
 cleanup:
-    std::cerr << "DEBUG: Connection handler exiting for client: "
-              << clientSocket << std::endl;
+    debug_log("Connection handler exiting for client: " + std::to_string(clientSocket));
 
     if (logger_)
     {

@@ -58,27 +58,34 @@ FindCommand::execute(const string& collection, const vector<uint8_t>& buffer,
         {
             try
             {
+                /* Use simple SQL query and existing rowToBsonDocument method */
+                debug_log("FauxDB FindCommand: Using simple SQL query with existing BSON conversion");
+                
                 stringstream sql;
-                sql << "SELECT * FROM " << collection << " LIMIT "
-                    << DEFAULT_LIMIT;
+                sql << "SELECT * FROM " << collection << " ORDER BY id LIMIT " << DEFAULT_LIMIT;
+                
                 debug_log("FauxDB FindCommand: Executing SQL: " + sql.str());
 
                 auto result = pgConnection->database->executeQuery(sql.str());
-                debug_log(
-                    "FauxDB FindCommand: Query success=" +
-                    string(result.success ? "true" : "false") +
-                    ", rows returned=" + std::to_string(result.rows.size()));
+                debug_log("FauxDB FindCommand: Query success=" +
+                          string(result.success ? "true" : "false") +
+                          ", rows returned=" + std::to_string(result.rows.size()));
 
                 if (result.success && !result.rows.empty())
                 {
-                    debug_log("FauxDB FindCommand: Converting rows to BSON...");
+                    debug_log("FauxDB FindCommand: Converting " + std::to_string(result.rows.size()) + " rows to BSON documents");
+                    
                     for (const auto& row : result.rows)
                     {
-                        documents.push_back(
-                            rowToBsonDocument(row, result.columnNames));
+                        documents.push_back(rowToBsonDocument(row, result.columnNames));
                     }
-                    debug_log("FauxDB FindCommand: Converted " +
-                              std::to_string(documents.size()) + " documents");
+                    
+                    debug_log("FauxDB FindCommand: Successfully created " + 
+                              std::to_string(documents.size()) + " BSON documents");
+                }
+                else
+                {
+                    debug_log("FauxDB FindCommand: No data returned from PostgreSQL query");
                 }
             }
             catch (const std::exception& e)
@@ -110,7 +117,60 @@ FindCommand::execute(const string& collection, const vector<uint8_t>& buffer,
     response.addDocument("cursor", cursor);
     response.endDocument();
 
+    debug_log("FauxDB FindCommand: Response structure created with " + 
+              std::to_string(documents.size()) + " documents");
+
+    /* Return just the BSON document - let COpMsgHandler handle wire protocol formatting */
+    debug_log("FauxDB FindCommand: Returning BSON response with " + 
+              std::to_string(documents.size()) + " documents");
+
     return response.getDocument();
+}
+
+CBsonType FindCommand::rowToBsonDocument(const vector<string>& row, const vector<string>& columnNames)
+{
+    CBsonType doc;
+    doc.initialize();
+    doc.beginDocument();
+    
+    for (size_t i = 0; i < columnNames.size() && i < row.size(); ++i)
+    {
+        string fieldName = columnNames[i];
+        string fieldValue = row[i];
+        
+        /* Convert field value to appropriate BSON type */
+        if (fieldName == "id")
+        {
+            try
+            {
+                int id = std::stoi(fieldValue);
+                doc.addInt32(fieldName, id);
+            }
+            catch (...)
+            {
+                doc.addString(fieldName, fieldValue);
+            }
+        }
+        else if (fieldName == "department_id")
+        {
+            try
+            {
+                int deptId = std::stoi(fieldValue);
+                doc.addInt32(fieldName, deptId);
+            }
+            catch (...)
+            {
+                doc.addString(fieldName, fieldValue);
+            }
+        }
+        else
+        {
+            doc.addString(fieldName, fieldValue);
+        }
+    }
+    
+    doc.endDocument();
+    return doc;
 }
 
 } /* namespace FauxDB */

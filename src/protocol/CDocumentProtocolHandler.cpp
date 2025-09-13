@@ -1520,33 +1520,138 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(
     /* Convert MongoDB BSON to PostgreSQL BSON format and build SQL query */
     std::stringstream sql;
 
-    /* First, let's try a simple approach: convert the query to a WHERE clause
-     * using PostgreSQL BSON */
-    /* We'll create a temporary table with BSON data and use BSON operators for
-     * filtering */
-    sql << "WITH bson_data AS (";
-    sql << "  SELECT *, ";
-    sql << "  ('{\"id\": ' || id || ', \"name\": \"' || name || '\", "
-           "\"email\": \"' || email || '\", \"department_id\": ' || "
-           "department_id || ', \"created_at\": \"' || created_at || "
-           "'\"}')::bson as doc_bson ";
-    sql << "  FROM " << collectionName;
-    sql << ") ";
-    sql << "SELECT id, name, email, department_id, created_at FROM bson_data ";
-
-    /* Try to parse basic filters from the MongoDB query */
-    /* For now, implement a simple name filter as a proof of concept */
-    if (queryBuffer.size() > 50)
-    { /* Basic check if there's a filter */
-        sql << "WHERE doc_bson @> '{\"name\": \"John Doe\"}'::bson ";
+    /* First, get the table schema to dynamically build BSON structure */
+    std::stringstream schemaQuery;
+    schemaQuery << "SELECT column_name, data_type FROM information_schema.columns "
+                << "WHERE table_name = '" << collectionName << "' AND table_schema = 'public' "
+                << "ORDER BY ordinal_position";
+    
+    auto schemaResult = connection->database->executeQuery(schemaQuery.str());
+    if (!schemaResult.success || schemaResult.rows.empty())
+    {
+        debug_log("createFindResponseWithPostgreSQLBSON: Failed to get table schema for collection: " + collectionName);
+        return createErrorWireResponse(requestID);
     }
 
-    sql << "ORDER BY id LIMIT 20";
+    /* Build dynamic BSON structure based on actual table schema */
+    std::stringstream bsonFields;
+    std::vector<std::string> columnNames;
+    
+    bsonFields << "'{";
+    bool firstField = true;
+    
+    for (const auto& row : schemaResult.rows)
+    {
+        std::string columnName = row[0];
+        std::string dataType = row[1];
+        columnNames.push_back(columnName);
+        
+        if (!firstField)
+        {
+            bsonFields << ", ";
+        }
+        firstField = false;
+        
+        bsonFields << "\"" << columnName << "\": ";
+        
+        if (dataType == "character varying" || dataType == "text" || dataType == "timestamp without time zone")
+        {
+            bsonFields << "'\"' || COALESCE(" << columnName << "::text, 'null') || '\"'";
+        }
+        else
+        {
+            bsonFields << "COALESCE(" << columnName << "::text, 'null')";
+        }
+    }
+    bsonFields << "}'";
 
-    if (logger_)
-        logger_->log(CLogLevel::DEBUG,
-                     "createFindResponseWithPostgreSQLBSON: Executing SQL: " +
-                         sql.str());
+    /* Build SQL with dynamic BSON structure */
+    sql << "WITH bson_data AS (";
+    sql << "  SELECT *, ";
+    sql << "  (" << bsonFields.str() << ")::bson as doc_bson ";
+    sql << "  FROM " << collectionName;
+    sql << ") ";
+    
+    /* Build SELECT clause with all columns */
+    sql << "SELECT ";
+    bool firstColumn = true;
+    for (const auto& columnName : columnNames)
+    {
+        if (!firstColumn)
+        {
+            sql << ", ";
+        }
+        firstColumn = false;
+        sql << columnName;
+    }
+    sql << " FROM bson_data ";
+
+    /* Parse MongoDB query parameters from the BSON buffer */
+    MongoDBQuery query = parseMongoDBQuery(queryBuffer, bytesRead, "find");
+    
+    /* TEMPORARY: Use default values for testing */
+    if (query.filters.empty() && query.limit == 0 && query.skip == 0)
+    {
+        debug_log("createFindResponseWithPostgreSQLBSON: Using default query parameters for testing");
+        query.limit = 20; /* Default limit */
+        query.skip = 0;
+    }
+    
+    debug_log("createFindResponseWithPostgreSQLBSON: Parsed query - filters: " + std::to_string(query.filters.size()) + 
+              ", skip: " + std::to_string(query.skip) + ", limit: " + std::to_string(query.limit));
+    
+    for (const auto& [fieldName, fieldValue] : query.filters)
+    {
+        debug_log("createFindResponseWithPostgreSQLBSON: Filter - " + fieldName + ": " + fieldValue);
+    }
+    
+    /* Build filter clause from parsed query */
+    if (!query.filters.empty())
+    {
+        sql << "WHERE ";
+        bool firstFilter = true;
+        for (const auto& [fieldName, fieldValue] : query.filters)
+        {
+            if (!firstFilter)
+            {
+                sql << " AND ";
+            }
+            firstFilter = false;
+            
+            /* Convert MongoDB filter to PostgreSQL BSON filter */
+            if (fieldValue.find('"') != string::npos)
+            {
+                /* String value - already quoted */
+                sql << "doc_bson @> '{\"" << fieldName << "\": " << fieldValue << "}'::bson";
+            }
+            else
+            {
+                /* Numeric value */
+                sql << "doc_bson @> '{\"" << fieldName << "\": " << fieldValue << "}'::bson";
+            }
+        }
+        sql << " ";
+    }
+
+    sql << "ORDER BY id";
+    
+    /* Add LIMIT clause if specified */
+    if (query.limit > 0)
+    {
+        sql << " LIMIT " << query.limit;
+    }
+    else
+    {
+        sql << " LIMIT 20"; /* Default limit */
+    }
+    
+    /* Add OFFSET clause if skip is specified */
+    if (query.skip > 0)
+    {
+        sql << " OFFSET " << query.skip;
+    }
+
+    debug_log("createFindResponseWithPostgreSQLBSON: Executing SQL: " + sql.str());
 
     /* Execute the SQL query */
     auto result = connection->database->executeQuery(sql.str());
@@ -1559,11 +1664,23 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(
         return createErrorWireResponse(requestID);
     }
 
-    if (logger_)
-        logger_->log(CLogLevel::DEBUG, "createFindResponseWithPostgreSQLBSON: "
-                                       "SQL executed successfully, got " +
-                                           std::to_string(result.rows.size()) +
-                                           " rows");
+    debug_log("createFindResponseWithPostgreSQLBSON: SQL executed successfully, got " + 
+              std::to_string(result.rows.size()) + " rows");
+    
+    if (result.rows.empty())
+    {
+        debug_log("createFindResponseWithPostgreSQLBSON: No rows returned from SQL query");
+    }
+    else
+    {
+        debug_log("createFindResponseWithPostgreSQLBSON: First row has " + 
+                  std::to_string(result.rows[0].size()) + " columns");
+        for (size_t i = 0; i < result.columnNames.size(); ++i)
+        {
+            debug_log("createFindResponseWithPostgreSQLBSON: Column " + std::to_string(i) + 
+                      ": " + result.columnNames[i] + " = " + result.rows[0][i]);
+        }
+    }
 
     /* Convert PostgreSQL results to BSON documents */
     std::vector<CBsonType> documents;
@@ -1573,38 +1690,95 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseWithPostgreSQLBSON(
         doc.initialize();
         doc.beginDocument();
 
-        /* Add all fields from the result */
+        /* Add all fields from the result with dynamic type conversion */
         for (size_t j = 0; j < result.columnNames.size(); ++j)
         {
             std::string fieldName = result.columnNames[j];
             std::string fieldValue = result.rows[i][j];
 
-            /* Convert field value to appropriate BSON type */
-            if (fieldName == "id")
+            /* Skip doc_bson field as it's only used for filtering */
+            if (fieldName == "doc_bson")
             {
-                try
+                continue;
+            }
+
+            /* Convert field value to appropriate BSON type based on data type */
+            bool converted = false;
+            
+            /* Try to find the data type for this column from schema */
+            for (size_t k = 0; k < schemaResult.rows.size() && !converted; ++k)
+            {
+                if (schemaResult.rows[k][0] == fieldName)
                 {
-                    int id = std::stoi(fieldValue);
-                    doc.addInt32(fieldName, id);
-                }
-                catch (...)
-                {
-                    doc.addString(fieldName, fieldValue);
+                    std::string dataType = schemaResult.rows[k][1];
+                    
+                    if (dataType == "integer")
+                    {
+                        try
+                        {
+                            int intValue = std::stoi(fieldValue);
+                            doc.addInt32(fieldName, intValue);
+                            converted = true;
+                        }
+                        catch (...)
+                        {
+                            /* Fall back to string if conversion fails */
+                            doc.addString(fieldName, fieldValue);
+                            converted = true;
+                        }
+                    }
+                    else if (dataType == "bigint")
+                    {
+                        try
+                        {
+                            int64_t longValue = std::stoll(fieldValue);
+                            doc.addInt64(fieldName, longValue);
+                            converted = true;
+                        }
+                        catch (...)
+                        {
+                            doc.addString(fieldName, fieldValue);
+                            converted = true;
+                        }
+                    }
+                    else if (dataType == "double precision" || dataType == "real" || dataType == "numeric")
+                    {
+                        try
+                        {
+                            double doubleValue = std::stod(fieldValue);
+                            doc.addDouble(fieldName, doubleValue);
+                            converted = true;
+                        }
+                        catch (...)
+                        {
+                            doc.addString(fieldName, fieldValue);
+                            converted = true;
+                        }
+                    }
+                    else if (dataType == "boolean")
+                    {
+                        if (fieldValue == "t" || fieldValue == "true" || fieldValue == "1")
+                        {
+                            doc.addBool(fieldName, true);
+                        }
+                        else
+                        {
+                            doc.addBool(fieldName, false);
+                        }
+                        converted = true;
+                    }
+                    else
+                    {
+                        /* Default to string for all other types */
+                        doc.addString(fieldName, fieldValue);
+                        converted = true;
+                    }
+                    break;
                 }
             }
-            else if (fieldName == "department_id")
-            {
-                try
-                {
-                    int deptId = std::stoi(fieldValue);
-                    doc.addInt32(fieldName, deptId);
-                }
-                catch (...)
-                {
-                    doc.addString(fieldName, fieldValue);
-                }
-            }
-            else
+            
+            /* Fallback if column not found in schema */
+            if (!converted)
             {
                 doc.addString(fieldName, fieldValue);
             }

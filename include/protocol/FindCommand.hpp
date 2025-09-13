@@ -35,6 +35,9 @@ class FindCommand : public BaseCommand
     {
         return "find";
     }
+
+  private:
+    CBsonType rowToBsonDocument(const vector<string>& row, const vector<string>& columnNames);
 };
 
 } /* namespace FauxDB */

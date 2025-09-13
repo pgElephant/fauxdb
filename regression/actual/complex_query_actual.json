@@ -1,0 +1,30 @@
+  {
+    "_id": "68ae17eea26159c3e2ebf129",
+    "name": "Alice",
+    "age": 30,
+    "skills": [
+      "python",
+      "sql",
+      "javascript"
+    ],
+    "address": {
+      "city": "San Francisco",
+      "state": "CA",
+      "zipcode": "94105"
+    },
+    "salary": 75000
+  },
+  {
+    "_id": "68c47d2f8143797474b85840",
+    "name": "Alice",
+    "age": 30,
+    "skills": [
+      "python",
+      "sql"
+    ],
+    "address": {
+      "city": "San Francisco",
+      "state": "CA"
+    }
+  }
+]

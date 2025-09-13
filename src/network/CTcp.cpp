@@ -205,7 +205,7 @@ void CTcp::listenerLoop()
     {
         sockaddr_in clientAddr{};
         socklen_t clientAddrLen = sizeof(clientAddr);
-        // Unnecessary debug log removed.
+        
         int clientSocket =
             accept(server_socket_, (sockaddr*)&clientAddr, &clientAddrLen);
         if (clientSocket < 0)
@@ -324,6 +324,7 @@ void CTcp::connectionWorker(int clientSocket)
         // Extract message length (little endian)
         int32_t messageLength;
         std::memcpy(&messageLength, headerBytes, 4);
+        std::cerr << "DEBUG: Message length: " << messageLength << std::endl;
 
         // Sanity check message length
         if (messageLength < 16 || messageLength > 48000000)
@@ -369,15 +370,22 @@ void CTcp::connectionWorker(int clientSocket)
         }
 
         // Process complete message
+        std::cerr << "DEBUG: Processing message of length: " << messageLength << std::endl;
         auto response = documentHandler->processDocumentMessage(
             buffer, messageLength, *responseBuilder);
+        std::cerr << "DEBUG: Got response from processDocumentMessage, size: " << response.size() << std::endl;
         if (!response.empty())
         {
+            std::cerr << "DEBUG: About to send response, size: " << response.size() << std::endl;
             ssize_t bytesSent =
                 send(clientSocket, response.data(), response.size(), 0);
             std::cerr << "DEBUG: Sent " << bytesSent
                       << " bytes (response size: " << response.size() << ")"
                       << std::endl;
+        }
+        else
+        {
+            std::cerr << "DEBUG: Response is empty, not sending" << std::endl;
         }
     }
 

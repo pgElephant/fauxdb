@@ -29,7 +29,7 @@ CServerConfig::setDefaults()
 {
 	serverName = "FauxDB";
 	bindAddress = "0.0.0.0";
-	port = 27017;
+	port = 27018;
 	maxConnections = 1000;
 	workerThreads = 4;
 	startupTimeout = std::chrono::milliseconds(30000);

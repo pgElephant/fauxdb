@@ -28,6 +28,91 @@ CBsonType::CBsonType()
     }
 }
 
+CBsonType::CBsonType(const CBsonType& other)
+    : bsonDoc_(nullptr), bsonArray_(nullptr), lastError_(), hasErrors_(false),
+      inArray_(false), currentArrayKey_(), currentArrayIndex_(0)
+{
+    // Copy the main document
+    if (other.bsonDoc_)
+    {
+        bsonDoc_ = bson_copy(other.bsonDoc_);
+        if (!bsonDoc_)
+        {
+            setError("Failed to copy BSON document");
+        }
+    }
+    else
+    {
+        bsonDoc_ = bson_new();
+    }
+    
+    // Copy the array if it exists
+    if (other.bsonArray_)
+    {
+        bsonArray_ = bson_copy(other.bsonArray_);
+        if (!bsonArray_)
+        {
+            setError("Failed to copy BSON array");
+        }
+    }
+    
+    // Copy other state
+    lastError_ = other.lastError_;
+    hasErrors_ = other.hasErrors_;
+    inArray_ = other.inArray_;
+    currentArrayKey_ = other.currentArrayKey_;
+    currentArrayIndex_ = other.currentArrayIndex_;
+}
+
+CBsonType& CBsonType::operator=(const CBsonType& other)
+{
+    if (this == &other)
+        return *this;
+    
+    // Clean up existing resources
+    if (bsonArray_)
+        bson_destroy(bsonArray_);
+    if (bsonDoc_)
+        bson_destroy(bsonDoc_);
+    
+    // Copy the main document
+    if (other.bsonDoc_)
+    {
+        bsonDoc_ = bson_copy(other.bsonDoc_);
+        if (!bsonDoc_)
+        {
+            setError("Failed to copy BSON document");
+        }
+    }
+    else
+    {
+        bsonDoc_ = bson_new();
+    }
+    
+    // Copy the array if it exists
+    if (other.bsonArray_)
+    {
+        bsonArray_ = bson_copy(other.bsonArray_);
+        if (!bsonArray_)
+        {
+            setError("Failed to copy BSON array");
+        }
+    }
+    else
+    {
+        bsonArray_ = nullptr;
+    }
+    
+    // Copy other state
+    lastError_ = other.lastError_;
+    hasErrors_ = other.hasErrors_;
+    inArray_ = other.inArray_;
+    currentArrayKey_ = other.currentArrayKey_;
+    currentArrayIndex_ = other.currentArrayIndex_;
+    
+    return *this;
+}
+
 CBsonType::~CBsonType()
 {
     if (bsonArray_)

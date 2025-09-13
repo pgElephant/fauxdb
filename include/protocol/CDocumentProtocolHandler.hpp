@@ -147,6 +147,9 @@ class CDocumentProtocolHandler
     vector<uint8_t>
     createFindResponseFromPostgreSQL(const string& collectionName,
                                      int32_t requestID);
+    vector<uint8_t>
+    createCountResponseFromPostgreSQL(const string& collectionName,
+                                      int32_t requestID);
     vector<CBsonType> queryPostgreSQLCollection(const string& collectionName);
 
     /* CRUD operation helper methods */
@@ -197,7 +200,7 @@ class CDocumentProtocolHandler
     std::string parseCommandFromBSON(const std::vector<uint8_t>& buffer,
                                      size_t offset, size_t remaining);
     std::string parseCollectionNameFromBSON(const std::vector<uint8_t>& buffer,
-                                            size_t offset, size_t remaining);
+                                            size_t offset, size_t remaining, const std::string& commandName);
 };
 
 class CHelloCommandHandler : public IDocumentCommandHandler

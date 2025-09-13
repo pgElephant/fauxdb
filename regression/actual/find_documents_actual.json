@@ -1,0 +1,39 @@
+  {
+    "_id": "68ae17eea26159c3e2ebf121",
+    "name": "John Doe",
+    "age": 30,
+    "email": "john@example.com",
+    "created": "2025-08-26T20:24:14.702Z"
+  },
+  {
+    "_id": "68ae17eea26159c3e2ebf122",
+    "name": "Jane Doe",
+    "age": 28,
+    "email": "jane@example.com"
+  },
+  {
+    "_id": "68ae17eea26159c3e2ebf123",
+    "name": "Bob Smith",
+    "age": 35,
+    "email": "bob@example.com"
+  },
+  {
+    "_id": "68ae17eea26159c3e2ebf124",
+    "name": "Update Test",
+    "age": 36,
+    "status": "active",
+    "updated": "2025-08-26T20:24:14.736Z"
+  },
+  {
+    "_id": "68c47d2b1c3aaedea2a8e06a",
+    "name": "John Doe",
+    "age": 30,
+    "email": "john@example.com"
+  },
+  {
+    "_id": "68c47d2c97fd1fa3d22580a0",
+    "name": "Jane Doe",
+    "age": 28,
+    "email": "jane@example.com"
+  }
+]

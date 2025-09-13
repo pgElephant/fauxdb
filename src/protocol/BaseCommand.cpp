@@ -38,17 +38,10 @@ BaseCommand::getConnection(shared_ptr<CPGConnectionPooler> connectionPooler)
 
     try
     {
-        auto voidConnection = connectionPooler->getConnection();
-        if (!voidConnection)
+        auto pgConnection = connectionPooler->getPostgresConnection();
+        if (pgConnection && pgConnection->database)
         {
-            return nullptr;
-        }
-
-        auto connection =
-            std::static_pointer_cast<PGConnection>(voidConnection);
-        if (connection && connection->database)
-        {
-            return connection->database;
+            return pgConnection->database;
         }
     }
     catch (const std::exception& e)

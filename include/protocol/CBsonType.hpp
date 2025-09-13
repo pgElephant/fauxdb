@@ -23,6 +23,8 @@ class CBsonType
 {
   public:
     CBsonType();
+    CBsonType(const CBsonType& other);
+    CBsonType& operator=(const CBsonType& other);
     ~CBsonType();
 
     bool initialize();

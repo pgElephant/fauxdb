@@ -151,6 +151,8 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
     const vector<uint8_t>& buffer, ssize_t bytesRead,
     CResponseBuilder& responseBuilder)
 {
+    std::cout << "[DEBUG] processDocumentMessage: Starting with buffer size: " << buffer.size() << ", bytesRead: " << bytesRead << std::endl;
+    
 	int32_t					messageLength;
 	int32_t					requestID;
 	int32_t					responseTo;
@@ -175,6 +177,8 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
     std::memcpy(&requestID, buffer.data() + 4, 4);
     std::memcpy(&responseTo, buffer.data() + 8, 4);
     std::memcpy(&opCode, buffer.data() + 12, 4);
+    
+    std::cout << "[DEBUG] processDocumentMessage: messageLength=" << messageLength << ", requestID=" << requestID << ", opCode=" << opCode << std::endl;
 
     if (messageLength != bytesRead)
     {
@@ -207,6 +211,7 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         }
 
         commandName = parseCommandFromBSON(buffer, 25, docSize - 4);
+        std::cout << "[DEBUG] processDocumentMessage: Parsed command name: '" << commandName << "'" << std::endl;
 
         // Route to appropriate handler - ALWAYS echo the request's requestID
         if (commandName == "hello" || commandName == "isMaster")
@@ -223,9 +228,14 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         }
         else if (commandName == "find")
         {
+            std::cout << "[DEBUG] processDocumentMessage: Routing to find handler" << std::endl;
             collectionName =
-                parseCollectionNameFromBSON(buffer, 25, docSize - 4);
-            return createFindResponseFromPostgreSQL(collectionName, requestID);
+                parseCollectionNameFromBSON(buffer, 25, docSize - 4, "find");
+            std::cout << "[DEBUG] processDocumentMessage: Parsed collection name: '" << collectionName << "'" << std::endl;
+            std::cout << "[DEBUG] processDocumentMessage: Calling createFindResponseFromPostgreSQL" << std::endl;
+            auto result = createFindResponseFromPostgreSQL(collectionName, requestID);
+            std::cout << "[DEBUG] processDocumentMessage: createFindResponseFromPostgreSQL returned, size: " << result.size() << std::endl;
+            return result;
         }
         else if (commandName == "insert")
         {
@@ -246,6 +256,13 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         else if (commandName == "getParameter")
         {
             return createGetParameterWireResponse(requestID);
+        }
+        else if (commandName == "countDocuments" || commandName == "count")
+        {
+            std::cout << "[DEBUG] processDocumentMessage: Routing to count handler" << std::endl;
+            collectionName = parseCollectionNameFromBSON(buffer, 25, docSize - 4, commandName);
+            std::cout << "[DEBUG] processDocumentMessage: Parsed collection name for count: '" << collectionName << "'" << std::endl;
+            return createCountResponseFromPostgreSQL(collectionName, requestID);
         }
         else
         {
@@ -286,6 +303,7 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
 
         commandName =
             parseCommandFromBSON(buffer, offset + 4, queryDocSize - 4);
+        std::cout << "[DEBUG] OP_QUERY: Parsed command name: '" << commandName << "'" << std::endl;
 
         if (commandName == "hello" || commandName == "isMaster" ||
             commandName == "ismaster")
@@ -298,8 +316,10 @@ vector<uint8_t> CDocumentProtocolHandler::processDocumentMessage(
         }
         else if (commandName == "find")
         {
+            std::cout << "[DEBUG] OP_QUERY: Routing to find handler" << std::endl;
             collectionName = parseCollectionNameFromBSON(
-                buffer, offset + 4, queryDocSize - 4);
+                buffer, offset + 4, queryDocSize - 4, "find");
+            std::cout << "[DEBUG] OP_QUERY: Parsed collection name: '" << collectionName << "'" << std::endl;
             return createFindOpReplyResponseFromPostgreSQL(collectionName,
                                                            requestID);
         }
@@ -342,13 +362,13 @@ CDocumentProtocolHandler::parseCommandFromBSON(const vector<uint8_t>& buffer,
 }
 
 std::string CDocumentProtocolHandler::parseCollectionNameFromBSON(
-    const vector<uint8_t>& buffer, size_t offset, size_t remaining)
+    const vector<uint8_t>& buffer, size_t offset, size_t remaining, const std::string& commandName)
 {
     if (remaining < 2)
         return "";
 
     uint8_t fieldType = buffer[offset];
-    // For find command, we expect the first field to be a string (0x02)
+    // For commands, we expect the first field to be a string (0x02)
     // containing the collection name
     if (fieldType != 0x02)
         return "";
@@ -356,7 +376,7 @@ std::string CDocumentProtocolHandler::parseCollectionNameFromBSON(
     // Skip field type
     offset++;
 
-    // Read field name - should be "find"
+    // Read field name - should match the command name
     size_t nameStart = offset;
     size_t nameEnd = nameStart;
     while (nameEnd < offset + remaining && buffer[nameEnd] != 0)
@@ -368,7 +388,7 @@ std::string CDocumentProtocolHandler::parseCollectionNameFromBSON(
     std::string fieldName(
         reinterpret_cast<const char*>(buffer.data() + nameStart),
         nameEnd - nameStart);
-    if (fieldName != "find")
+    if (fieldName != commandName)
         return "";
 
     // Skip null terminator
@@ -399,12 +419,18 @@ CDocumentProtocolHandler::createHelloWireResponse(int32_t requestID)
     b.addDouble("ok", 1.0);
     b.addBool("helloOk", true);
     b.addBool("isWritablePrimary", true);
+    b.addBool("ismaster", true);
     b.addInt32("minWireVersion", 0);
     b.addInt32("maxWireVersion", 17);
     b.addInt32("logicalSessionTimeoutMinutes", 30);
     b.addInt32("maxBsonObjectSize", 16777216);
     b.addInt32("maxMessageSizeBytes", 48000000);
     b.addInt32("maxWriteBatchSize", 100000);
+    b.addString("host", "localhost:27018");
+    b.addString("version", "7.0.0");
+    b.addString("gitVersion", "fauxdb-1.0.0");
+    b.addString("me", "localhost:27018");
+    b.addBool("readOnly", false);
     b.endDocument();
 
     auto doc = b.getDocument();
@@ -725,7 +751,16 @@ CDocumentProtocolHandler::createHelloOpReplyResponse(int32_t requestID)
     b.addBool("ismaster", true);
     b.addInt32("minWireVersion", 0);
     b.addInt32("maxWireVersion", 17);
-    b.addDouble("ok", 1.0);
+    b.addString("host", "localhost:27018");
+    b.addString("version", "7.0.0");
+    b.addString("gitVersion", "fauxdb-1.0.0");
+    b.addString("versionArray", "[7,0,0,0]");
+    b.addString("me", "localhost:27018");
+    b.addInt32("maxBsonObjectSize", 16777216);
+    b.addInt32("maxMessageSizeBytes", 48000000);
+    b.addInt32("maxWriteBatchSize", 100000);
+    b.addBool("readOnly", false);
+    b.addBool("ok", true);
     b.endDocument();
     auto bsonDoc = b.getDocument();
 
@@ -875,33 +910,45 @@ vector<uint8_t>
 CDocumentProtocolHandler::createFindOpReplyResponseFromPostgreSQL(
     const string& collectionName, int32_t requestID)
 {
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Processing find for collection: " << collectionName << std::endl;
+    
     // Check if connection pooler is available
     if (!connectionPooler_)
     {
+        std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: No connection pooler available" << std::endl;
         return createErrorOpReplyResponse(requestID);
     }
 
     // Query PostgreSQL for the collection data
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Querying PostgreSQL..." << std::endl;
     vector<CBsonType> documents = queryPostgreSQLCollection(collectionName);
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Got " << documents.size() << " documents from PostgreSQL" << std::endl;
 
     // Create cursor subdocument
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Creating cursor subdocument" << std::endl;
     CBsonType cursor;
     cursor.initialize();
     cursor.beginDocument();
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Adding cursor fields" << std::endl;
     cursor.addInt64("id", 0);
     cursor.addString("ns", collectionName + ".collection");
     cursor.beginArray("firstBatch");
 
     // Add documents from PostgreSQL
-    for (const auto& doc : documents)
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Adding " << documents.size() << " documents to cursor" << std::endl;
+    for (size_t i = 0; i < documents.size(); ++i)
     {
-        cursor.addArrayDocument(doc);
+        std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Adding document " << i << " to cursor" << std::endl;
+        cursor.addArrayDocument(documents[i]);
+        std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Document " << i << " added successfully" << std::endl;
     }
 
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Ending cursor array and document" << std::endl;
     cursor.endArray();
     cursor.endDocument();
 
     // Create main response document
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Creating main response document" << std::endl;
     CBsonType b;
     b.initialize();
     b.beginDocument();
@@ -910,32 +957,41 @@ CDocumentProtocolHandler::createFindOpReplyResponseFromPostgreSQL(
     b.endDocument();
 
     // Create OP_REPLY response
+    std::cout << "[DEBUG] createFindOpReplyResponseFromPostgreSQL: Creating OP_REPLY response" << std::endl;
     return createOpReplyResponse(requestID, b.getDocument());
 }
 
 vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     const string& collectionName, int32_t requestID)
 {
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Processing find for collection: " << collectionName << std::endl;
+    
     // Check if connection pooler is available
     if (!connectionPooler_)
     {
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: No connection pooler available" << std::endl;
         return createErrorBsonDocument(
             -10, "PostgreSQL connection pooler not available");
     }
 
     // Query PostgreSQL for the collection data
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Querying PostgreSQL..." << std::endl;
     vector<CBsonType> documents = queryPostgreSQLCollection(collectionName);
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Got " << documents.size() << " documents from PostgreSQL" << std::endl;
 
     // Build response document
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Building response document" << std::endl;
     CBsonType bson;
     if (!bson.initialize() || !bson.beginDocument())
     {
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: BSON init failed" << std::endl;
         return createErrorBsonDocument(-6, "BSON init failed");
     }
 
     bson.addDouble("ok", 1.0);
 
     // Create cursor subdocument
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Creating cursor subdocument" << std::endl;
     CBsonType cursorDoc;
     cursorDoc.initialize();
     cursorDoc.beginDocument();
@@ -943,65 +999,184 @@ vector<uint8_t> CDocumentProtocolHandler::createFindResponseFromPostgreSQL(
     cursorDoc.addString("ns", collectionName + ".collection"); // namespace
 
     // Create firstBatch array with PostgreSQL data
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Creating firstBatch array" << std::endl;
     cursorDoc.beginArray("firstBatch");
 
     // Add documents from PostgreSQL
-    for (const auto& doc : documents)
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Adding " << documents.size() << " documents to cursor" << std::endl;
+    for (size_t i = 0; i < documents.size(); ++i)
     {
-        cursorDoc.addArrayDocument(doc);
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Adding document " << i << " to cursor" << std::endl;
+        cursorDoc.addArrayDocument(documents[i]);
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Document " << i << " added successfully" << std::endl;
     }
 
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Ending cursor array and document" << std::endl;
     cursorDoc.endArray();    // end firstBatch
     cursorDoc.endDocument(); // end cursor
 
     // Add the cursor subdocument to main response
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Adding cursor to main response" << std::endl;
     bson.addDocument("cursor", cursorDoc);
 
     if (!bson.endDocument())
     {
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: BSON finalize failed" << std::endl;
         return createErrorBsonDocument(-7, "BSON finalize failed");
     }
 
-    // Create a proper MongoDB OP_MSG response
-    vector<uint8_t> response;
+    // Create a simple response for testing
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Creating simple response" << std::endl;
+    
+    // Create proper MongoDB find response with cursor
+    CBsonType response;
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: CBsonType created" << std::endl;
+    response.initialize();
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: CBsonType initialized" << std::endl;
+    response.beginDocument();
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Document begun" << std::endl;
+    
+    // Create cursor document
+    CBsonType newCursorDoc;
+    newCursorDoc.initialize();
+    newCursorDoc.beginDocument();
+    newCursorDoc.addString("ns", "fauxdb." + collectionName);
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Added ns field" << std::endl;
+    newCursorDoc.addInt64("id", 0); // cursor id
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Added id field" << std::endl;
+    
+    // Add firstBatch array
+    newCursorDoc.beginArray("firstBatch");
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: firstBatch array begun" << std::endl;
+    
+    // Add documents to firstBatch
+    for (const auto& doc : documents)
+    {
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: About to add document to firstBatch" << std::endl;
+        newCursorDoc.addArrayDocument(doc);
+        std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Document added to firstBatch" << std::endl;
+    }
+    
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Ending firstBatch array" << std::endl;
+    newCursorDoc.endArray();
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: firstBatch array ended" << std::endl;
+    newCursorDoc.endDocument();
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Cursor document ended" << std::endl;
+    
+    // Add cursor document to main response
+    response.addDocument("cursor", newCursorDoc);
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Cursor document added to response" << std::endl;
+    
+    response.addDouble("ok", 1.0);
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Added ok field" << std::endl;
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Ending main document" << std::endl;
+    response.endDocument(); // end main document
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Main document ended" << std::endl;
+    
+    auto responseBytes = response.getDocument();
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: Response created, size: " << responseBytes.size() << std::endl;
+    std::cout << "[DEBUG] createFindResponseFromPostgreSQL: About to create OP_MSG response" << std::endl;
+    
+    // Create proper OP_MSG response
+    return createWireMessage(1, requestID, responseBytes);
+}
 
-    // Calculate sizes
-    vector<uint8_t> bsonDoc = bson.getDocument();
-    int32_t bodySize =
-        4 + 1 +
-        static_cast<int32_t>(bsonDoc.size()); // flagBits + kind + document
-    int32_t messageSize = 16 + bodySize;      // header + body
-
-    // Reserve space
-    response.resize(messageSize);
-    size_t offset = 0;
-
-    // Write header
-    std::memcpy(response.data() + offset, &messageSize, 4);
-    offset += 4;
-    std::memcpy(response.data() + offset, &requestID, 4);
-    offset += 4;
-    int32_t responseTo = requestID;
-    std::memcpy(response.data() + offset, &responseTo, 4);
-    offset += 4;
-    int32_t opCode = 2013; // OP_MSG
-    std::memcpy(response.data() + offset, &opCode, 4);
-    offset += 4;
-
-    // Write body
-    uint32_t flagBits = 0;
-    std::memcpy(response.data() + offset, &flagBits, 4);
-    offset += 4;
-    uint8_t kind = 0; // Kind 0 (Body)
-    response[offset++] = kind;
-    std::memcpy(response.data() + offset, bsonDoc.data(), bsonDoc.size());
-
-    return response;
+vector<uint8_t>
+CDocumentProtocolHandler::createCountResponseFromPostgreSQL(const string& collectionName, int32_t requestID)
+{
+    std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Processing count for collection: " << collectionName << std::endl;
+    
+    int64_t count = 0;
+    
+    if (!connectionPooler_)
+    {
+        std::cout << "[DEBUG] createCountResponseFromPostgreSQL: No connection pooler available" << std::endl;
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR, "No connection pooler available for count query");
+        }
+    }
+    else
+    {
+        std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Getting PostgreSQL connection" << std::endl;
+        auto connection = connectionPooler_->getPostgresConnection();
+        
+        if (!connection || !connection->database)
+        {
+            std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Failed to get connection or database" << std::endl;
+            if (logger_)
+            {
+                logger_->log(CLogLevel::ERROR, "Failed to get PostgreSQL connection for count query");
+            }
+        }
+        else
+        {
+            std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Connection acquired successfully" << std::endl;
+            
+            try
+            {
+                stringstream sql;
+                sql << "SELECT COUNT(*) FROM " << collectionName;
+                std::cout << "[DEBUG] createCountResponseFromPostgreSQL: About to execute SQL: " << sql.str() << std::endl;
+                
+                auto result = connection->database->executeQuery(sql.str());
+                std::cout << "[DEBUG] createCountResponseFromPostgreSQL: SQL executed successfully" << std::endl;
+                std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Query success=" << result.success << ", rows=" << result.rows.size() << std::endl;
+                
+                if (result.success && !result.rows.empty())
+                {
+                    try
+                    {
+                        count = std::stoll(result.rows[0][0]);
+                        std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Count result: " << count << std::endl;
+                    }
+                    catch (const std::exception& e)
+                    {
+                        std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Failed to parse count result" << std::endl;
+                        count = 0;
+                    }
+                }
+                else
+                {
+                    std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Query failed or no results" << std::endl;
+                    count = 0;
+                }
+            }
+            catch (const std::exception& e)
+            {
+                std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Exception during query: " << e.what() << std::endl;
+                if (logger_)
+                {
+                    logger_->log(CLogLevel::ERROR, "Exception during count query: " + string(e.what()));
+                }
+                count = 0;
+            }
+            
+            connectionPooler_->releasePostgresConnection(connection);
+            std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Connection released" << std::endl;
+        }
+    }
+    
+    // Create MongoDB count response
+    std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Creating count response" << std::endl;
+    CBsonType response;
+    response.initialize();
+    response.beginDocument();
+    response.addDouble("ok", 1.0);
+    response.addInt64("n", count);
+    response.endDocument();
+    
+    auto responseBytes = response.getDocument();
+    std::cout << "[DEBUG] createCountResponseFromPostgreSQL: Count response created, size: " << responseBytes.size() << std::endl;
+    
+    // Create proper OP_MSG response
+    return createWireMessage(1, requestID, responseBytes);
 }
 
 vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
     const string& collectionName)
 {
+    std::cout << "[DEBUG] queryPostgreSQLCollection: Starting query for collection: " << collectionName << std::endl;
     vector<CBsonType> documents;
 
     if (logger_)
@@ -1010,23 +1185,119 @@ vector<CBsonType> CDocumentProtocolHandler::queryPostgreSQLCollection(
                      "Querying PostgreSQL collection: " + collectionName);
     }
 
-    // For now, return a simple test document to verify the flow works
-    CBsonType testDoc;
-    testDoc.initialize();
-    testDoc.beginDocument();
-    testDoc.addString("_id", "pg_test_123");
-    testDoc.addString("name", "PostgreSQL Test User");
-    testDoc.addString("email", "test@postgresql.example");
-    testDoc.addString("source", "PostgreSQL");
-    testDoc.addString("collection", collectionName);
-    testDoc.endDocument();
-    documents.push_back(testDoc);
+    // Check if connection pooler is available
+    if (!connectionPooler_)
+    {
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         "No connection pooler available for PostgreSQL query");
+        }
+        return documents;
+    }
+
+    auto connection = connectionPooler_->getPostgresConnection();
+    std::cout << "[DEBUG] queryPostgreSQLCollection: Got connection: " << (connection ? "YES" : "NO") << std::endl;
+    if (!connection || !connection->database)
+    {
+        std::cout << "[DEBUG] queryPostgreSQLCollection: Connection or database is null" << std::endl;
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         "Failed to get PostgreSQL connection for query");
+        }
+        return documents;
+    }
+    
+    std::cout << "[DEBUG] queryPostgreSQLCollection: Connection and database are valid" << std::endl;
+
+    try
+    {
+        // Execute SQL query
+        stringstream sql;
+        sql << "SELECT * FROM " << collectionName;
+        std::cout << "[DEBUG] queryPostgreSQLCollection: About to execute SQL: " << sql.str() << std::endl;
 
     if (logger_)
     {
         logger_->log(CLogLevel::INFO,
-                     "Returning test document for collection: " +
-                         collectionName);
+                         "Executing SQL: " + sql.str());
+        }
+
+        auto result = connection->database->executeQuery(sql.str());
+        std::cout << "[DEBUG] queryPostgreSQLCollection: SQL executed successfully" << std::endl;
+        
+        if (logger_)
+        {
+            logger_->log(CLogLevel::INFO,
+                         "Query success=" + string(result.success ? "true" : "false") + 
+                         ", rows returned=" + to_string(result.rows.size()));
+        }
+        
+        std::cout << "[DEBUG] queryPostgreSQLCollection: Query success=" << result.success << ", rows=" << result.rows.size() << std::endl;
+
+        if (result.success && !result.rows.empty())
+        {
+            std::cout << "[DEBUG] queryPostgreSQLCollection: Processing " << result.rows.size() << " rows" << std::endl;
+            // Process all rows
+            for (size_t rowIndex = 0; rowIndex < result.rows.size(); ++rowIndex)
+            {
+                std::cout << "[DEBUG] queryPostgreSQLCollection: Processing row " << rowIndex << std::endl;
+                const auto& row = result.rows[rowIndex];
+                CBsonType doc;
+                doc.initialize();
+                doc.beginDocument();
+                
+                for (size_t i = 0; i < row.size() && i < result.columnNames.size(); ++i)
+                {
+                    const string& columnName = result.columnNames[i];
+                    const string& value = row[i];
+                    std::cout << "[DEBUG] queryPostgreSQLCollection: Processing field " << columnName << " = '" << value << "'" << std::endl;
+                    
+                    // Try to determine data type and add appropriately
+                    if (columnName == "id" && !value.empty())
+                    {
+                        try
+                        {
+                            int32_t intVal = stoi(value);
+                            doc.addInt32(columnName, intVal);
+                        }
+                        catch (...)
+                        {
+                            doc.addString(columnName, value);
+                        }
+                    }
+                    else
+                    {
+                        doc.addString(columnName, value);
+                    }
+                }
+                
+                std::cout << "[DEBUG] queryPostgreSQLCollection: Ending document for row " << rowIndex << std::endl;
+                doc.endDocument();
+                std::cout << "[DEBUG] queryPostgreSQLCollection: Adding document to vector for row " << rowIndex << std::endl;
+                documents.push_back(doc);
+                std::cout << "[DEBUG] queryPostgreSQLCollection: Document added successfully for row " << rowIndex << std::endl;
+            }
+        }
+    }
+    catch (const std::exception& e)
+    {
+        if (logger_)
+        {
+            logger_->log(CLogLevel::ERROR,
+                         "Exception during PostgreSQL query: " + string(e.what()));
+        }
+    }
+
+    // Always return connection to pool
+    connectionPooler_->releasePostgresConnection(connection);
+
+    if (logger_)
+    {
+        logger_->log(CLogLevel::INFO,
+                     "Returning " + to_string(documents.size()) + 
+                     " documents for collection: " + collectionName);
     }
 
     return documents;

@@ -241,7 +241,7 @@ main(int argc, char **argv)
 				return 1;
 			}
 
-			config.port = get_config_value<int>(loader, "port", 27017);
+			config.port = get_config_value<int>(loader, "port", 27018);
 			config.bindAddress = get_config_string(loader, "bind_address", "0.0.0.0");
 			config.maxConnections = get_config_value<int>(loader, "max_connections", 1000);
 			config.workerThreads = get_config_value<int>(loader, "worker_threads", 4);

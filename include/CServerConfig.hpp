@@ -86,7 +86,7 @@ struct CServerConfig
     std::string postgresqlClientAuthSSLCA;
 
     CServerConfig()
-        : serverName("FauxDB"), bindAddress("0.0.0.0"), port(27017),
+        : serverName("FauxDB"), bindAddress("0.0.0.0"), port(27018),
           maxConnections(100), workerThreads(4), startupTimeout(30000),
           shutdownTimeout(30000), enableSSL(false), sslCertPath(""),
           sslKeyPath(""), logLevel("INFO"), configFile(""),

@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# Document Database Client Regressio# Set default client if not set
+#!/bin/bash
+# Document Database Client Regression Test Runner
+# Set default client if not set
 if [ -z "$CLIENT" ]; then
     export CLIENT=mongosh
 fi
@@ -13,13 +15,13 @@ check_client_shell() {
         return 1
     fi
     log_info "Found client shell: $(which $CLIENT)"
-}ript
+}
 # This script runs fauxdb and tests it with actual document database client queries
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BUILD_DIR="$PROJECT_ROOT/build"
 REGRESSION_DIR="$PROJECT_ROOT/regression"
 EXPECTED_DIR="$REGRESSION_DIR/expected"
@@ -33,7 +35,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Test configuration
-FAUXDB_PORT=27018
+FAUXDB_PORT=27017
 FAUXDB_HOST="127.0.0.1"
 TEST_DATABASE="testdb"
 

@@ -12,6 +12,7 @@
 #pragma once
 #include "CBsonType.hpp"
 #include "CDocumentWireProtocol.hpp"
+#include "database/CPGConnectionPooler.hpp"
 
 #include <memory>
 #include <string>
@@ -74,12 +75,15 @@ class COpMsgHandler
     buildCursorResponse(const std::string& ns, int64_t cursorId,
                         const std::vector<std::vector<uint8_t>>& batch);
 
+    void setConnectionPooler(std::shared_ptr<CPGConnectionPooler> pooler);
+
   private:
     bool parseSections(const uint8_t*& data, size_t& remaining,
                        std::vector<OpMsgSection>& sections);
     OpMsgSection parseDocumentSection(const uint8_t*& data, size_t& remaining);
     OpMsgSection parseDocumentSequenceSection(const uint8_t*& data,
                                               size_t& remaining);
+    void parseCommandFromSections(OpMsgCommand& command);
 
     std::vector<uint8_t> routeCommand(const OpMsgCommand& command);
 
@@ -89,6 +93,8 @@ class COpMsgHandler
 
     uint32_t calculateCRC32C(const uint8_t* data, size_t size);
     std::vector<uint8_t> serializeBsonDocument(const std::vector<uint8_t>& doc);
+
+    std::shared_ptr<CPGConnectionPooler> connectionPooler_;
 };
 
 } /* namespace FauxDB */

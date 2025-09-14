@@ -5,7 +5,7 @@
 
 use crate::error::Result;
 use crate::config::Config;
-use crate::documentdb::DocumentDBManager;
+use crate::postgresql_manager::PostgreSQLManager;
 use crate::command_processor::CommandProcessor;
 use std::sync::Arc;
 use tokio::net::{TcpListener, TcpStream};
@@ -13,13 +13,13 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 
 pub struct FauxDBServer {
     config: Config,
-    db_manager: DocumentDBManager,
+    db_manager: PostgreSQLManager,
     command_processor: Arc<CommandProcessor>,
 }
 
 impl FauxDBServer {
     pub async fn new(config: Config) -> Result<Self> {
-        let db_manager = DocumentDBManager::new(config.database.clone()).await?;
+        let db_manager = PostgreSQLManager::new(config.database.clone()).await?;
         let command_processor = Arc::new(CommandProcessor::new(db_manager.clone()));
         
         Ok(Self {

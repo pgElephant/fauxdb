@@ -3,19 +3,19 @@
  * @brief MongoDB command processing for FauxDB
  */
 
-use crate::documentdb::DocumentDBManager;
+use crate::postgresql_manager::PostgreSQLManager;
 use crate::error::{FauxDBError, Result};
 use crate::wire_protocol::{WireProtocolHandler, MongoMessage};
 use bson::{Document, Bson, doc};
 
 pub struct CommandProcessor {
-    db_manager: DocumentDBManager,
+    db_manager: PostgreSQLManager,
     wire_handler: WireProtocolHandler,
     default_database: String,
 }
 
 impl CommandProcessor {
-    pub fn new(db_manager: DocumentDBManager) -> Self {
+    pub fn new(db_manager: PostgreSQLManager) -> Self {
         Self {
             db_manager,
             wire_handler: WireProtocolHandler::new(),

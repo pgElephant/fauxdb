@@ -16,14 +16,14 @@
 - ✓ **High Performance** - Built in Rust for superior speed and memory efficiency
 - ✓ **Production Ready** - Enterprise-grade monitoring, logging, and configuration
 - ✓ **Advanced Features** - Transactions, geospatial, aggregation pipelines
-- ✓ **PostgreSQL Backend** - Leverages proven PostgreSQL reliability and features
+- ✓ **Pure PostgreSQL Backend** - Native JSONB support, no external dependencies
 
 ## Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   MongoDB       │    │     FauxDB       │    │   PostgreSQL    │
-│   Client        │◄──►│   (Rust Core)    │◄──►│  + DocumentDB   │
+│   Client        │◄──►│   (Rust Core)    │◄──►│   + JSONB       │
 │                 │    │                  │    │   Extensions    │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
                               │
@@ -331,8 +331,9 @@ FauxDB is licensed under the MIT License - see the [LICENSE](LICENSE) file for d
 ## Acknowledgments
 
 - Built in Rust
-- Powered by PostgreSQL and DocumentDB extensions
+- Powered by pure PostgreSQL with native JSONB support
 - Inspired by MongoDB's excellent API design
+- Zero external MongoDB dependencies
 
 ---
 

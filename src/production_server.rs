@@ -1,4 +1,9 @@
-/*!
+/*
+ * Copyright (c) 2025 pgElephant. All rights reserved.
+ *
+ * FauxDB - Production-ready MongoDB-compatible database server
+ * Built with Rust for superior performance and reliability
+ *
  * Production-ready FauxDB Server
  * Full MongoDB 5.0+ compatibility with enterprise features
  */
@@ -305,6 +310,7 @@ impl ProductionFauxDBServer {
         Ok(())
     }
 
+    #[allow(dead_code)]
     fn parse_mongodb_message_with_id(bytes: &[u8]) -> Result<(bson::Document, u32)> {
         // Log the raw bytes for debugging
         fauxdb_debug!("Received {} bytes: {:02X?}", bytes.len(), &bytes[..std::cmp::min(bytes.len(), 64)]);
@@ -399,11 +405,13 @@ impl ProductionFauxDBServer {
         Ok((doc, 1))
     }
 
+    #[allow(dead_code)]
     fn parse_mongodb_message(bytes: &[u8]) -> Result<bson::Document> {
         let (doc, _) = Self::parse_mongodb_message_with_id(bytes)?;
         Ok(doc)
     }
 
+    #[allow(dead_code)]
     fn try_parse_bson_strategy(data: &[u8], strategy: &str) -> Result<bson::Document> {
         match strategy {
             "direct" => {
@@ -444,6 +452,7 @@ impl ProductionFauxDBServer {
         }
     }
 
+    #[allow(dead_code)]
     fn find_bson_start(data: &[u8]) -> Option<usize> {
         // Look for BSON document start (length field)
         for i in 0..data.len().saturating_sub(4) {
@@ -458,6 +467,7 @@ impl ProductionFauxDBServer {
         None
     }
 
+    #[allow(dead_code)]
     fn parse_bson_safely(data: &[u8]) -> Result<bson::Document> {
         if data.len() < 5 {
             return Err(anyhow::anyhow!("BSON data too short: {} bytes", data.len()));
@@ -518,6 +528,7 @@ impl ProductionFauxDBServer {
         doc
     }
 
+    #[allow(dead_code)]
     fn build_mongodb_response(document: bson::Document, request_id: u32) -> Result<Vec<u8>> {
         // Serialize the document to BSON
         let bson_data = bson::to_vec(&document)?;

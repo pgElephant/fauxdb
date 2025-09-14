@@ -10,7 +10,7 @@ uri = "postgresql://localhost:5432/fauxdb"
 max_connections = 10
 connection_timeout_ms = 5000
 idle_timeout_ms = 60000
-enable_documentdb_extensions = true
+enable_jsonb_extensions = true
 
 [logging]
 level = "info"

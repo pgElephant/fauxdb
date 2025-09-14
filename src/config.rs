@@ -1,4 +1,9 @@
-/*!
+/*
+ * Copyright (c) 2025 pgElephant. All rights reserved.
+ *
+ * FauxDB - Production-ready MongoDB-compatible database server
+ * Built with Rust for superior performance and reliability
+ *
  * @file config.rs
  * @brief FauxDB configuration management
  */
@@ -32,7 +37,7 @@ pub struct DatabaseConfig {
     pub max_connections: u32,
     pub connection_timeout_ms: u64,
     pub idle_timeout_ms: u64,
-    pub enable_documentdb_extensions: bool,
+    pub enable_jsonb_extensions: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -117,7 +122,7 @@ impl Default for Config {
                 max_connections: 10,
                 connection_timeout_ms: 5000,
                 idle_timeout_ms: 60000,
-                enable_documentdb_extensions: true,
+                enable_jsonb_extensions: true,
             },
             logging: LoggingConfig {
                 level: "info".to_string(),

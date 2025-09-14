@@ -1,4 +1,9 @@
-/*!
+/*
+ * Copyright (c) 2025 pgElephant. All rights reserved.
+ *
+ * FauxDB - Production-ready MongoDB-compatible database server
+ * Built with Rust for superior performance and reliability
+ *
  * @file error.rs
  * @brief FauxDB error handling
  */

@@ -1,6 +1,11 @@
-/*!
- * @file documentdb_server.rs
- * @brief DocumentDB-based MongoDB compatible server
+/*
+ * Copyright (c) 2025 pgElephant. All rights reserved.
+ *
+ * FauxDB - Production-ready MongoDB-compatible database server
+ * Built with Rust for superior performance and reliability
+ *
+ * @file postgresql_server.rs
+ * @brief PostgreSQL-based MongoDB compatible server
  */
 
 use crate::error::{FauxDBError, Result};
@@ -11,12 +16,12 @@ use deadpool_postgres::{Pool, Manager};
 use tokio_postgres::NoTls;
 use bson;
 
-pub struct DocumentDBServer {
+pub struct PostgreSQLServer {
     config: Config,
     pool: Pool,
 }
 
-impl DocumentDBServer {
+impl PostgreSQLServer {
     pub async fn new(config: Config) -> Result<Self> {
         let pg_config = config.database.uri.parse()
             .map_err(|e| FauxDBError::Database(format!("Invalid PostgreSQL URI: {}", e)))?;
@@ -27,16 +32,15 @@ impl DocumentDBServer {
             .build()
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to build connection pool: {}", e)))?;
 
-        // Initialize DocumentDB extension
+        // Initialize PostgreSQL backend
         let _client = pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
         
-        // Note: DocumentDB core extension requires shared_preload_libraries
-        // For now, we'll use basic PostgreSQL functionality with MongoDB wire protocol compatibility
-        // client.execute("CREATE EXTENSION IF NOT EXISTS documentdb_core", &[]).await
-        //     .map_err(|e| FauxDBError::Database(format!("Failed to create DocumentDB core extension: {}", e)))?;
+        // Enable JSONB support (built into PostgreSQL)
+        // client.execute("CREATE EXTENSION IF NOT EXISTS btree_gin", &[]).await
+        //     .map_err(|e| FauxDBError::Database(format!("Failed to create btree_gin extension: {}", e)))?;
 
-        println!("✅ DocumentDB server initialized with basic PostgreSQL backend");
+        println!("✓ PostgreSQL server initialized with JSONB support");
 
         Ok(Self { config, pool })
     }
@@ -44,9 +48,9 @@ impl DocumentDBServer {
     pub async fn start(&self) -> Result<()> {
         let addr = format!("{}:{}", self.config.server.host, self.config.server.port);
         let listener = TcpListener::bind(&addr).await
-            .map_err(|e| FauxDBError::Network(e))?;
+            .map_err(FauxDBError::Network)?;
 
-        println!("🚀 DocumentDB server listening on {}", addr);
+        println!("✓ PostgreSQL server listening on {}", addr);
 
         loop {
             match listener.accept().await {
@@ -81,7 +85,7 @@ impl DocumentDBServer {
                     // Parse MongoDB wire protocol message
                     match Self::parse_message(&buffer[..n]) {
                         Ok(message) => {
-                            // Process the message using DocumentDB
+                            // Process the message using PostgreSQL
                             match Self::process_message(&message, &pool).await {
                                 Ok(response) => {
                                     // Send response back to client
@@ -147,16 +151,16 @@ impl DocumentDBServer {
 
         match message.op_code {
             2013 => {
-                // OP_MSG - Process using DocumentDB core functions
-                Self::process_op_msg(&message, &client).await
+                // OP_MSG - Process using PostgreSQL JSONB
+                Self::process_op_msg(message, &client).await
             }
             2001 => {
-                // OP_QUERY - Process using DocumentDB core functions
-                Self::process_op_query(&message, &client).await
+                // OP_QUERY - Process using PostgreSQL JSONB
+                Self::process_op_query(message, &client).await
             }
             2004 => {
                 // Legacy OP_QUERY - Process as OP_QUERY
-                Self::process_op_query(&message, &client).await
+                Self::process_op_query(message, &client).await
             }
             _ => {
                 // Unsupported operation
@@ -194,7 +198,7 @@ impl DocumentDBServer {
         let bson_doc = bson::from_slice::<bson::Document>(&bson_payload[..doc_length])
             .map_err(|e| FauxDBError::WireProtocol(format!("Failed to parse BSON: {}", e)))?;
 
-        // Process the command using DocumentDB core functions
+        // Process the command using PostgreSQL JSONB
         let command_name = bson_doc.keys().next()
             .ok_or_else(|| FauxDBError::WireProtocol("Empty command document".to_string()))?;
 
@@ -301,7 +305,7 @@ impl DocumentDBServer {
         let response_doc = bson::doc! {
             "ok": 1.0,
             "helloOk": true,
-            "msg": "DocumentDB server",
+            "msg": "PostgreSQL server",
             "version": "1.0.0",
             "isWritablePrimary": true,
             "maxBsonObjectSize": 16777216,

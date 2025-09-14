@@ -1,4 +1,9 @@
-/*!
+/*
+ * Copyright (c) 2025 pgElephant. All rights reserved.
+ *
+ * FauxDB - Production-ready MongoDB-compatible database server
+ * Built with Rust for superior performance and reliability
+ *
  * MongoDB Wire Protocol Implementation
  */
 
@@ -399,8 +404,10 @@ impl WireMessage {
             WireMessage::Msg(op_msg) => {
                 // For OP_MSG, get the first body section document
                 if let Some(section) = op_msg.sections.first() {
-                    if let OpMsgSection::Body { document } = section {
-                        return document.clone();
+                    match section {
+                        OpMsgSection::Body { document } => {
+                            return document.clone();
+                        }
                     }
                 }
                 Document::new()

@@ -3,7 +3,7 @@ name = "fauxdb"
 version = "1.0.0"
 edition = "2021"
 authors = ["FauxDB Team"]
-description = "MongoDB-compatible database server using PostgreSQL backend"
+description = "MongoDB-compatible database server using pure PostgreSQL with native JSONB support"
 license = "MIT"
 
 [[bin]]

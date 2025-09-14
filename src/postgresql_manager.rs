@@ -1,22 +1,27 @@
-/*!
- * @file documentdb.rs
- * @brief DocumentDB integration for FauxDB
+/*
+ * Copyright (c) 2025 pgElephant. All rights reserved.
+ *
+ * FauxDB - Production-ready MongoDB-compatible database server
+ * Built with Rust for superior performance and reliability
+ *
+ * @file postgresql_manager.rs
+ * @brief PostgreSQL backend integration for FauxDB
  */
 
 use crate::error::{FauxDBError, Result};
 use crate::config::DatabaseConfig;
 use bson::Document;
-use std::collections::HashMap;
 use tokio_postgres::NoTls;
 use deadpool_postgres::{Pool, Manager};
 use serde_json::Value;
 
-pub struct DocumentDBManager {
+pub struct PostgreSQLManager {
     pool: Pool,
+    #[allow(dead_code)]
     config: DatabaseConfig,
 }
 
-impl DocumentDBManager {
+impl PostgreSQLManager {
     pub async fn new(config: DatabaseConfig) -> Result<Self> {
         let pg_config = config.uri.parse()
             .map_err(|e| FauxDBError::Database(format!("Invalid PostgreSQL URI: {}", e)))?;
@@ -27,13 +32,13 @@ impl DocumentDBManager {
             .build()
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to build connection pool: {}", e)))?;
 
-        // Initialize DocumentDB extension
+        // Initialize PostgreSQL backend
         let client = pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
         
-        // Create DocumentDB core extension if it doesn't exist
-        client.execute("CREATE EXTENSION IF NOT EXISTS documentdb_core", &[]).await
-            .map_err(|e| FauxDBError::Database(format!("Failed to create DocumentDB core extension: {}", e)))?;
+        // Enable JSONB support (built into PostgreSQL)
+        client.execute("CREATE EXTENSION IF NOT EXISTS btree_gin", &[]).await
+            .map_err(|e| FauxDBError::Database(format!("Failed to create btree_gin extension: {}", e)))?;
 
         Ok(Self { pool, config })
     }
@@ -42,7 +47,7 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
         let table_name = format!("{}_collections", collection);
 
         // Create schema if it doesn't exist
@@ -85,19 +90,19 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
         let table_name = format!("{}_collections", collection);
 
         // Convert BSON document to JSON
         let json_value = bson::to_bson(document)
-            .map_err(|e| FauxDBError::Bson(format!("Failed to convert BSON to JSON: {}", e)))?;
+            .map_err(FauxDBError::BsonSerialization)?;
         
         let json_str = serde_json::to_string(&json_value)
-            .map_err(|e| FauxDBError::Serialization(format!("Failed to serialize JSON: {}", e)))?;
+            .map_err(FauxDBError::Serialization)?;
 
         // Convert BSON to bytes
         let bson_bytes = bson::to_vec(document)
-            .map_err(|e| FauxDBError::Bson(format!("Failed to serialize BSON: {}", e)))?;
+            .map_err(FauxDBError::BsonSerialization)?;
 
         let insert_query = format!(
             "INSERT INTO {}.{} (document, bson_document) VALUES ($1::jsonb, $2) RETURNING id",
@@ -115,7 +120,7 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
         let table_name = format!("{}_collections", collection);
 
         let mut query = format!("SELECT document FROM {}.{}", schema_name, table_name);
@@ -160,12 +165,12 @@ impl DocumentDBManager {
         for row in rows {
             let json_str: String = row.get("document");
             let json_value: Value = serde_json::from_str(&json_str)
-                .map_err(|e| FauxDBError::Serialization(format!("Failed to parse JSON: {}", e)))?;
+                .map_err(FauxDBError::Serialization)?;
             
             let document = bson::to_bson(&json_value)
-                .map_err(|e| FauxDBError::Bson(format!("Failed to convert JSON to BSON: {}", e)))?
+                .map_err(|e| FauxDBError::BsonSerialization(e))?
                 .as_document()
-                .ok_or_else(|| FauxDBError::Bson("Failed to convert to document".to_string()))?
+                .ok_or_else(|| FauxDBError::Database("Failed to convert to document".to_string()))?
                 .clone();
             
             documents.push(document);
@@ -178,15 +183,15 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
         let table_name = format!("{}_collections", collection);
 
         // Convert update document to JSON
         let update_json = bson::to_bson(update)
-            .map_err(|e| FauxDBError::Bson(format!("Failed to convert update to JSON: {}", e)))?;
+            .map_err(FauxDBError::BsonSerialization)?;
         
         let update_str = serde_json::to_string(&update_json)
-            .map_err(|e| FauxDBError::Serialization(format!("Failed to serialize update: {}", e)))?;
+            .map_err(FauxDBError::Serialization)?;
 
         // Build WHERE clause from filter
         let mut where_clause = String::new();
@@ -224,7 +229,7 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
         let table_name = format!("{}_collections", collection);
 
         // Build WHERE clause from filter
@@ -261,7 +266,7 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
         let table_name = format!("{}_collections", collection);
 
         let mut query = format!("SELECT COUNT(*) FROM {}.{}", schema_name, table_name);
@@ -299,7 +304,7 @@ impl DocumentDBManager {
         let client = self.pool.get().await
             .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get database connection: {}", e)))?;
 
-        let schema_name = format!("documentdb_{}", database);
+        let schema_name = format!("fauxdb_{}", database);
 
         let query = format!(
             "SELECT table_name FROM information_schema.tables 
@@ -326,7 +331,7 @@ impl DocumentDBManager {
 
         let query = "
             SELECT schema_name FROM information_schema.schemata 
-            WHERE schema_name LIKE 'documentdb_%'
+            WHERE schema_name LIKE 'fauxdb_%'
         ";
 
         let rows = client.query(query, &[]).await
@@ -335,7 +340,7 @@ impl DocumentDBManager {
         let mut databases = Vec::new();
         for row in rows {
             let schema_name: String = row.get("schema_name");
-            let database_name = schema_name.replace("documentdb_", "");
+            let database_name = schema_name.replace("fauxdb_", "");
             databases.push(database_name);
         }
 

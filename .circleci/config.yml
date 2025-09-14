@@ -1,467 +1,147 @@
-# CircleCI 2.1 configuration for FauxDB
-# MongoDB-compatible database server with PostgreSQL backend
 version: 2.1
 
-# Orbs for common functionality
 orbs:
-  codecov: codecov/codecov@4.0.1
+  rust: circleci/rust@1.1.0
 
-# Executors define the environment where jobs run
-executors:
-  ubuntu-cpp:
+jobs:
+  test:
     docker:
-      - image: cimg/base:2024.02
-    resource_class: large
-    environment:
-      CC: gcc-12
-      CXX: g++-12
-      CMAKE_BUILD_TYPE: Release
-      POSTGRES_VERSION: "17"
+      - image: cimg/rust:1.70
+      - image: cimg/postgres:17.0
+        environment:
+          POSTGRES_DB: fauxdb_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ""
 
-  ubuntu-cpp-debug:
+    steps:
+      - checkout
+      
+      - rust/install-deps
+      
+      - run:
+          name: Wait for PostgreSQL
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      
+      - run:
+          name: Run tests
+          command: cargo test --verbose
+          environment:
+            DATABASE_URL: postgresql://postgres@localhost/fauxdb_test
+
+  lint:
     docker:
-      - image: cimg/base:2024.02
-    resource_class: large
-    environment:
-      CC: gcc-12
-      CXX: g++-12
-      CMAKE_BUILD_TYPE: Debug
-      POSTGRES_VERSION: "17"
-
-# Commands for reusable steps
-commands:
-  setup_build_environment:
-    description: "Install build dependencies and tools"
+      - image: cimg/rust:1.70
+    
     steps:
+      - checkout
+      
+      - rust/install-deps
+      
       - run:
-          name: Update package index
-          command: |
-            sudo apt-get update
-
+          name: Check formatting
+          command: cargo fmt -- --check
+      
       - run:
-          name: Install build dependencies
-          command: |
-            sudo apt-get install -y \
-              build-essential \
-              cmake \
-              ninja-build \
-              pkg-config \
-              git \
-              curl \
-              wget \
-              software-properties-common \
-              apt-transport-https \
-              ca-certificates \
-              gnupg \
-              lsb-release
+          name: Run clippy
+          command: cargo clippy -- -D warnings
 
-      - run:
-          name: Install GCC 12
-          command: |
-            sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-            sudo apt-get update
-            sudo apt-get install -y gcc-12 g++-12
-            sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 60
-            sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 60
+  coverage:
+    docker:
+      - image: cimg/rust:1.70
+      - image: cimg/postgres:17.0
+        environment:
+          POSTGRES_DB: fauxdb_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ""
 
-      - run:
-          name: Install PostgreSQL 17
-          command: |
-            sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-            wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-            sudo apt-get update
-            sudo apt-get install -y postgresql-17 postgresql-client-17 postgresql-server-dev-17
-            sudo systemctl start postgresql
-            sudo systemctl enable postgresql
-
-      - run:
-          name: Install vcpkg
-          command: |
-            cd /opt
-            sudo git clone https://github.com/Microsoft/vcpkg.git
-            sudo chown -R circleci:circleci /opt/vcpkg
-            cd /opt/vcpkg
-            ./bootstrap-vcpkg.sh
-            echo 'export VCPKG_ROOT=/opt/vcpkg' >> $BASH_ENV
-            echo 'export PATH=/opt/vcpkg:$PATH' >> $BASH_ENV
-
-      - run:
-          name: Install vcpkg dependencies
-          command: |
-            cd /opt/vcpkg
-            ./vcpkg install \
-              boost \
-              nlohmann-json \
-              fmt \
-              spdlog \
-              gtest \
-              benchmark \
-              openssl \
-              zlib \
-              bzip2 \
-              lz4 \
-              zstd
-
-  setup_postgresql:
-    description: "Setup PostgreSQL for testing"
     steps:
+      - checkout
+      
+      - rust/install-deps
+      
       - run:
-          name: Configure PostgreSQL
-          command: |
-            sudo -u postgres createuser -s fauxdb
-            sudo -u postgres createdb fauxdb -O fauxdb
-            sudo -u postgres psql -c "ALTER USER fauxdb PASSWORD 'fauxdb';"
-            sudo -u postgres psql -d fauxdb -c "CREATE EXTENSION IF NOT EXISTS btree_gin;"
-            sudo -u postgres psql -d fauxdb -c "CREATE EXTENSION IF NOT EXISTS btree_gist;"
-
+          name: Install tarpaulin
+          command: cargo install cargo-tarpaulin
+      
       - run:
-          name: Setup test data
-          command: |
-            sudo -u postgres psql -d fauxdb -c "
-              CREATE TABLE IF NOT EXISTS users (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                email VARCHAR(255) UNIQUE NOT NULL,
-                age INTEGER,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-              );
-              
-              CREATE TABLE IF NOT EXISTS products (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                price DECIMAL(10,2),
-                category VARCHAR(100),
-                in_stock BOOLEAN DEFAULT true,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-              );
-              
-              INSERT INTO users (name, email, age) VALUES 
-                ('John Doe', 'john@example.com', 30),
-                ('Jane Smith', 'jane@example.com', 25),
-                ('Bob Johnson', 'bob@example.com', 35)
-              ON CONFLICT (email) DO NOTHING;
-              
-              INSERT INTO products (name, price, category, in_stock) VALUES 
-                ('Laptop', 999.99, 'Electronics', true),
-                ('Book', 19.99, 'Education', true),
-                ('Chair', 149.99, 'Furniture', false)
-              ON CONFLICT DO NOTHING;
-            "
+          name: Wait for PostgreSQL
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      
+      - run:
+          name: Generate coverage
+          command: cargo tarpaulin --verbose --all-features --workspace --timeout 120 --out Xml
+          environment:
+            DATABASE_URL: postgresql://postgres@localhost/fauxdb_test
+      
+      - run:
+          name: Upload coverage to Codecov
+          command: bash <(curl -s https://codecov.io/bash)
 
-  install_mongodb_tools:
-    description: "Install MongoDB tools for testing"
+  integration:
+    docker:
+      - image: cimg/rust:1.70
+      - image: cimg/postgres:17.0
+        environment:
+          POSTGRES_DB: fauxdb_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ""
+
     steps:
+      - checkout
+      
+      - rust/install-deps
+      
       - run:
-          name: Install MongoDB tools
+          name: Install mongosh
           command: |
-            wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -
-            echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+            curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+            echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
             sudo apt-get update
             sudo apt-get install -y mongodb-mongosh
-
-# Jobs define individual tasks
-jobs:
-  build_and_test:
-    executor: ubuntu-cpp
-    steps:
-      - checkout
-      - setup_build_environment
-      - setup_postgresql
-      - install_mongodb_tools
-
+      
       - run:
-          name: Configure project
-          command: |
-            mkdir -p build
-            cd build
-            cmake .. \
-              -GNinja \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
-              -DCMAKE_INSTALL_PREFIX=/usr/local \
-              -DENABLE_TESTING=ON \
-              -DENABLE_BENCHMARKS=ON
-
+          name: Wait for PostgreSQL
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      
       - run:
-          name: Build project
-          command: |
-            cd build
-            ninja -j$(nproc)
-
+          name: Build FauxDB
+          command: cargo build --release
+      
       - run:
-          name: Run unit tests
+          name: Start FauxDB
           command: |
-            cd build
-            ctest --output-on-failure --parallel $(nproc)
-
-      - run:
-          name: Start FauxDB server
-          command: |
-            cd build
-            ./fauxdb -c ../config/fauxdb.conf &
-            sleep 5
-          background: true
-
-      - run:
-          name: Run integration tests
-          command: |
-            sleep 10  # Wait for server to start
-            # Test basic connectivity
-            mongosh --host localhost --port 27018 --eval "db.runCommand({ping: 1})"
-            
-            # Test find command
-            mongosh --host localhost --port 27018 --eval "db.users.find().limit(5)"
-            
-            # Test hello command
-            mongosh --host localhost --port 27018 --eval "db.runCommand({hello: 1})"
-
-      - run:
-          name: Stop FauxDB server
-          command: |
-            pkill -f fauxdb || true
-
-      - store_test_results:
-          path: build/test-results
-
-      - store_artifacts:
-          path: build/fauxdb
-          destination: fauxdb-binary
-
-      - store_artifacts:
-          path: build/CMakeCache.txt
-          destination: cmake-cache
-
-  build_debug:
-    executor: ubuntu-cpp-debug
-    steps:
-      - checkout
-      - setup_build_environment
-      - setup_postgresql
-
-      - run:
-          name: Configure project (Debug)
-          command: |
-            mkdir -p build-debug
-            cd build-debug
-            cmake .. \
-              -GNinja \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
-              -DENABLE_TESTING=ON \
-              -DENABLE_COVERAGE=ON \
-              -DCMAKE_CXX_FLAGS="--coverage -fprofile-arcs -ftest-coverage"
-
-      - run:
-          name: Build project (Debug)
-          command: |
-            cd build-debug
-            ninja -j$(nproc)
-
-      - run:
-          name: Run tests with coverage
-          command: |
-            cd build-debug
-            ctest --output-on-failure --parallel $(nproc)
-
-      - run:
-          name: Generate coverage report
-          command: |
-            sudo apt-get install -y lcov
-            cd build-debug
-            lcov --capture --directory . --output-file coverage.info
-            lcov --remove coverage.info '/usr/*' --output-file coverage.info
-            lcov --remove coverage.info '*/vcpkg/*' --output-file coverage.info
-            lcov --remove coverage.info '*/test/*' --output-file coverage.info
-            lcov --list coverage.info
-
-      - codecov/upload:
-          file: build-debug/coverage.info
-
-      - store_artifacts:
-          path: build-debug/coverage.info
-          destination: coverage-report
-
-  code_quality:
-    executor: ubuntu-cpp
-    steps:
-      - checkout
-      - setup_build_environment
-
-      - run:
-          name: Install code quality tools
-          command: |
-            sudo apt-get install -y \
-              clang-format-14 \
-              clang-tidy-14 \
-              cppcheck \
-              iwyu
-
-      - run:
-          name: Check code formatting
-          command: |
-            find . -name "*.cpp" -o -name "*.hpp" | grep -v build | xargs clang-format-14 --dry-run --Werror
-
-      - run:
-          name: Run static analysis with cppcheck
-          command: |
-            cppcheck --enable=all --inconclusive --xml --xml-version=2 \
-              --suppress=missingIncludeSystem \
-              --suppress=unusedFunction \
-              --suppress=unmatchedSuppression \
-              src/ include/ 2> cppcheck-report.xml || true
-
-      - run:
-          name: Configure for clang-tidy
-          command: |
-            mkdir -p build-analysis
-            cd build-analysis
-            cmake .. \
-              -GNinja \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-
-      - run:
-          name: Run clang-tidy
-          command: |
-            cd build-analysis
-            find ../src ../include -name "*.cpp" | head -10 | xargs clang-tidy-14 -p . || true
-
-      - store_artifacts:
-          path: cppcheck-report.xml
-          destination: static-analysis
-
-  security_scan:
-    executor: ubuntu-cpp
-    steps:
-      - checkout
-      - setup_build_environment
-
-      - run:
-          name: Install security scanning tools
-          command: |
-            # Install semgrep for security scanning
-            python3 -m pip install semgrep
-
-      - run:
-          name: Run security scan
-          command: |
-            semgrep --config=auto src/ include/ --json --output=semgrep-results.json || true
-
-      - store_artifacts:
-          path: semgrep-results.json
-          destination: security-scan
-
-  performance_test:
-    executor: ubuntu-cpp
-    steps:
-      - checkout
-      - setup_build_environment
-      - setup_postgresql
-      - install_mongodb_tools
-
-      - run:
-          name: Build with benchmarks
-          command: |
-            mkdir -p build-perf
-            cd build-perf
-            cmake .. \
-              -GNinja \
-              -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake \
-              -DENABLE_BENCHMARKS=ON
-
-      - run:
-          name: Build project
-          command: |
-            cd build-perf
-            ninja -j$(nproc)
-
-      - run:
-          name: Start FauxDB server
-          command: |
-            cd build-perf
-            ./fauxdb -c ../config/fauxdb.conf &
+            ./target/release/fauxdb &
             sleep 10
-          background: true
-
+      
       - run:
-          name: Run performance tests
-          command: |
-            sleep 15  # Wait for server to fully start
-            
-            # Run basic performance test with multiple connections
-            for i in {1..10}; do
-              mongosh --host localhost --port 27018 --eval "
-                for(let i = 0; i < 100; i++) {
-                  db.runCommand({ping: 1});
-                }
-              " &
-            done
-            wait
-            
-            # Test find performance
-            mongosh --host localhost --port 27018 --eval "
-              const start = new Date();
-              for(let i = 0; i < 50; i++) {
-                db.users.find().limit(10);
-              }
-              const end = new Date();
-              print('Find operations took: ' + (end - start) + 'ms');
-            "
+          name: Run MongoDB compatibility tests
+          command: cargo test --test fauxdb_tests --verbose
+          environment:
+            DATABASE_URL: postgresql://postgres@localhost/fauxdb_test
 
+  security:
+    docker:
+      - image: cimg/rust:1.70
+    
+    steps:
+      - checkout
+      
+      - rust/install-deps
+      
       - run:
-          name: Stop FauxDB server
-          command: |
-            pkill -f fauxdb || true
+          name: Install cargo-audit
+          command: cargo install cargo-audit
+      
+      - run:
+          name: Run security audit
+          command: cargo audit
 
-# Workflows define how jobs are orchestrated
 workflows:
   version: 2
-  build_and_test_workflow:
+  test_and_deploy:
     jobs:
-      - build_and_test:
-          filters:
-            branches:
-              only: /.*/
-            tags:
-              only: /.*/
-
-      - build_debug:
-          filters:
-            branches:
-              only: /.*/
-
-      - code_quality:
-          filters:
-            branches:
-              only: /.*/
-
-      - security_scan:
-          filters:
-            branches:
-              only: /.*/
-
-      - performance_test:
-          requires:
-            - build_and_test
-          filters:
-            branches:
-              only:
-                - main
-                - develop
-
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 2 * * *"  # Run at 2 AM UTC every day
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - build_and_test
-      - build_debug
-      - performance_test:
-          requires:
-            - build_and_test
+      - lint
+      - test
+      - coverage
+      - integration
+      - security

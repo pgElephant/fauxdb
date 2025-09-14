@@ -1,5 +1,7 @@
 # Build directories
-build/
+target/
+debug/
+release/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
@@ -16,16 +18,19 @@ Makefile.cmake
 *.dylib
 *.dll
 *.log
+*.rlib
 
 # Executables
 fauxdb
 network_client
 network_server
+*.exe
 
 # Compiler generated files
 *.d
 *.gch
 *.pch
+*.rs.bk
 
 # Debug files
 *.dSYM/
@@ -72,6 +77,7 @@ _deps
 
 # Package manager files
 vcpkg_installed/
+Cargo.lock
 
 # Regression test outputs
 regression/results/

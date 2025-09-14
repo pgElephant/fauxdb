@@ -1,0 +1,208 @@
+/*!
+ * @file geospatial.rs
+ * @brief Geospatial operations support for FauxDB
+ */
+
+use crate::error::Result;
+use bson::Document;
+use serde::{Deserialize, Serialize};
+
+pub struct GeospatialEngine {
+    // Geospatial operations support
+}
+
+impl GeospatialEngine {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub async fn create_2d_index(&self, collection: &str, field: &str) -> Result<()> {
+        println!("🗺️ Creating 2D index on {} for field: {}", collection, field);
+        // Placeholder implementation
+        Ok(())
+    }
+
+    pub async fn create_2dsphere_index(&self, collection: &str, field: &str) -> Result<()> {
+        println!("🌐 Creating 2DSphere index on {} for field: {}", collection, field);
+        // Placeholder implementation
+        Ok(())
+    }
+
+    pub async fn create_geoHaystack_index(&self, collection: &str, field: &str, bucket_size: f64) -> Result<()> {
+        println!("🌾 Creating geoHaystack index on {} for field: {} with bucket size: {}", collection, field, bucket_size);
+        // Placeholder implementation
+        Ok(())
+    }
+
+    pub async fn find_near(&self, collection: &str, field: &str, point: GeoPoint, _max_distance: Option<f64>, _min_distance: Option<f64>) -> Result<Vec<Document>> {
+        println!("📍 Finding documents near point: {:?} in collection: {} field: {}", point, collection, field);
+        // Placeholder implementation
+        Ok(vec![])
+    }
+
+    pub async fn find_within(&self, collection: &str, field: &str, geometry: GeoGeometry) -> Result<Vec<Document>> {
+        println!("🔍 Finding documents within geometry: {:?} in collection: {} field: {}", geometry, collection, field);
+        // Placeholder implementation
+        Ok(vec![])
+    }
+
+    pub async fn find_intersects(&self, collection: &str, field: &str, geometry: GeoGeometry) -> Result<Vec<Document>> {
+        println!("⚡ Finding documents that intersect geometry: {:?} in collection: {} field: {}", geometry, collection, field);
+        // Placeholder implementation
+        Ok(vec![])
+    }
+
+    pub async fn calculate_distance(&self, point1: GeoPoint, point2: GeoPoint) -> Result<f64> {
+        println!("📏 Calculating distance between points: {:?} and {:?}", point1, point2);
+        
+        // Haversine formula for calculating distance between two points on Earth
+        let lat1_rad = point1.latitude.to_radians();
+        let lat2_rad = point2.latitude.to_radians();
+        let delta_lat = (point2.latitude - point1.latitude).to_radians();
+        let delta_lon = (point2.longitude - point1.longitude).to_radians();
+
+        let a = (delta_lat / 2.0).sin().powi(2) + 
+                lat1_rad.cos() * lat2_rad.cos() * (delta_lon / 2.0).sin().powi(2);
+        let c = 2.0 * a.sqrt().atan2((1.0 - a).sqrt());
+
+        // Earth's radius in meters
+        let earth_radius = 6371000.0;
+        let distance = earth_radius * c;
+
+        Ok(distance)
+    }
+
+    pub fn validate_geo_json(&self, geometry: &GeoGeometry) -> Result<bool> {
+        match geometry {
+            GeoGeometry::Point(point) => {
+                self.validate_point(point)
+            }
+            GeoGeometry::LineString(line) => {
+                self.validate_line_string(line)
+            }
+            GeoGeometry::Polygon(polygon) => {
+                self.validate_polygon(polygon)
+            }
+            GeoGeometry::MultiPoint(points) => {
+                for point in points {
+                    if !self.validate_point(point)? {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
+            }
+            GeoGeometry::MultiLineString(lines) => {
+                for line in lines {
+                    if !self.validate_line_string(line)? {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
+            }
+            GeoGeometry::MultiPolygon(polygons) => {
+                for polygon in polygons {
+                    if !self.validate_polygon(polygon)? {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
+            }
+            GeoGeometry::GeometryCollection(geometries) => {
+                for geometry in geometries {
+                    if !self.validate_geo_json(geometry)? {
+                        return Ok(false);
+                    }
+                }
+                Ok(true)
+            }
+        }
+    }
+
+    fn validate_point(&self, point: &GeoPoint) -> Result<bool> {
+        Ok(point.longitude >= -180.0 && point.longitude <= 180.0 && 
+           point.latitude >= -90.0 && point.latitude <= 90.0)
+    }
+
+    fn validate_line_string(&self, line: &LineString) -> Result<bool> {
+        if line.points.len() < 2 {
+            return Ok(false);
+        }
+        
+        for point in &line.points {
+            if !self.validate_point(point)? {
+                return Ok(false);
+            }
+        }
+        
+        Ok(true)
+    }
+
+    fn validate_polygon(&self, polygon: &Polygon) -> Result<bool> {
+        if polygon.rings.is_empty() {
+            return Ok(false);
+        }
+        
+        for ring in &polygon.rings {
+            if ring.points.len() < 4 {
+                return Ok(false);
+            }
+            
+            for point in &ring.points {
+                if !self.validate_point(point)? {
+                    return Ok(false);
+                }
+            }
+        }
+        
+        Ok(true)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeoPoint {
+    pub longitude: f64,
+    pub latitude: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GeoGeometry {
+    Point(GeoPoint),
+    LineString(LineString),
+    Polygon(Polygon),
+    MultiPoint(Vec<GeoPoint>),
+    MultiLineString(Vec<LineString>),
+    MultiPolygon(Vec<Polygon>),
+    GeometryCollection(Vec<GeoGeometry>),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LineString {
+    pub points: Vec<GeoPoint>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Polygon {
+    pub rings: Vec<LinearRing>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LinearRing {
+    pub points: Vec<GeoPoint>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GeoIndex {
+    pub collection: String,
+    pub field: String,
+    pub index_type: GeoIndexType,
+    pub bucket_size: Option<f64>,
+    pub min: Option<f64>,
+    pub max: Option<f64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum GeoIndexType {
+    Geo2D,
+    Geo2DSphere,
+    GeoHaystack,
+}

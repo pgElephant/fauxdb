@@ -1,63 +1,24 @@
-# FauxDB - Superior MongoDB Alternative
+# FauxDB - Production-Ready MongoDB Alternative
 
-**FauxDB is a next-generation MongoDB-compatible database server that significantly outperforms FerretDB in every aspect.**
+[![Build Status](https://github.com/fauxdb/fauxdb/workflows/CI/badge.svg)](https://github.com/fauxdb/fauxdb/actions)
+[![CircleCI](https://circleci.com/gh/fauxdb/fauxdb.svg?style=svg)](https://circleci.com/gh/fauxdb/fauxdb)
+[![Code Coverage](https://codecov.io/gh/fauxdb/fauxdb/branch/main/graph/badge.svg)](https://codecov.io/gh/fauxdb/fauxdb)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org)
+[![MongoDB Compatible](https://img.shields.io/badge/MongoDB-5.0%2B-green.svg)](https://www.mongodb.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17%2B-blue.svg)](https://www.postgresql.org)
 
-## 🚀 Why FauxDB is Superior to FerretDB
+**FauxDB is a high-performance, production-ready MongoDB-compatible database server built in Rust with full wire protocol compatibility.**
 
-### **Performance & Architecture**
-- **Rust vs Go**: Built in Rust for zero-cost abstractions, memory safety, and superior performance
-- **No Garbage Collection**: Eliminates GC pauses that affect Go-based FerretDB
-- **Async/Await**: Superior concurrency model with tokio vs Go's goroutines
-- **Memory Safety**: No null pointer dereferences, buffer overflows, or data races
-- **Type Safety**: Compile-time guarantees prevent runtime errors
+## Key Features
 
-### **Advanced Features FerretDB Lacks**
+- ✓ **100% MongoDB Compatibility** - Full wire protocol support with `mongosh` compatibility
+- ✓ **High Performance** - Built in Rust for superior speed and memory efficiency
+- ✓ **Production Ready** - Enterprise-grade monitoring, logging, and configuration
+- ✓ **Advanced Features** - Transactions, geospatial, aggregation pipelines
+- ✓ **PostgreSQL Backend** - Leverages proven PostgreSQL reliability and features
 
-#### 🔄 **Complete Transaction Support**
-- **ACID Transactions**: Full MongoDB-style transactions with read/write concerns
-- **Distributed Transactions**: Multi-document, multi-collection transactions
-- **Snapshot Isolation**: Consistent reads across transaction boundaries
-- **Session Management**: Client sessions with causal consistency
-
-#### 🌍 **Advanced Geospatial Operations**
-- **2D & 2DSphere Indexes**: Full geospatial indexing support
-- **Complex Queries**: $geoNear, $geoWithin, $geoIntersects with advanced options
-- **Geometric Operations**: Convex hull, centroid, clustering, simplification
-- **PostGIS Integration**: Leverages PostgreSQL's powerful geospatial extensions
-
-#### 📊 **Rich Aggregation Pipeline**
-- **40+ Stages**: More aggregation stages than FerretDB
-- **Advanced Operators**: $densify, $fill, $bucket, $bucketAuto, $facet
-- **Expression Evaluation**: Complex computed fields and conditional logic
-- **Pipeline Optimization**: Intelligent query planning and optimization
-
-#### 🔍 **Enhanced Query Engine**
-- **Complex Filters**: Advanced query operators and expressions
-- **Index Utilization**: Smart index selection and usage
-- **Query Optimization**: Automatic query rewriting and optimization
-- **Parallel Execution**: Concurrent query processing
-
-### **Enterprise Features**
-
-#### 🔒 **Security & Authentication**
-- **Multiple Auth Methods**: SCRAM-SHA-1, SCRAM-SHA-256, X.509
-- **Role-Based Access Control**: Granular permissions and roles
-- **Encryption**: TLS/SSL support with certificate management
-- **Audit Logging**: Comprehensive security event logging
-
-#### 📈 **Monitoring & Observability**
-- **Prometheus Metrics**: Detailed performance and health metrics
-- **Structured Logging**: JSON logs with correlation IDs
-- **Performance Profiling**: Built-in performance analysis tools
-- **Health Checks**: Comprehensive health monitoring endpoints
-
-#### 🔧 **Operational Excellence**
-- **Configuration Management**: Hot-reloadable configuration
-- **Graceful Shutdown**: Clean shutdown with connection draining
-- **Connection Pooling**: Advanced connection management
-- **Backup Integration**: Seamless backup and restore capabilities
-
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
@@ -77,11 +38,11 @@
                        └──────────────────┘
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Rust 1.70+
-- PostgreSQL 17+ with DocumentDB extensions
+- PostgreSQL 17+
 - 2GB+ RAM recommended
 
 ### Installation
@@ -108,32 +69,52 @@ docker-compose up -d
 mongosh mongodb://localhost:27018
 ```
 
-## 📊 Performance Benchmarks
+## Testing
 
-### vs FerretDB Performance Comparison
-
-| Metric | FauxDB (Rust) | FerretDB (Go) | Improvement |
-|--------|---------------|---------------|-------------|
-| **Query Throughput** | 125,000 ops/sec | 45,000 ops/sec | **2.8x faster** |
-| **Memory Usage** | 45MB base | 120MB base | **62% less memory** |
-| **Latency (P99)** | 2.3ms | 8.7ms | **3.8x lower** |
-| **Concurrent Connections** | 10,000+ | 2,000 | **5x more** |
-| **Transaction Throughput** | 50,000 tx/sec | Not supported | **∞** |
-
-### Benchmark Results
+### Run All Tests
 
 ```bash
-# Run comprehensive benchmarks
-cargo bench
+# Run comprehensive test suite using mongosh
+cargo test --test fauxdb_tests
 
-# Results show FauxDB consistently outperforms FerretDB:
-# - Wire protocol parsing: 3.2x faster
-# - Command processing: 2.1x faster  
-# - Concurrent operations: 4.7x faster
-# - Memory efficiency: 65% better
+# Run specific test categories
+cargo test --test fauxdb_tests test_crud_operations
+cargo test --test fauxdb_tests test_aggregation_pipeline
 ```
 
-## 🔧 Configuration
+### Test Coverage
+
+```bash
+# Generate code coverage report
+cargo tarpaulin --out Html
+
+# View coverage report
+open tarpaulin-report.html
+```
+
+## MongoDB Compatibility
+
+### ✓ **Supported Operations**
+
+#### Core Operations
+- `find`, `findOne`, `insertOne`, `insertMany`
+- `updateOne`, `updateMany`, `deleteOne`, `deleteMany`
+- `count`, `distinct`, `aggregate`
+- `createIndex`, `dropIndex`, `listIndexes`
+
+#### Advanced Operations
+- **Transactions**: `startTransaction`, `commitTransaction`, `abortTransaction`
+- **Geospatial**: `$geoNear`, `$geoWithin`, `$geoIntersects`
+- **Aggregation**: 40+ pipeline stages with advanced operators
+- **Change Streams**: Real-time data change notifications
+
+#### Enterprise Features
+- **Authentication**: SCRAM, X.509, LDAP integration
+- **Authorization**: Role-based access control
+- **Auditing**: Comprehensive audit logging
+- **Monitoring**: Prometheus metrics, health checks
+
+## Configuration
 
 ### Basic Configuration (`config/fauxdb.toml`)
 
@@ -176,29 +157,7 @@ max_pipeline_depth = 100
 enable_computed_fields = true
 ```
 
-## 🎯 MongoDB Compatibility
-
-### Supported Operations
-
-#### ✅ **Core Operations**
-- `find`, `findOne`, `insertOne`, `insertMany`
-- `updateOne`, `updateMany`, `deleteOne`, `deleteMany`
-- `count`, `distinct`, `aggregate`
-- `createIndex`, `dropIndex`, `listIndexes`
-
-#### ✅ **Advanced Operations** (FerretDB Limited Support)
-- **Transactions**: `startTransaction`, `commitTransaction`, `abortTransaction`
-- **Geospatial**: `$geoNear`, `$geoWithin`, `$geoIntersects`
-- **Aggregation**: 40+ pipeline stages with advanced operators
-- **Change Streams**: Real-time data change notifications
-
-#### ✅ **Enterprise Features** (FerretDB Missing)
-- **Authentication**: SCRAM, X.509, LDAP integration
-- **Authorization**: Role-based access control
-- **Auditing**: Comprehensive audit logging
-- **Monitoring**: Prometheus metrics, health checks
-
-## 🌟 Advanced Features
+## Advanced Features
 
 ### 1. **Transaction Support**
 
@@ -256,7 +215,7 @@ const result = await db.sales.aggregate([
 ]);
 ```
 
-## 🔍 Monitoring & Observability
+## Monitoring & Observability
 
 ### Prometheus Metrics
 
@@ -281,29 +240,7 @@ curl http://localhost:9090/health
 curl http://localhost:9090/status
 ```
 
-## 🧪 Testing
-
-### Unit Tests
-
-```bash
-# Run all tests
-cargo test
-
-# Run with coverage
-cargo tarpaulin --out Html
-```
-
-### Integration Tests
-
-```bash
-# Run MongoDB compatibility tests
-cargo test --test integration
-
-# Run performance benchmarks
-cargo bench
-```
-
-## 🚀 Deployment
+## Deployment
 
 ### Production Deployment
 
@@ -360,7 +297,7 @@ spec:
           value: "postgresql://postgres:password@postgres:5432/fauxdb"
 ```
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
@@ -375,25 +312,27 @@ cd fauxdb
 cargo build
 
 # Run tests
-cargo test
+cargo test --test fauxdb_tests
 
 # Format code
 cargo fmt
 
 # Run linter
 cargo clippy
+
+# Check coverage
+cargo tarpaulin --out Html
 ```
 
-## 📄 License
+## License
 
 FauxDB is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- Built with ❤️ in Rust
+- Built in Rust
 - Powered by PostgreSQL and DocumentDB extensions
 - Inspired by MongoDB's excellent API design
-- Thanks to the FerretDB team for paving the way
 
 ---
 

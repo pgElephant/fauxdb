@@ -3,21 +3,23 @@
  * @brief MongoDB command processing for FauxDB
  */
 
-use crate::database::DatabaseManager;
+use crate::documentdb::DocumentDBManager;
 use crate::error::{FauxDBError, Result};
 use crate::wire_protocol::{WireProtocolHandler, MongoMessage};
 use bson::{Document, Bson, doc};
 
 pub struct CommandProcessor {
-    db_manager: DatabaseManager,
+    db_manager: DocumentDBManager,
     wire_handler: WireProtocolHandler,
+    default_database: String,
 }
 
 impl CommandProcessor {
-    pub fn new(db_manager: DatabaseManager) -> Self {
+    pub fn new(db_manager: DocumentDBManager) -> Self {
         Self {
             db_manager,
             wire_handler: WireProtocolHandler::new(),
+            default_database: "fauxdb".to_string(),
         }
     }
 
@@ -100,16 +102,16 @@ impl CommandProcessor {
             .map_err(|_| FauxDBError::Command("Missing collection name in find command".to_string()))?;
 
         // Ensure collection exists
-        self.db_manager.create_collection(collection).await?;
+        self.db_manager.create_collection(&self.default_database, collection).await?;
 
         // Parse filter, projection, skip, limit
         let filter = document.get_document("filter").ok();
         let projection = document.get_document("projection").ok();
-        let skip = document.get_i64("skip").ok();
-        let limit = document.get_i64("limit").ok();
+        let skip = document.get_i64("skip").ok().map(|v| v as u64);
+        let limit = document.get_i64("limit").ok().map(|v| v as u64);
 
         // Query documents
-        let documents = self.db_manager.query_documents(collection, filter, projection, skip, limit).await?;
+        let documents = self.db_manager.query_documents(&self.default_database, collection, filter, projection, skip, limit).await?;
 
         // Create response
         self.wire_handler.create_find_response(request_id, response_to, documents, collection)
@@ -123,12 +125,12 @@ impl CommandProcessor {
             .map_err(|_| FauxDBError::Command("Missing documents in insert command".to_string()))?;
 
         // Ensure collection exists
-        self.db_manager.create_collection(collection).await?;
+        self.db_manager.create_collection(&self.default_database, collection).await?;
 
         let mut inserted_count = 0;
         for doc_value in documents {
             if let Bson::Document(doc) = doc_value {
-                self.db_manager.insert_document(collection, &doc).await?;
+                self.db_manager.insert_document(&self.default_database, collection, &doc).await?;
                 inserted_count += 1;
             }
         }
@@ -152,17 +154,17 @@ impl CommandProcessor {
                 let update_ops = update.get_document("u")
                     .map_err(|_| FauxDBError::Command("Missing update operations".to_string()))?;
                 
-                let upsert = update.get_bool("upsert").unwrap_or(false);
+                let _upsert = update.get_bool("upsert").unwrap_or(false);
 
-                let count = self.db_manager.update_document(collection, filter, update_ops, upsert).await?;
+                let count = self.db_manager.update_document(&self.default_database, collection, filter, update_ops).await?;
                 modified_count += count;
             }
         }
 
         let response = doc! {
             "ok": 1,
-            "n": modified_count,
-            "nModified": modified_count
+            "n": modified_count as i64,
+            "nModified": modified_count as i64
         };
 
         let bson_doc = bson::to_document(&response)?;
@@ -193,14 +195,14 @@ impl CommandProcessor {
                 let filter = delete.get_document("q")
                     .map_err(|_| FauxDBError::Command("Missing query in delete".to_string()))?;
 
-                let count = self.db_manager.delete_document(collection, filter).await?;
+                let count = self.db_manager.delete_document(&self.default_database, collection, filter).await?;
                 deleted_count += count;
             }
         }
 
         let response = doc! {
             "ok": 1,
-            "n": deleted_count
+            "n": deleted_count as i64
         };
 
         let bson_doc = bson::to_document(&response)?;
@@ -223,30 +225,31 @@ impl CommandProcessor {
             .map_err(|_| FauxDBError::Command("Missing collection name in count command".to_string()))?;
 
         let filter = document.get_document("query").ok();
-        let count = self.db_manager.count_documents(collection, filter).await?;
+        let count = self.db_manager.count_documents(&self.default_database, collection, filter).await?;
 
-        self.wire_handler.create_count_response(request_id, response_to, count)
+        self.wire_handler.create_count_response(request_id, response_to, count as i64)
     }
 
     async fn process_aggregate(&self, document: &Document, request_id: u32, response_to: u32) -> Result<Vec<u8>> {
         let collection = document.get_str("aggregate")
             .map_err(|_| FauxDBError::Command("Missing collection name in aggregate command".to_string()))?;
 
-        let pipeline = document.get_array("pipeline")
+        let _pipeline = document.get_array("pipeline")
             .map_err(|_| FauxDBError::Command("Missing pipeline in aggregate command".to_string()))?;
 
         // For now, just return a simple aggregation result
         // In a full implementation, this would process the aggregation pipeline
+        let count = self.db_manager.count_documents(&self.default_database, collection, None).await?;
         let result_doc = doc! {
             "_id": null,
-            "count": self.db_manager.count_documents(collection, None).await?
+            "count": count as i64
         };
 
         self.wire_handler.create_find_response(request_id, response_to, vec![result_doc], collection)
     }
 
     async fn process_list_collections(&self, _document: &Document, request_id: u32, response_to: u32) -> Result<Vec<u8>> {
-        let collections = self.db_manager.list_collections().await?;
+        let collections = self.db_manager.list_collections(&self.default_database).await?;
         
         let mut cursor_batch = Vec::new();
         for collection in collections {
@@ -285,7 +288,7 @@ impl CommandProcessor {
         let collection = document.get_str("create")
             .map_err(|_| FauxDBError::Command("Missing collection name in create command".to_string()))?;
 
-        self.db_manager.create_collection(collection).await?;
+        self.db_manager.create_collection(&self.default_database, collection).await?;
 
         self.wire_handler.create_success_response(request_id, response_to)
     }
@@ -294,7 +297,7 @@ impl CommandProcessor {
         let collection = document.get_str("drop")
             .map_err(|_| FauxDBError::Command("Missing collection name in drop command".to_string()))?;
 
-        self.db_manager.drop_collection(collection).await?;
+        self.db_manager.drop_collection(&self.default_database, collection).await?;
 
         self.wire_handler.create_success_response(request_id, response_to)
     }

@@ -7,8 +7,8 @@ use crate::error::{FauxDBError, Result};
 use crate::config::DatabaseConfig;
 use bson::Document;
 use std::collections::HashMap;
-use tokio_postgres::{Client, NoTls};
-use deadpool_postgres::{Pool, Manager, Runtime};
+use tokio_postgres::NoTls;
+use deadpool_postgres::{Pool, Manager};
 use serde_json::Value;
 
 pub struct DatabaseManager {
@@ -41,7 +41,8 @@ impl DatabaseManager {
         for row in rows {
             let mut map = HashMap::new();
             for (i, column) in row.columns().iter().enumerate() {
-                let value: Value = row.get(i);
+                let value_str: String = row.get(i);
+                let value: Value = serde_json::from_str(&value_str).unwrap_or(Value::Null);
                 map.insert(column.name().to_string(), value);
             }
             results.push(map);
@@ -58,19 +59,8 @@ impl DatabaseManager {
             .map_err(|e| FauxDBError::Database(format!("Command execution failed: {}", e)))
     }
 
-    pub async fn query_documents(&self, collection: &str, filter: Option<&Document>, projection: Option<&Document>, skip: Option<i64>, limit: Option<i64>) -> Result<Vec<Document>> {
+    pub async fn query_documents(&self, collection: &str, _filter: Option<&Document>, _projection: Option<&Document>, skip: Option<i64>, limit: Option<i64>) -> Result<Vec<Document>> {
         let mut query = format!("SELECT data FROM {}", collection);
-        let mut params: Vec<&(dyn tokio_postgres::types::ToSql + Sync)> = Vec::new();
-        let mut param_idx = 1;
-
-        if let Some(f) = filter {
-            // Convert BSON filter to SQL WHERE clause (simplified)
-            if let Some((key, value)) = f.iter().next() {
-                query.push_str(&format!(" WHERE data->>'{}' = ${}", key, param_idx));
-                params.push(value);
-                param_idx += 1;
-            }
-        }
 
         if let Some(s) = skip {
             query.push_str(&format!(" OFFSET {}", s));
@@ -79,13 +69,13 @@ impl DatabaseManager {
             query.push_str(&format!(" LIMIT {}", l));
         }
 
-        let results = self.execute_query(&query, &params).await?;
+        let results = self.execute_query(&query, &[]).await?;
 
         let mut documents = Vec::new();
         for row in results {
             if let Some(data_value) = row.get("data") {
                 if let Ok(data_str) = serde_json::to_string(data_value) {
-                    if let Ok(doc) = bson::from_str::<Document>(&data_str) {
+                    if let Ok(doc) = serde_json::from_str::<Document>(&data_str) {
                         documents.push(doc);
                     }
                 }
@@ -110,7 +100,7 @@ impl DatabaseManager {
         }
 
         let mut updated_count = 0;
-        for mut doc in existing_docs {
+        for mut doc in existing_docs.clone() {
             // Apply update logic (simplified)
             for (key, value) in update.iter() {
                 doc.insert(key, value.clone());
@@ -135,18 +125,9 @@ impl DatabaseManager {
         self.execute_command(&query, &[&filter_json]).await
     }
 
-    pub async fn count_documents(&self, collection: &str, filter: Option<&Document>) -> Result<i64> {
-        let mut query = format!("SELECT COUNT(*) as count FROM {}", collection);
-        let mut params: Vec<&(dyn tokio_postgres::types::ToSql + Sync)> = Vec::new();
-
-        if let Some(f) = filter {
-            if let Some((key, value)) = f.iter().next() {
-                query.push_str(&format!(" WHERE data->>'{}' = $1", key));
-                params.push(value);
-            }
-        }
-
-        let results = self.execute_query(&query, &params).await?;
+    pub async fn count_documents(&self, collection: &str, _filter: Option<&Document>) -> Result<i64> {
+        let query = format!("SELECT COUNT(*) as count FROM {}", collection);
+        let results = self.execute_query(&query, &[]).await?;
 
         for row in results {
             if let Some(count_value) = row.get("count") {

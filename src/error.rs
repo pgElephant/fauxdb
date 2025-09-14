@@ -13,17 +13,11 @@ pub enum FauxDBError {
     #[error("BSON error: {0}")]
     Bson(#[from] bson::de::Error),
 
-    #[error("MongoDB error: {0}")]
-    MongoDB(String),
+    #[error("BSON serialization error: {0}")]
+    BsonSerialization(#[from] bson::ser::Error),
 
     #[error("Wire protocol error: {0}")]
     WireProtocol(String),
-
-    #[error("Command error: {0}")]
-    Command(String),
-
-    #[error("Configuration error: {0}")]
-    Config(String),
 
     #[error("Network error: {0}")]
     Network(#[from] std::io::Error),
@@ -33,21 +27,6 @@ pub enum FauxDBError {
 
     #[error("Connection pool error: {0}")]
     ConnectionPool(String),
-
-    #[error("Authentication error: {0}")]
-    Authentication(String),
-
-    #[error("Authorization error: {0}")]
-    Authorization(String),
-
-    #[error("Internal error: {0}")]
-    Internal(String),
-
-    #[error("Transaction error: {0}")]
-    Transaction(String),
-
-    #[error("Geospatial error: {0}")]
-    Geospatial(String),
 }
 
 pub type Result<T> = std::result::Result<T, FauxDBError>;

@@ -1,0 +1,84 @@
+[package]
+name = "fauxdb"
+version = "1.0.0"
+edition = "2021"
+authors = ["FauxDB Team"]
+description = "MongoDB-compatible database server using PostgreSQL backend"
+license = "MIT"
+
+[[bin]]
+name = "fauxdb"
+path = "src/main.rs"
+
+
+[dependencies]
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# BSON support
+bson = "2.8"
+
+# PostgreSQL driver
+tokio-postgres = "0.7"
+deadpool-postgres = "0.12"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Configuration
+config = "0.14"
+toml = "0.8"
+serde_yaml = "0.9"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Additional dependencies for new modules
+uuid = { version = "1.0", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+md5 = "0.7"  # MD5 hashing for MongoDB-CR authentication
+sha2 = "0.10"  # SHA-256 hashing for SCRAM authentication
+hmac = "0.12"  # HMAC for SCRAM authentication
+base64 = "0.21"  # Base64 encoding/decoding
+rand = "0.8"  # Random number generation for salts and nonces
+
+# Production-ready dependencies
+dashmap = "5.5"  # High-performance concurrent HashMap
+arc-swap = "1.6"  # Atomic reference counting
+metrics = "0.22"  # Metrics collection
+metrics-exporter-prometheus = "0.13"  # Prometheus metrics
+parking_lot = "0.12"  # Fast synchronization primitives
+crossbeam = "0.8"  # Lock-free data structures
+rayon = "1.8"  # Parallel processing
+regex = "1.10"  # Regular expressions for advanced queries
+indexmap = "2.1"  # Hash map with deterministic iteration
+ahash = "0.8"  # Fast hashing
+
+# MongoDB 5.0+ compatibility features
+num_cpus = "1.16"  # CPU detection for parallel processing
+lru = "0.12"  # LRU cache for query optimization
+futures = "0.3"  # Async utilities
+async-trait = "0.1"  # Async traits
+bytes = "1.5"  # Byte buffer utilities
+tokio-util = "0.7"  # Tokio utilities
+hyper = "1.0"  # HTTP server for metrics
+warp = "0.3"  # Web framework for admin endpoints
+rustls = "0.21"  # TLS implementation
+rustls-pemfile = "1.0"  # PEM file parsing
+tokio-rustls = "0.24"  # Async TLS
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+
+[profile.dev]
+opt-level = 0
+debug = true

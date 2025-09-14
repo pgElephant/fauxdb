@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: fauxdb-postgres-prod
+    environment:
+      POSTGRES_DB: fauxdb_prod
+      POSTGRES_USER: ${POSTGRES_USER:-fauxdb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-$(openssl rand -base64 32)}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./docker/postgres/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - fauxdb-prod-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-fauxdb} -d fauxdb_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  fauxdb:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: fauxdb-server-prod
+    environment:
+      # Database configuration
+      DATABASE_URL: postgresql://${POSTGRES_USER:-fauxdb}:${POSTGRES_PASSWORD}@postgres:5432/fauxdb_prod
+      
+      # Server configuration
+      FAUXDB_HOST: 0.0.0.0
+      FAUXDB_PORT: 27018
+      FAUXDB_MAX_CONNECTIONS: ${FAUXDB_MAX_CONNECTIONS:-1000}
+      
+      # Logging
+      RUST_LOG: ${RUST_LOG:-info}
+      
+      # Production settings
+      FAUXDB_ENABLE_SSL: ${FAUXDB_ENABLE_SSL:-false}
+      FAUXDB_ENABLE_AUTH: ${FAUXDB_ENABLE_AUTH:-false}
+      FAUXDB_WORKER_THREADS: ${FAUXDB_WORKER_THREADS:-4}
+    ports:
+      - "${FAUXDB_PORT:-27018}:27018"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fauxdb-prod-network
+    volumes:
+      - ./config:/app/config:ro
+      - fauxdb_prod_logs:/app/logs
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongosh", "--host", "localhost", "--port", "27018", "--eval", "db.runCommand({ping: 1})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '2.0'
+        reservations:
+          memory: 256M
+          cpus: '0.5'
+      replicas: ${FAUXDB_REPLICAS:-1}
+
+  # Optional: Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fauxdb-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - fauxdb-prod-network
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+  # Optional: Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fauxdb-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin123}
+      GF_USERS_ALLOW_SIGN_UP: false
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - fauxdb-prod-network
+    profiles:
+      - monitoring
+    restart: unless-stopped
+
+volumes:
+  postgres_prod_data:
+    driver: local
+  fauxdb_prod_logs:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+networks:
+  fauxdb-prod-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16

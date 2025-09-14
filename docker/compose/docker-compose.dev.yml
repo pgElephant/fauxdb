@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: fauxdb-postgres-dev
+    environment:
+      POSTGRES_DB: fauxdb_dev
+      POSTGRES_USER: fauxdb
+      POSTGRES_PASSWORD: fauxdb123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5433:5432"
+    networks:
+      - fauxdb-dev-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fauxdb -d fauxdb_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Development version with hot reload
+  fauxdb-dev:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.dev
+    container_name: fauxdb-dev-server
+    environment:
+      # Database configuration
+      DATABASE_URL: postgresql://fauxdb:fauxdb123@postgres:5432/fauxdb_dev
+      
+      # Server configuration
+      FAUXDB_HOST: 0.0.0.0
+      FAUXDB_PORT: 27019
+      FAUXDB_MAX_CONNECTIONS: 100
+      
+      # Development settings
+      RUST_LOG: debug
+      RUST_BACKTRACE: 1
+      FAUXDB_ENABLE_SSL: false
+      FAUXDB_ENABLE_AUTH: false
+    ports:
+      - "27019:27019"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - fauxdb-dev-network
+    volumes:
+      - .:/app
+      - cargo_cache:/usr/local/cargo/registry
+    working_dir: /app
+    command: >
+      sh -c "
+        echo 'Installing cargo-watch for hot reload...' &&
+        cargo install cargo-watch &&
+        echo 'Starting FauxDB in development mode...' &&
+        cargo watch -x 'run --bin fauxdb'
+      "
+    restart: unless-stopped
+
+  # Database admin interface
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fauxdb-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@fauxdb.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - fauxdb-dev-network
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    profiles:
+      - admin
+
+volumes:
+  postgres_dev_data:
+    driver: local
+  cargo_cache:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  fauxdb-dev-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16

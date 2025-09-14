@@ -62,12 +62,128 @@ cargo build --release
 ### Docker Quick Start
 
 ```bash
-# Start FauxDB with PostgreSQL
+# Clone and setup
+git clone https://github.com/fauxdb/fauxdb.git
+cd fauxdb
+
+# Quick start with Docker
+make setup  # Copies .env file and starts development environment
+# OR
 docker-compose up -d
 
 # Connect with MongoDB client
 mongosh mongodb://localhost:27018
+
+# Test the connection
+mongosh --host localhost --port 27018 --eval "db.runCommand({ping: 1})"
 ```
+
+### Docker Development Environment
+
+```bash
+# Start development environment with hot reload
+make dev
+
+# View logs
+make dev-logs
+
+# Open shell in container
+make dev-shell
+
+# Stop development environment
+make dev-stop
+```
+
+### Docker Production Environment
+
+```bash
+# Copy and configure environment
+cp docker/config/docker.env.example .env
+# Edit .env with your production settings
+
+# Start production environment
+make prod
+
+# Start with monitoring (Prometheus + Grafana)
+make monitor
+
+# View production logs
+make prod-logs
+```
+
+## Docker Support
+
+FauxDB includes comprehensive Docker support for development, testing, and production deployments.
+
+### Available Docker Compose Files
+
+- **`docker/compose/docker-compose.yml`** - Basic setup with PostgreSQL
+- **`docker/compose/docker-compose.dev.yml`** - Development environment with hot reload
+- **`docker/compose/docker-compose.prod.yml`** - Production environment with monitoring
+
+### Docker Commands
+
+```bash
+# Quick setup
+make setup
+
+# Development
+make dev          # Start development environment
+make dev-logs     # View development logs
+make dev-shell    # Open shell in dev container
+
+# Production
+make prod         # Start production environment
+make monitor      # Start with monitoring stack
+make prod-logs    # View production logs
+
+# Testing
+make test         # Run tests with Docker
+make test-mongosh # Test with mongosh client
+make perf-test    # Run performance tests
+
+# Database
+make db-shell     # Open PostgreSQL shell
+make db-backup    # Backup database
+make db-restore   # Restore database
+
+# Utilities
+make clean        # Clean up Docker resources
+make status       # Show service status
+make health       # Check service health
+```
+
+### Docker Environment Variables
+
+Copy `docker.env.example` to `.env` and configure:
+
+```bash
+# PostgreSQL
+POSTGRES_USER=fauxdb
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=fauxdb_prod
+
+# FauxDB Server
+FAUXDB_PORT=27018
+FAUXDB_MAX_CONNECTIONS=1000
+FAUXDB_WORKER_THREADS=4
+
+# Security
+FAUXDB_ENABLE_SSL=false
+FAUXDB_ENABLE_AUTH=false
+
+# Monitoring
+GRAFANA_PASSWORD=admin123
+```
+
+**Note**: Copy `docker/config/docker.env.example` to `.env` for configuration.
+
+### Docker Volumes
+
+- **`postgres_data`** - PostgreSQL data persistence
+- **`fauxdb_logs`** - FauxDB application logs
+- **`prometheus_data`** - Prometheus metrics storage
+- **`grafana_data`** - Grafana dashboards and settings
 
 ## Testing
 

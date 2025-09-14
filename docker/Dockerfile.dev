@@ -1,0 +1,44 @@
+# Development Dockerfile for FauxDB
+FROM rust:1.70-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    libssl-dev \
+    libpq-dev \
+    curl \
+    git \
+    mongosh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install MongoDB shell for testing
+RUN curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor && \
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list && \
+    apt-get update && apt-get install -y mongodb-mongosh && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r fauxdb && useradd -r -g fauxdb fauxdb
+
+# Set working directory
+WORKDIR /app
+
+# Copy Cargo files
+COPY Cargo.toml Cargo.lock ./
+
+# Build dependencies
+RUN cargo build
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN cargo build
+
+# Switch to non-root user
+USER fauxdb
+
+# Expose port
+EXPOSE 27019
+
+# Default command (will be overridden in docker-compose)
+CMD ["cargo", "run", "--bin", "fauxdb"]

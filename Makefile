@@ -31,9 +31,6 @@ default_target: all
 
 .SUFFIXES: .hpux_make_needs_suffix_list
 
-# Produce verbose output by default.
-VERBOSE = 1
-
 # Command-line flag to silence nested $(MAKE).
 $(VERBOSE)MAKESILENT = -s
 
@@ -177,365 +174,53 @@ fauxdb/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/build
 .PHONY : fauxdb/fast
 
-src/CConfig.o: src/CConfig.cpp.o
-.PHONY : src/CConfig.o
+src/bson.o: src/bson.cpp.o
+.PHONY : src/bson.o
 
 # target to build an object file
-src/CConfig.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CConfig.cpp.o
-.PHONY : src/CConfig.cpp.o
+src/bson.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/bson.cpp.o
+.PHONY : src/bson.cpp.o
 
-src/CConfig.i: src/CConfig.cpp.i
-.PHONY : src/CConfig.i
+src/bson.i: src/bson.cpp.i
+.PHONY : src/bson.i
 
 # target to preprocess a source file
-src/CConfig.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CConfig.cpp.i
-.PHONY : src/CConfig.cpp.i
+src/bson.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/bson.cpp.i
+.PHONY : src/bson.cpp.i
 
-src/CConfig.s: src/CConfig.cpp.s
-.PHONY : src/CConfig.s
+src/bson.s: src/bson.cpp.s
+.PHONY : src/bson.s
 
 # target to generate assembly for a file
-src/CConfig.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CConfig.cpp.s
-.PHONY : src/CConfig.cpp.s
+src/bson.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/bson.cpp.s
+.PHONY : src/bson.cpp.s
 
-src/CConfiguration.o: src/CConfiguration.cpp.o
-.PHONY : src/CConfiguration.o
+src/logger.o: src/logger.cpp.o
+.PHONY : src/logger.o
 
 # target to build an object file
-src/CConfiguration.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CConfiguration.cpp.o
-.PHONY : src/CConfiguration.cpp.o
+src/logger.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/logger.cpp.o
+.PHONY : src/logger.cpp.o
 
-src/CConfiguration.i: src/CConfiguration.cpp.i
-.PHONY : src/CConfiguration.i
-
-# target to preprocess a source file
-src/CConfiguration.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CConfiguration.cpp.i
-.PHONY : src/CConfiguration.cpp.i
-
-src/CConfiguration.s: src/CConfiguration.cpp.s
-.PHONY : src/CConfiguration.s
-
-# target to generate assembly for a file
-src/CConfiguration.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CConfiguration.cpp.s
-.PHONY : src/CConfiguration.cpp.s
-
-src/CLogger.o: src/CLogger.cpp.o
-.PHONY : src/CLogger.o
-
-# target to build an object file
-src/CLogger.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CLogger.cpp.o
-.PHONY : src/CLogger.cpp.o
-
-src/CLogger.i: src/CLogger.cpp.i
-.PHONY : src/CLogger.i
+src/logger.i: src/logger.cpp.i
+.PHONY : src/logger.i
 
 # target to preprocess a source file
-src/CLogger.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CLogger.cpp.i
-.PHONY : src/CLogger.cpp.i
+src/logger.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/logger.cpp.i
+.PHONY : src/logger.cpp.i
 
-src/CLogger.s: src/CLogger.cpp.s
-.PHONY : src/CLogger.s
-
-# target to generate assembly for a file
-src/CLogger.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CLogger.cpp.s
-.PHONY : src/CLogger.cpp.s
-
-src/CServer.o: src/CServer.cpp.o
-.PHONY : src/CServer.o
-
-# target to build an object file
-src/CServer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CServer.cpp.o
-.PHONY : src/CServer.cpp.o
-
-src/CServer.i: src/CServer.cpp.i
-.PHONY : src/CServer.i
-
-# target to preprocess a source file
-src/CServer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CServer.cpp.i
-.PHONY : src/CServer.cpp.i
-
-src/CServer.s: src/CServer.cpp.s
-.PHONY : src/CServer.s
+src/logger.s: src/logger.cpp.s
+.PHONY : src/logger.s
 
 # target to generate assembly for a file
-src/CServer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CServer.cpp.s
-.PHONY : src/CServer.cpp.s
-
-src/CServerConfig.o: src/CServerConfig.cpp.o
-.PHONY : src/CServerConfig.o
-
-# target to build an object file
-src/CServerConfig.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CServerConfig.cpp.o
-.PHONY : src/CServerConfig.cpp.o
-
-src/CServerConfig.i: src/CServerConfig.cpp.i
-.PHONY : src/CServerConfig.i
-
-# target to preprocess a source file
-src/CServerConfig.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CServerConfig.cpp.i
-.PHONY : src/CServerConfig.cpp.i
-
-src/CServerConfig.s: src/CServerConfig.cpp.s
-.PHONY : src/CServerConfig.s
-
-# target to generate assembly for a file
-src/CServerConfig.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CServerConfig.cpp.s
-.PHONY : src/CServerConfig.cpp.s
-
-src/CSignal.o: src/CSignal.cpp.o
-.PHONY : src/CSignal.o
-
-# target to build an object file
-src/CSignal.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CSignal.cpp.o
-.PHONY : src/CSignal.cpp.o
-
-src/CSignal.i: src/CSignal.cpp.i
-.PHONY : src/CSignal.i
-
-# target to preprocess a source file
-src/CSignal.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CSignal.cpp.i
-.PHONY : src/CSignal.cpp.i
-
-src/CSignal.s: src/CSignal.cpp.s
-.PHONY : src/CSignal.s
-
-# target to generate assembly for a file
-src/CSignal.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/CSignal.cpp.s
-.PHONY : src/CSignal.cpp.s
-
-src/auth/CAuthRegistry.o: src/auth/CAuthRegistry.cpp.o
-.PHONY : src/auth/CAuthRegistry.o
-
-# target to build an object file
-src/auth/CAuthRegistry.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CAuthRegistry.cpp.o
-.PHONY : src/auth/CAuthRegistry.cpp.o
-
-src/auth/CAuthRegistry.i: src/auth/CAuthRegistry.cpp.i
-.PHONY : src/auth/CAuthRegistry.i
-
-# target to preprocess a source file
-src/auth/CAuthRegistry.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CAuthRegistry.cpp.i
-.PHONY : src/auth/CAuthRegistry.cpp.i
-
-src/auth/CAuthRegistry.s: src/auth/CAuthRegistry.cpp.s
-.PHONY : src/auth/CAuthRegistry.s
-
-# target to generate assembly for a file
-src/auth/CAuthRegistry.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CAuthRegistry.cpp.s
-.PHONY : src/auth/CAuthRegistry.cpp.s
-
-src/auth/CBasicAuth.o: src/auth/CBasicAuth.cpp.o
-.PHONY : src/auth/CBasicAuth.o
-
-# target to build an object file
-src/auth/CBasicAuth.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CBasicAuth.cpp.o
-.PHONY : src/auth/CBasicAuth.cpp.o
-
-src/auth/CBasicAuth.i: src/auth/CBasicAuth.cpp.i
-.PHONY : src/auth/CBasicAuth.i
-
-# target to preprocess a source file
-src/auth/CBasicAuth.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CBasicAuth.cpp.i
-.PHONY : src/auth/CBasicAuth.cpp.i
-
-src/auth/CBasicAuth.s: src/auth/CBasicAuth.cpp.s
-.PHONY : src/auth/CBasicAuth.s
-
-# target to generate assembly for a file
-src/auth/CBasicAuth.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CBasicAuth.cpp.s
-.PHONY : src/auth/CBasicAuth.cpp.s
-
-src/auth/CScramAuth.o: src/auth/CScramAuth.cpp.o
-.PHONY : src/auth/CScramAuth.o
-
-# target to build an object file
-src/auth/CScramAuth.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.o
-.PHONY : src/auth/CScramAuth.cpp.o
-
-src/auth/CScramAuth.i: src/auth/CScramAuth.cpp.i
-.PHONY : src/auth/CScramAuth.i
-
-# target to preprocess a source file
-src/auth/CScramAuth.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.i
-.PHONY : src/auth/CScramAuth.cpp.i
-
-src/auth/CScramAuth.s: src/auth/CScramAuth.cpp.s
-.PHONY : src/auth/CScramAuth.s
-
-# target to generate assembly for a file
-src/auth/CScramAuth.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramAuth.cpp.s
-.PHONY : src/auth/CScramAuth.cpp.s
-
-src/auth/CScramMongoAuth.o: src/auth/CScramMongoAuth.cpp.o
-.PHONY : src/auth/CScramMongoAuth.o
-
-# target to build an object file
-src/auth/CScramMongoAuth.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramMongoAuth.cpp.o
-.PHONY : src/auth/CScramMongoAuth.cpp.o
-
-src/auth/CScramMongoAuth.i: src/auth/CScramMongoAuth.cpp.i
-.PHONY : src/auth/CScramMongoAuth.i
-
-# target to preprocess a source file
-src/auth/CScramMongoAuth.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramMongoAuth.cpp.i
-.PHONY : src/auth/CScramMongoAuth.cpp.i
-
-src/auth/CScramMongoAuth.s: src/auth/CScramMongoAuth.cpp.s
-.PHONY : src/auth/CScramMongoAuth.s
-
-# target to generate assembly for a file
-src/auth/CScramMongoAuth.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/auth/CScramMongoAuth.cpp.s
-.PHONY : src/auth/CScramMongoAuth.cpp.s
-
-src/database/CConnectionPooler.o: src/database/CConnectionPooler.cpp.o
-.PHONY : src/database/CConnectionPooler.o
-
-# target to build an object file
-src/database/CConnectionPooler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CConnectionPooler.cpp.o
-.PHONY : src/database/CConnectionPooler.cpp.o
-
-src/database/CConnectionPooler.i: src/database/CConnectionPooler.cpp.i
-.PHONY : src/database/CConnectionPooler.i
-
-# target to preprocess a source file
-src/database/CConnectionPooler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CConnectionPooler.cpp.i
-.PHONY : src/database/CConnectionPooler.cpp.i
-
-src/database/CConnectionPooler.s: src/database/CConnectionPooler.cpp.s
-.PHONY : src/database/CConnectionPooler.s
-
-# target to generate assembly for a file
-src/database/CConnectionPooler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CConnectionPooler.cpp.s
-.PHONY : src/database/CConnectionPooler.cpp.s
-
-src/database/CDatabase.o: src/database/CDatabase.cpp.o
-.PHONY : src/database/CDatabase.o
-
-# target to build an object file
-src/database/CDatabase.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CDatabase.cpp.o
-.PHONY : src/database/CDatabase.cpp.o
-
-src/database/CDatabase.i: src/database/CDatabase.cpp.i
-.PHONY : src/database/CDatabase.i
-
-# target to preprocess a source file
-src/database/CDatabase.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CDatabase.cpp.i
-.PHONY : src/database/CDatabase.cpp.i
-
-src/database/CDatabase.s: src/database/CDatabase.cpp.s
-.PHONY : src/database/CDatabase.s
-
-# target to generate assembly for a file
-src/database/CDatabase.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CDatabase.cpp.s
-.PHONY : src/database/CDatabase.cpp.s
-
-src/database/CLibpq.o: src/database/CLibpq.cpp.o
-.PHONY : src/database/CLibpq.o
-
-# target to build an object file
-src/database/CLibpq.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CLibpq.cpp.o
-.PHONY : src/database/CLibpq.cpp.o
-
-src/database/CLibpq.i: src/database/CLibpq.cpp.i
-.PHONY : src/database/CLibpq.i
-
-# target to preprocess a source file
-src/database/CLibpq.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CLibpq.cpp.i
-.PHONY : src/database/CLibpq.cpp.i
-
-src/database/CLibpq.s: src/database/CLibpq.cpp.s
-.PHONY : src/database/CLibpq.s
-
-# target to generate assembly for a file
-src/database/CLibpq.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CLibpq.cpp.s
-.PHONY : src/database/CLibpq.cpp.s
-
-src/database/CPGConnectionPooler.o: src/database/CPGConnectionPooler.cpp.o
-.PHONY : src/database/CPGConnectionPooler.o
-
-# target to build an object file
-src/database/CPGConnectionPooler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CPGConnectionPooler.cpp.o
-.PHONY : src/database/CPGConnectionPooler.cpp.o
-
-src/database/CPGConnectionPooler.i: src/database/CPGConnectionPooler.cpp.i
-.PHONY : src/database/CPGConnectionPooler.i
-
-# target to preprocess a source file
-src/database/CPGConnectionPooler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CPGConnectionPooler.cpp.i
-.PHONY : src/database/CPGConnectionPooler.cpp.i
-
-src/database/CPGConnectionPooler.s: src/database/CPGConnectionPooler.cpp.s
-.PHONY : src/database/CPGConnectionPooler.s
-
-# target to generate assembly for a file
-src/database/CPGConnectionPooler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CPGConnectionPooler.cpp.s
-.PHONY : src/database/CPGConnectionPooler.cpp.s
-
-src/database/CPostgresDatabase.o: src/database/CPostgresDatabase.cpp.o
-.PHONY : src/database/CPostgresDatabase.o
-
-# target to build an object file
-src/database/CPostgresDatabase.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CPostgresDatabase.cpp.o
-.PHONY : src/database/CPostgresDatabase.cpp.o
-
-src/database/CPostgresDatabase.i: src/database/CPostgresDatabase.cpp.i
-.PHONY : src/database/CPostgresDatabase.i
-
-# target to preprocess a source file
-src/database/CPostgresDatabase.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CPostgresDatabase.cpp.i
-.PHONY : src/database/CPostgresDatabase.cpp.i
-
-src/database/CPostgresDatabase.s: src/database/CPostgresDatabase.cpp.s
-.PHONY : src/database/CPostgresDatabase.s
-
-# target to generate assembly for a file
-src/database/CPostgresDatabase.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/database/CPostgresDatabase.cpp.s
-.PHONY : src/database/CPostgresDatabase.cpp.s
+src/logger.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/logger.cpp.s
+.PHONY : src/logger.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -561,989 +246,77 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/network/CNetwork.o: src/network/CNetwork.cpp.o
-.PHONY : src/network/CNetwork.o
+src/mongodb.o: src/mongodb.cpp.o
+.PHONY : src/mongodb.o
 
 # target to build an object file
-src/network/CNetwork.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CNetwork.cpp.o
-.PHONY : src/network/CNetwork.cpp.o
+src/mongodb.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/mongodb.cpp.o
+.PHONY : src/mongodb.cpp.o
 
-src/network/CNetwork.i: src/network/CNetwork.cpp.i
-.PHONY : src/network/CNetwork.i
+src/mongodb.i: src/mongodb.cpp.i
+.PHONY : src/mongodb.i
 
 # target to preprocess a source file
-src/network/CNetwork.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CNetwork.cpp.i
-.PHONY : src/network/CNetwork.cpp.i
+src/mongodb.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/mongodb.cpp.i
+.PHONY : src/mongodb.cpp.i
 
-src/network/CNetwork.s: src/network/CNetwork.cpp.s
-.PHONY : src/network/CNetwork.s
+src/mongodb.s: src/mongodb.cpp.s
+.PHONY : src/mongodb.s
 
 # target to generate assembly for a file
-src/network/CNetwork.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CNetwork.cpp.s
-.PHONY : src/network/CNetwork.cpp.s
+src/mongodb.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/mongodb.cpp.s
+.PHONY : src/mongodb.cpp.s
 
-src/network/CTcp.o: src/network/CTcp.cpp.o
-.PHONY : src/network/CTcp.o
+src/protocol.o: src/protocol.cpp.o
+.PHONY : src/protocol.o
 
 # target to build an object file
-src/network/CTcp.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CTcp.cpp.o
-.PHONY : src/network/CTcp.cpp.o
+src/protocol.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol.cpp.o
+.PHONY : src/protocol.cpp.o
 
-src/network/CTcp.i: src/network/CTcp.cpp.i
-.PHONY : src/network/CTcp.i
+src/protocol.i: src/protocol.cpp.i
+.PHONY : src/protocol.i
 
 # target to preprocess a source file
-src/network/CTcp.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CTcp.cpp.i
-.PHONY : src/network/CTcp.cpp.i
+src/protocol.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol.cpp.i
+.PHONY : src/protocol.cpp.i
 
-src/network/CTcp.s: src/network/CTcp.cpp.s
-.PHONY : src/network/CTcp.s
+src/protocol.s: src/protocol.cpp.s
+.PHONY : src/protocol.s
 
 # target to generate assembly for a file
-src/network/CTcp.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CTcp.cpp.s
-.PHONY : src/network/CTcp.cpp.s
+src/protocol.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol.cpp.s
+.PHONY : src/protocol.cpp.s
 
-src/network/CThread.o: src/network/CThread.cpp.o
-.PHONY : src/network/CThread.o
+src/wire_protocol_handler.o: src/wire_protocol_handler.cpp.o
+.PHONY : src/wire_protocol_handler.o
 
 # target to build an object file
-src/network/CThread.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CThread.cpp.o
-.PHONY : src/network/CThread.cpp.o
+src/wire_protocol_handler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/wire_protocol_handler.cpp.o
+.PHONY : src/wire_protocol_handler.cpp.o
 
-src/network/CThread.i: src/network/CThread.cpp.i
-.PHONY : src/network/CThread.i
-
-# target to preprocess a source file
-src/network/CThread.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CThread.cpp.i
-.PHONY : src/network/CThread.cpp.i
-
-src/network/CThread.s: src/network/CThread.cpp.s
-.PHONY : src/network/CThread.s
-
-# target to generate assembly for a file
-src/network/CThread.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/network/CThread.cpp.s
-.PHONY : src/network/CThread.cpp.s
-
-src/parsing/CMessageParser.o: src/parsing/CMessageParser.cpp.o
-.PHONY : src/parsing/CMessageParser.o
-
-# target to build an object file
-src/parsing/CMessageParser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CMessageParser.cpp.o
-.PHONY : src/parsing/CMessageParser.cpp.o
-
-src/parsing/CMessageParser.i: src/parsing/CMessageParser.cpp.i
-.PHONY : src/parsing/CMessageParser.i
+src/wire_protocol_handler.i: src/wire_protocol_handler.cpp.i
+.PHONY : src/wire_protocol_handler.i
 
 # target to preprocess a source file
-src/parsing/CMessageParser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CMessageParser.cpp.i
-.PHONY : src/parsing/CMessageParser.cpp.i
+src/wire_protocol_handler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/wire_protocol_handler.cpp.i
+.PHONY : src/wire_protocol_handler.cpp.i
 
-src/parsing/CMessageParser.s: src/parsing/CMessageParser.cpp.s
-.PHONY : src/parsing/CMessageParser.s
-
-# target to generate assembly for a file
-src/parsing/CMessageParser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CMessageParser.cpp.s
-.PHONY : src/parsing/CMessageParser.cpp.s
-
-src/parsing/CParser.o: src/parsing/CParser.cpp.o
-.PHONY : src/parsing/CParser.o
-
-# target to build an object file
-src/parsing/CParser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CParser.cpp.o
-.PHONY : src/parsing/CParser.cpp.o
-
-src/parsing/CParser.i: src/parsing/CParser.cpp.i
-.PHONY : src/parsing/CParser.i
-
-# target to preprocess a source file
-src/parsing/CParser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CParser.cpp.i
-.PHONY : src/parsing/CParser.cpp.i
-
-src/parsing/CParser.s: src/parsing/CParser.cpp.s
-.PHONY : src/parsing/CParser.s
+src/wire_protocol_handler.s: src/wire_protocol_handler.cpp.s
+.PHONY : src/wire_protocol_handler.s
 
 # target to generate assembly for a file
-src/parsing/CParser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/parsing/CParser.cpp.s
-.PHONY : src/parsing/CParser.cpp.s
-
-src/protocol/BaseCommand.o: src/protocol/BaseCommand.cpp.o
-.PHONY : src/protocol/BaseCommand.o
-
-# target to build an object file
-src/protocol/BaseCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/BaseCommand.cpp.o
-.PHONY : src/protocol/BaseCommand.cpp.o
-
-src/protocol/BaseCommand.i: src/protocol/BaseCommand.cpp.i
-.PHONY : src/protocol/BaseCommand.i
-
-# target to preprocess a source file
-src/protocol/BaseCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/BaseCommand.cpp.i
-.PHONY : src/protocol/BaseCommand.cpp.i
-
-src/protocol/BaseCommand.s: src/protocol/BaseCommand.cpp.s
-.PHONY : src/protocol/BaseCommand.s
-
-# target to generate assembly for a file
-src/protocol/BaseCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/BaseCommand.cpp.s
-.PHONY : src/protocol/BaseCommand.cpp.s
-
-src/protocol/CBsonType.o: src/protocol/CBsonType.cpp.o
-.PHONY : src/protocol/CBsonType.o
-
-# target to build an object file
-src/protocol/CBsonType.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CBsonType.cpp.o
-.PHONY : src/protocol/CBsonType.cpp.o
-
-src/protocol/CBsonType.i: src/protocol/CBsonType.cpp.i
-.PHONY : src/protocol/CBsonType.i
-
-# target to preprocess a source file
-src/protocol/CBsonType.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CBsonType.cpp.i
-.PHONY : src/protocol/CBsonType.cpp.i
-
-src/protocol/CBsonType.s: src/protocol/CBsonType.cpp.s
-.PHONY : src/protocol/CBsonType.s
-
-# target to generate assembly for a file
-src/protocol/CBsonType.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CBsonType.cpp.s
-.PHONY : src/protocol/CBsonType.cpp.s
-
-src/protocol/CCommandHandler.o: src/protocol/CCommandHandler.cpp.o
-.PHONY : src/protocol/CCommandHandler.o
-
-# target to build an object file
-src/protocol/CCommandHandler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CCommandHandler.cpp.o
-.PHONY : src/protocol/CCommandHandler.cpp.o
-
-src/protocol/CCommandHandler.i: src/protocol/CCommandHandler.cpp.i
-.PHONY : src/protocol/CCommandHandler.i
-
-# target to preprocess a source file
-src/protocol/CCommandHandler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CCommandHandler.cpp.i
-.PHONY : src/protocol/CCommandHandler.cpp.i
-
-src/protocol/CCommandHandler.s: src/protocol/CCommandHandler.cpp.s
-.PHONY : src/protocol/CCommandHandler.s
-
-# target to generate assembly for a file
-src/protocol/CCommandHandler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CCommandHandler.cpp.s
-.PHONY : src/protocol/CCommandHandler.cpp.s
-
-src/protocol/CDocumentCommandHandler.o: src/protocol/CDocumentCommandHandler.cpp.o
-.PHONY : src/protocol/CDocumentCommandHandler.o
-
-# target to build an object file
-src/protocol/CDocumentCommandHandler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentCommandHandler.cpp.o
-.PHONY : src/protocol/CDocumentCommandHandler.cpp.o
-
-src/protocol/CDocumentCommandHandler.i: src/protocol/CDocumentCommandHandler.cpp.i
-.PHONY : src/protocol/CDocumentCommandHandler.i
-
-# target to preprocess a source file
-src/protocol/CDocumentCommandHandler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentCommandHandler.cpp.i
-.PHONY : src/protocol/CDocumentCommandHandler.cpp.i
-
-src/protocol/CDocumentCommandHandler.s: src/protocol/CDocumentCommandHandler.cpp.s
-.PHONY : src/protocol/CDocumentCommandHandler.s
-
-# target to generate assembly for a file
-src/protocol/CDocumentCommandHandler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentCommandHandler.cpp.s
-.PHONY : src/protocol/CDocumentCommandHandler.cpp.s
-
-src/protocol/CDocumentProtocolHandler.o: src/protocol/CDocumentProtocolHandler.cpp.o
-.PHONY : src/protocol/CDocumentProtocolHandler.o
-
-# target to build an object file
-src/protocol/CDocumentProtocolHandler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentProtocolHandler.cpp.o
-.PHONY : src/protocol/CDocumentProtocolHandler.cpp.o
-
-src/protocol/CDocumentProtocolHandler.i: src/protocol/CDocumentProtocolHandler.cpp.i
-.PHONY : src/protocol/CDocumentProtocolHandler.i
-
-# target to preprocess a source file
-src/protocol/CDocumentProtocolHandler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentProtocolHandler.cpp.i
-.PHONY : src/protocol/CDocumentProtocolHandler.cpp.i
-
-src/protocol/CDocumentProtocolHandler.s: src/protocol/CDocumentProtocolHandler.cpp.s
-.PHONY : src/protocol/CDocumentProtocolHandler.s
-
-# target to generate assembly for a file
-src/protocol/CDocumentProtocolHandler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentProtocolHandler.cpp.s
-.PHONY : src/protocol/CDocumentProtocolHandler.cpp.s
-
-src/protocol/CDocumentWireProtocol.o: src/protocol/CDocumentWireProtocol.cpp.o
-.PHONY : src/protocol/CDocumentWireProtocol.o
-
-# target to build an object file
-src/protocol/CDocumentWireProtocol.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentWireProtocol.cpp.o
-.PHONY : src/protocol/CDocumentWireProtocol.cpp.o
-
-src/protocol/CDocumentWireProtocol.i: src/protocol/CDocumentWireProtocol.cpp.i
-.PHONY : src/protocol/CDocumentWireProtocol.i
-
-# target to preprocess a source file
-src/protocol/CDocumentWireProtocol.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentWireProtocol.cpp.i
-.PHONY : src/protocol/CDocumentWireProtocol.cpp.i
-
-src/protocol/CDocumentWireProtocol.s: src/protocol/CDocumentWireProtocol.cpp.s
-.PHONY : src/protocol/CDocumentWireProtocol.s
-
-# target to generate assembly for a file
-src/protocol/CDocumentWireProtocol.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CDocumentWireProtocol.cpp.s
-.PHONY : src/protocol/CDocumentWireProtocol.cpp.s
-
-src/protocol/COpMsgHandler.o: src/protocol/COpMsgHandler.cpp.o
-.PHONY : src/protocol/COpMsgHandler.o
-
-# target to build an object file
-src/protocol/COpMsgHandler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpMsgHandler.cpp.o
-.PHONY : src/protocol/COpMsgHandler.cpp.o
-
-src/protocol/COpMsgHandler.i: src/protocol/COpMsgHandler.cpp.i
-.PHONY : src/protocol/COpMsgHandler.i
-
-# target to preprocess a source file
-src/protocol/COpMsgHandler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpMsgHandler.cpp.i
-.PHONY : src/protocol/COpMsgHandler.cpp.i
-
-src/protocol/COpMsgHandler.s: src/protocol/COpMsgHandler.cpp.s
-.PHONY : src/protocol/COpMsgHandler.s
-
-# target to generate assembly for a file
-src/protocol/COpMsgHandler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpMsgHandler.cpp.s
-.PHONY : src/protocol/COpMsgHandler.cpp.s
-
-src/protocol/COpReplyHandler.o: src/protocol/COpReplyHandler.cpp.o
-.PHONY : src/protocol/COpReplyHandler.o
-
-# target to build an object file
-src/protocol/COpReplyHandler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpReplyHandler.cpp.o
-.PHONY : src/protocol/COpReplyHandler.cpp.o
-
-src/protocol/COpReplyHandler.i: src/protocol/COpReplyHandler.cpp.i
-.PHONY : src/protocol/COpReplyHandler.i
-
-# target to preprocess a source file
-src/protocol/COpReplyHandler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpReplyHandler.cpp.i
-.PHONY : src/protocol/COpReplyHandler.cpp.i
-
-src/protocol/COpReplyHandler.s: src/protocol/COpReplyHandler.cpp.s
-.PHONY : src/protocol/COpReplyHandler.s
-
-# target to generate assembly for a file
-src/protocol/COpReplyHandler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/COpReplyHandler.cpp.s
-.PHONY : src/protocol/COpReplyHandler.cpp.s
-
-src/protocol/CResponseBuilder.o: src/protocol/CResponseBuilder.cpp.o
-.PHONY : src/protocol/CResponseBuilder.o
-
-# target to build an object file
-src/protocol/CResponseBuilder.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CResponseBuilder.cpp.o
-.PHONY : src/protocol/CResponseBuilder.cpp.o
-
-src/protocol/CResponseBuilder.i: src/protocol/CResponseBuilder.cpp.i
-.PHONY : src/protocol/CResponseBuilder.i
-
-# target to preprocess a source file
-src/protocol/CResponseBuilder.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CResponseBuilder.cpp.i
-.PHONY : src/protocol/CResponseBuilder.cpp.i
-
-src/protocol/CResponseBuilder.s: src/protocol/CResponseBuilder.cpp.s
-.PHONY : src/protocol/CResponseBuilder.s
-
-# target to generate assembly for a file
-src/protocol/CResponseBuilder.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CResponseBuilder.cpp.s
-.PHONY : src/protocol/CResponseBuilder.cpp.s
-
-src/protocol/CollectionNameParser.o: src/protocol/CollectionNameParser.cpp.o
-.PHONY : src/protocol/CollectionNameParser.o
-
-# target to build an object file
-src/protocol/CollectionNameParser.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CollectionNameParser.cpp.o
-.PHONY : src/protocol/CollectionNameParser.cpp.o
-
-src/protocol/CollectionNameParser.i: src/protocol/CollectionNameParser.cpp.i
-.PHONY : src/protocol/CollectionNameParser.i
-
-# target to preprocess a source file
-src/protocol/CollectionNameParser.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CollectionNameParser.cpp.i
-.PHONY : src/protocol/CollectionNameParser.cpp.i
-
-src/protocol/CollectionNameParser.s: src/protocol/CollectionNameParser.cpp.s
-.PHONY : src/protocol/CollectionNameParser.s
-
-# target to generate assembly for a file
-src/protocol/CollectionNameParser.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CollectionNameParser.cpp.s
-.PHONY : src/protocol/CollectionNameParser.cpp.s
-
-src/protocol/CommandRegistry.o: src/protocol/CommandRegistry.cpp.o
-.PHONY : src/protocol/CommandRegistry.o
-
-# target to build an object file
-src/protocol/CommandRegistry.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CommandRegistry.cpp.o
-.PHONY : src/protocol/CommandRegistry.cpp.o
-
-src/protocol/CommandRegistry.i: src/protocol/CommandRegistry.cpp.i
-.PHONY : src/protocol/CommandRegistry.i
-
-# target to preprocess a source file
-src/protocol/CommandRegistry.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CommandRegistry.cpp.i
-.PHONY : src/protocol/CommandRegistry.cpp.i
-
-src/protocol/CommandRegistry.s: src/protocol/CommandRegistry.cpp.s
-.PHONY : src/protocol/CommandRegistry.s
-
-# target to generate assembly for a file
-src/protocol/CommandRegistry.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CommandRegistry.cpp.s
-.PHONY : src/protocol/CommandRegistry.cpp.s
-
-src/protocol/CountCommand.o: src/protocol/CountCommand.cpp.o
-.PHONY : src/protocol/CountCommand.o
-
-# target to build an object file
-src/protocol/CountCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CountCommand.cpp.o
-.PHONY : src/protocol/CountCommand.cpp.o
-
-src/protocol/CountCommand.i: src/protocol/CountCommand.cpp.i
-.PHONY : src/protocol/CountCommand.i
-
-# target to preprocess a source file
-src/protocol/CountCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CountCommand.cpp.i
-.PHONY : src/protocol/CountCommand.cpp.i
-
-src/protocol/CountCommand.s: src/protocol/CountCommand.cpp.s
-.PHONY : src/protocol/CountCommand.s
-
-# target to generate assembly for a file
-src/protocol/CountCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/CountCommand.cpp.s
-.PHONY : src/protocol/CountCommand.cpp.s
-
-src/protocol/FindCommand.o: src/protocol/FindCommand.cpp.o
-.PHONY : src/protocol/FindCommand.o
-
-# target to build an object file
-src/protocol/FindCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindCommand.cpp.o
-.PHONY : src/protocol/FindCommand.cpp.o
-
-src/protocol/FindCommand.i: src/protocol/FindCommand.cpp.i
-.PHONY : src/protocol/FindCommand.i
-
-# target to preprocess a source file
-src/protocol/FindCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindCommand.cpp.i
-.PHONY : src/protocol/FindCommand.cpp.i
-
-src/protocol/FindCommand.s: src/protocol/FindCommand.cpp.s
-.PHONY : src/protocol/FindCommand.s
-
-# target to generate assembly for a file
-src/protocol/FindCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindCommand.cpp.s
-.PHONY : src/protocol/FindCommand.cpp.s
-
-src/protocol/FindOneCommand.o: src/protocol/FindOneCommand.cpp.o
-.PHONY : src/protocol/FindOneCommand.o
-
-# target to build an object file
-src/protocol/FindOneCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindOneCommand.cpp.o
-.PHONY : src/protocol/FindOneCommand.cpp.o
-
-src/protocol/FindOneCommand.i: src/protocol/FindOneCommand.cpp.i
-.PHONY : src/protocol/FindOneCommand.i
-
-# target to preprocess a source file
-src/protocol/FindOneCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindOneCommand.cpp.i
-.PHONY : src/protocol/FindOneCommand.cpp.i
-
-src/protocol/FindOneCommand.s: src/protocol/FindOneCommand.cpp.s
-.PHONY : src/protocol/FindOneCommand.s
-
-# target to generate assembly for a file
-src/protocol/FindOneCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/FindOneCommand.cpp.s
-.PHONY : src/protocol/FindOneCommand.cpp.s
-
-src/protocol/commands/CAggregateCommand.o: src/protocol/commands/CAggregateCommand.cpp.o
-.PHONY : src/protocol/commands/CAggregateCommand.o
-
-# target to build an object file
-src/protocol/commands/CAggregateCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CAggregateCommand.cpp.o
-.PHONY : src/protocol/commands/CAggregateCommand.cpp.o
-
-src/protocol/commands/CAggregateCommand.i: src/protocol/commands/CAggregateCommand.cpp.i
-.PHONY : src/protocol/commands/CAggregateCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CAggregateCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CAggregateCommand.cpp.i
-.PHONY : src/protocol/commands/CAggregateCommand.cpp.i
-
-src/protocol/commands/CAggregateCommand.s: src/protocol/commands/CAggregateCommand.cpp.s
-.PHONY : src/protocol/commands/CAggregateCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CAggregateCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CAggregateCommand.cpp.s
-.PHONY : src/protocol/commands/CAggregateCommand.cpp.s
-
-src/protocol/commands/CBaseCommand.o: src/protocol/commands/CBaseCommand.cpp.o
-.PHONY : src/protocol/commands/CBaseCommand.o
-
-# target to build an object file
-src/protocol/commands/CBaseCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CBaseCommand.cpp.o
-.PHONY : src/protocol/commands/CBaseCommand.cpp.o
-
-src/protocol/commands/CBaseCommand.i: src/protocol/commands/CBaseCommand.cpp.i
-.PHONY : src/protocol/commands/CBaseCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CBaseCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CBaseCommand.cpp.i
-.PHONY : src/protocol/commands/CBaseCommand.cpp.i
-
-src/protocol/commands/CBaseCommand.s: src/protocol/commands/CBaseCommand.cpp.s
-.PHONY : src/protocol/commands/CBaseCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CBaseCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CBaseCommand.cpp.s
-.PHONY : src/protocol/commands/CBaseCommand.cpp.s
-
-src/protocol/commands/CBuildInfoCommand.o: src/protocol/commands/CBuildInfoCommand.cpp.o
-.PHONY : src/protocol/commands/CBuildInfoCommand.o
-
-# target to build an object file
-src/protocol/commands/CBuildInfoCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CBuildInfoCommand.cpp.o
-.PHONY : src/protocol/commands/CBuildInfoCommand.cpp.o
-
-src/protocol/commands/CBuildInfoCommand.i: src/protocol/commands/CBuildInfoCommand.cpp.i
-.PHONY : src/protocol/commands/CBuildInfoCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CBuildInfoCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CBuildInfoCommand.cpp.i
-.PHONY : src/protocol/commands/CBuildInfoCommand.cpp.i
-
-src/protocol/commands/CBuildInfoCommand.s: src/protocol/commands/CBuildInfoCommand.cpp.s
-.PHONY : src/protocol/commands/CBuildInfoCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CBuildInfoCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CBuildInfoCommand.cpp.s
-.PHONY : src/protocol/commands/CBuildInfoCommand.cpp.s
-
-src/protocol/commands/CCollStatsCommand.o: src/protocol/commands/CCollStatsCommand.cpp.o
-.PHONY : src/protocol/commands/CCollStatsCommand.o
-
-# target to build an object file
-src/protocol/commands/CCollStatsCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCollStatsCommand.cpp.o
-.PHONY : src/protocol/commands/CCollStatsCommand.cpp.o
-
-src/protocol/commands/CCollStatsCommand.i: src/protocol/commands/CCollStatsCommand.cpp.i
-.PHONY : src/protocol/commands/CCollStatsCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CCollStatsCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCollStatsCommand.cpp.i
-.PHONY : src/protocol/commands/CCollStatsCommand.cpp.i
-
-src/protocol/commands/CCollStatsCommand.s: src/protocol/commands/CCollStatsCommand.cpp.s
-.PHONY : src/protocol/commands/CCollStatsCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CCollStatsCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCollStatsCommand.cpp.s
-.PHONY : src/protocol/commands/CCollStatsCommand.cpp.s
-
-src/protocol/commands/CCommandRegistry.o: src/protocol/commands/CCommandRegistry.cpp.o
-.PHONY : src/protocol/commands/CCommandRegistry.o
-
-# target to build an object file
-src/protocol/commands/CCommandRegistry.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCommandRegistry.cpp.o
-.PHONY : src/protocol/commands/CCommandRegistry.cpp.o
-
-src/protocol/commands/CCommandRegistry.i: src/protocol/commands/CCommandRegistry.cpp.i
-.PHONY : src/protocol/commands/CCommandRegistry.i
-
-# target to preprocess a source file
-src/protocol/commands/CCommandRegistry.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCommandRegistry.cpp.i
-.PHONY : src/protocol/commands/CCommandRegistry.cpp.i
-
-src/protocol/commands/CCommandRegistry.s: src/protocol/commands/CCommandRegistry.cpp.s
-.PHONY : src/protocol/commands/CCommandRegistry.s
-
-# target to generate assembly for a file
-src/protocol/commands/CCommandRegistry.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCommandRegistry.cpp.s
-.PHONY : src/protocol/commands/CCommandRegistry.cpp.s
-
-src/protocol/commands/CCountCommand.o: src/protocol/commands/CCountCommand.cpp.o
-.PHONY : src/protocol/commands/CCountCommand.o
-
-# target to build an object file
-src/protocol/commands/CCountCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCountCommand.cpp.o
-.PHONY : src/protocol/commands/CCountCommand.cpp.o
-
-src/protocol/commands/CCountCommand.i: src/protocol/commands/CCountCommand.cpp.i
-.PHONY : src/protocol/commands/CCountCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CCountCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCountCommand.cpp.i
-.PHONY : src/protocol/commands/CCountCommand.cpp.i
-
-src/protocol/commands/CCountCommand.s: src/protocol/commands/CCountCommand.cpp.s
-.PHONY : src/protocol/commands/CCountCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CCountCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCountCommand.cpp.s
-.PHONY : src/protocol/commands/CCountCommand.cpp.s
-
-src/protocol/commands/CCreateCommand.o: src/protocol/commands/CCreateCommand.cpp.o
-.PHONY : src/protocol/commands/CCreateCommand.o
-
-# target to build an object file
-src/protocol/commands/CCreateCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCreateCommand.cpp.o
-.PHONY : src/protocol/commands/CCreateCommand.cpp.o
-
-src/protocol/commands/CCreateCommand.i: src/protocol/commands/CCreateCommand.cpp.i
-.PHONY : src/protocol/commands/CCreateCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CCreateCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCreateCommand.cpp.i
-.PHONY : src/protocol/commands/CCreateCommand.cpp.i
-
-src/protocol/commands/CCreateCommand.s: src/protocol/commands/CCreateCommand.cpp.s
-.PHONY : src/protocol/commands/CCreateCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CCreateCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCreateCommand.cpp.s
-.PHONY : src/protocol/commands/CCreateCommand.cpp.s
-
-src/protocol/commands/CCreateIndexesCommand.o: src/protocol/commands/CCreateIndexesCommand.cpp.o
-.PHONY : src/protocol/commands/CCreateIndexesCommand.o
-
-# target to build an object file
-src/protocol/commands/CCreateIndexesCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCreateIndexesCommand.cpp.o
-.PHONY : src/protocol/commands/CCreateIndexesCommand.cpp.o
-
-src/protocol/commands/CCreateIndexesCommand.i: src/protocol/commands/CCreateIndexesCommand.cpp.i
-.PHONY : src/protocol/commands/CCreateIndexesCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CCreateIndexesCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCreateIndexesCommand.cpp.i
-.PHONY : src/protocol/commands/CCreateIndexesCommand.cpp.i
-
-src/protocol/commands/CCreateIndexesCommand.s: src/protocol/commands/CCreateIndexesCommand.cpp.s
-.PHONY : src/protocol/commands/CCreateIndexesCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CCreateIndexesCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CCreateIndexesCommand.cpp.s
-.PHONY : src/protocol/commands/CCreateIndexesCommand.cpp.s
-
-src/protocol/commands/CDbStatsCommand.o: src/protocol/commands/CDbStatsCommand.cpp.o
-.PHONY : src/protocol/commands/CDbStatsCommand.o
-
-# target to build an object file
-src/protocol/commands/CDbStatsCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDbStatsCommand.cpp.o
-.PHONY : src/protocol/commands/CDbStatsCommand.cpp.o
-
-src/protocol/commands/CDbStatsCommand.i: src/protocol/commands/CDbStatsCommand.cpp.i
-.PHONY : src/protocol/commands/CDbStatsCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CDbStatsCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDbStatsCommand.cpp.i
-.PHONY : src/protocol/commands/CDbStatsCommand.cpp.i
-
-src/protocol/commands/CDbStatsCommand.s: src/protocol/commands/CDbStatsCommand.cpp.s
-.PHONY : src/protocol/commands/CDbStatsCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CDbStatsCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDbStatsCommand.cpp.s
-.PHONY : src/protocol/commands/CDbStatsCommand.cpp.s
-
-src/protocol/commands/CDistinctCommand.o: src/protocol/commands/CDistinctCommand.cpp.o
-.PHONY : src/protocol/commands/CDistinctCommand.o
-
-# target to build an object file
-src/protocol/commands/CDistinctCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDistinctCommand.cpp.o
-.PHONY : src/protocol/commands/CDistinctCommand.cpp.o
-
-src/protocol/commands/CDistinctCommand.i: src/protocol/commands/CDistinctCommand.cpp.i
-.PHONY : src/protocol/commands/CDistinctCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CDistinctCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDistinctCommand.cpp.i
-.PHONY : src/protocol/commands/CDistinctCommand.cpp.i
-
-src/protocol/commands/CDistinctCommand.s: src/protocol/commands/CDistinctCommand.cpp.s
-.PHONY : src/protocol/commands/CDistinctCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CDistinctCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDistinctCommand.cpp.s
-.PHONY : src/protocol/commands/CDistinctCommand.cpp.s
-
-src/protocol/commands/CDropCommand.o: src/protocol/commands/CDropCommand.cpp.o
-.PHONY : src/protocol/commands/CDropCommand.o
-
-# target to build an object file
-src/protocol/commands/CDropCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDropCommand.cpp.o
-.PHONY : src/protocol/commands/CDropCommand.cpp.o
-
-src/protocol/commands/CDropCommand.i: src/protocol/commands/CDropCommand.cpp.i
-.PHONY : src/protocol/commands/CDropCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CDropCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDropCommand.cpp.i
-.PHONY : src/protocol/commands/CDropCommand.cpp.i
-
-src/protocol/commands/CDropCommand.s: src/protocol/commands/CDropCommand.cpp.s
-.PHONY : src/protocol/commands/CDropCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CDropCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDropCommand.cpp.s
-.PHONY : src/protocol/commands/CDropCommand.cpp.s
-
-src/protocol/commands/CDropIndexesCommand.o: src/protocol/commands/CDropIndexesCommand.cpp.o
-.PHONY : src/protocol/commands/CDropIndexesCommand.o
-
-# target to build an object file
-src/protocol/commands/CDropIndexesCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDropIndexesCommand.cpp.o
-.PHONY : src/protocol/commands/CDropIndexesCommand.cpp.o
-
-src/protocol/commands/CDropIndexesCommand.i: src/protocol/commands/CDropIndexesCommand.cpp.i
-.PHONY : src/protocol/commands/CDropIndexesCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CDropIndexesCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDropIndexesCommand.cpp.i
-.PHONY : src/protocol/commands/CDropIndexesCommand.cpp.i
-
-src/protocol/commands/CDropIndexesCommand.s: src/protocol/commands/CDropIndexesCommand.cpp.s
-.PHONY : src/protocol/commands/CDropIndexesCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CDropIndexesCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CDropIndexesCommand.cpp.s
-.PHONY : src/protocol/commands/CDropIndexesCommand.cpp.s
-
-src/protocol/commands/CExplainCommand.o: src/protocol/commands/CExplainCommand.cpp.o
-.PHONY : src/protocol/commands/CExplainCommand.o
-
-# target to build an object file
-src/protocol/commands/CExplainCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CExplainCommand.cpp.o
-.PHONY : src/protocol/commands/CExplainCommand.cpp.o
-
-src/protocol/commands/CExplainCommand.i: src/protocol/commands/CExplainCommand.cpp.i
-.PHONY : src/protocol/commands/CExplainCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CExplainCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CExplainCommand.cpp.i
-.PHONY : src/protocol/commands/CExplainCommand.cpp.i
-
-src/protocol/commands/CExplainCommand.s: src/protocol/commands/CExplainCommand.cpp.s
-.PHONY : src/protocol/commands/CExplainCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CExplainCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CExplainCommand.cpp.s
-.PHONY : src/protocol/commands/CExplainCommand.cpp.s
-
-src/protocol/commands/CFindAndModifyCommand.o: src/protocol/commands/CFindAndModifyCommand.cpp.o
-.PHONY : src/protocol/commands/CFindAndModifyCommand.o
-
-# target to build an object file
-src/protocol/commands/CFindAndModifyCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CFindAndModifyCommand.cpp.o
-.PHONY : src/protocol/commands/CFindAndModifyCommand.cpp.o
-
-src/protocol/commands/CFindAndModifyCommand.i: src/protocol/commands/CFindAndModifyCommand.cpp.i
-.PHONY : src/protocol/commands/CFindAndModifyCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CFindAndModifyCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CFindAndModifyCommand.cpp.i
-.PHONY : src/protocol/commands/CFindAndModifyCommand.cpp.i
-
-src/protocol/commands/CFindAndModifyCommand.s: src/protocol/commands/CFindAndModifyCommand.cpp.s
-.PHONY : src/protocol/commands/CFindAndModifyCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CFindAndModifyCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CFindAndModifyCommand.cpp.s
-.PHONY : src/protocol/commands/CFindAndModifyCommand.cpp.s
-
-src/protocol/commands/CHelloCommand.o: src/protocol/commands/CHelloCommand.cpp.o
-.PHONY : src/protocol/commands/CHelloCommand.o
-
-# target to build an object file
-src/protocol/commands/CHelloCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CHelloCommand.cpp.o
-.PHONY : src/protocol/commands/CHelloCommand.cpp.o
-
-src/protocol/commands/CHelloCommand.i: src/protocol/commands/CHelloCommand.cpp.i
-.PHONY : src/protocol/commands/CHelloCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CHelloCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CHelloCommand.cpp.i
-.PHONY : src/protocol/commands/CHelloCommand.cpp.i
-
-src/protocol/commands/CHelloCommand.s: src/protocol/commands/CHelloCommand.cpp.s
-.PHONY : src/protocol/commands/CHelloCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CHelloCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CHelloCommand.cpp.s
-.PHONY : src/protocol/commands/CHelloCommand.cpp.s
-
-src/protocol/commands/CIsMasterCommand.o: src/protocol/commands/CIsMasterCommand.cpp.o
-.PHONY : src/protocol/commands/CIsMasterCommand.o
-
-# target to build an object file
-src/protocol/commands/CIsMasterCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CIsMasterCommand.cpp.o
-.PHONY : src/protocol/commands/CIsMasterCommand.cpp.o
-
-src/protocol/commands/CIsMasterCommand.i: src/protocol/commands/CIsMasterCommand.cpp.i
-.PHONY : src/protocol/commands/CIsMasterCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CIsMasterCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CIsMasterCommand.cpp.i
-.PHONY : src/protocol/commands/CIsMasterCommand.cpp.i
-
-src/protocol/commands/CIsMasterCommand.s: src/protocol/commands/CIsMasterCommand.cpp.s
-.PHONY : src/protocol/commands/CIsMasterCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CIsMasterCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CIsMasterCommand.cpp.s
-.PHONY : src/protocol/commands/CIsMasterCommand.cpp.s
-
-src/protocol/commands/CListCollectionsCommand.o: src/protocol/commands/CListCollectionsCommand.cpp.o
-.PHONY : src/protocol/commands/CListCollectionsCommand.o
-
-# target to build an object file
-src/protocol/commands/CListCollectionsCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListCollectionsCommand.cpp.o
-.PHONY : src/protocol/commands/CListCollectionsCommand.cpp.o
-
-src/protocol/commands/CListCollectionsCommand.i: src/protocol/commands/CListCollectionsCommand.cpp.i
-.PHONY : src/protocol/commands/CListCollectionsCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CListCollectionsCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListCollectionsCommand.cpp.i
-.PHONY : src/protocol/commands/CListCollectionsCommand.cpp.i
-
-src/protocol/commands/CListCollectionsCommand.s: src/protocol/commands/CListCollectionsCommand.cpp.s
-.PHONY : src/protocol/commands/CListCollectionsCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CListCollectionsCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListCollectionsCommand.cpp.s
-.PHONY : src/protocol/commands/CListCollectionsCommand.cpp.s
-
-src/protocol/commands/CListDatabasesCommand.o: src/protocol/commands/CListDatabasesCommand.cpp.o
-.PHONY : src/protocol/commands/CListDatabasesCommand.o
-
-# target to build an object file
-src/protocol/commands/CListDatabasesCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListDatabasesCommand.cpp.o
-.PHONY : src/protocol/commands/CListDatabasesCommand.cpp.o
-
-src/protocol/commands/CListDatabasesCommand.i: src/protocol/commands/CListDatabasesCommand.cpp.i
-.PHONY : src/protocol/commands/CListDatabasesCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CListDatabasesCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListDatabasesCommand.cpp.i
-.PHONY : src/protocol/commands/CListDatabasesCommand.cpp.i
-
-src/protocol/commands/CListDatabasesCommand.s: src/protocol/commands/CListDatabasesCommand.cpp.s
-.PHONY : src/protocol/commands/CListDatabasesCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CListDatabasesCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListDatabasesCommand.cpp.s
-.PHONY : src/protocol/commands/CListDatabasesCommand.cpp.s
-
-src/protocol/commands/CListIndexesCommand.o: src/protocol/commands/CListIndexesCommand.cpp.o
-.PHONY : src/protocol/commands/CListIndexesCommand.o
-
-# target to build an object file
-src/protocol/commands/CListIndexesCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListIndexesCommand.cpp.o
-.PHONY : src/protocol/commands/CListIndexesCommand.cpp.o
-
-src/protocol/commands/CListIndexesCommand.i: src/protocol/commands/CListIndexesCommand.cpp.i
-.PHONY : src/protocol/commands/CListIndexesCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CListIndexesCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListIndexesCommand.cpp.i
-.PHONY : src/protocol/commands/CListIndexesCommand.cpp.i
-
-src/protocol/commands/CListIndexesCommand.s: src/protocol/commands/CListIndexesCommand.cpp.s
-.PHONY : src/protocol/commands/CListIndexesCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CListIndexesCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CListIndexesCommand.cpp.s
-.PHONY : src/protocol/commands/CListIndexesCommand.cpp.s
-
-src/protocol/commands/CPingCommand.o: src/protocol/commands/CPingCommand.cpp.o
-.PHONY : src/protocol/commands/CPingCommand.o
-
-# target to build an object file
-src/protocol/commands/CPingCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CPingCommand.cpp.o
-.PHONY : src/protocol/commands/CPingCommand.cpp.o
-
-src/protocol/commands/CPingCommand.i: src/protocol/commands/CPingCommand.cpp.i
-.PHONY : src/protocol/commands/CPingCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CPingCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CPingCommand.cpp.i
-.PHONY : src/protocol/commands/CPingCommand.cpp.i
-
-src/protocol/commands/CPingCommand.s: src/protocol/commands/CPingCommand.cpp.s
-.PHONY : src/protocol/commands/CPingCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CPingCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CPingCommand.cpp.s
-.PHONY : src/protocol/commands/CPingCommand.cpp.s
-
-src/protocol/commands/CServerStatusCommand.o: src/protocol/commands/CServerStatusCommand.cpp.o
-.PHONY : src/protocol/commands/CServerStatusCommand.o
-
-# target to build an object file
-src/protocol/commands/CServerStatusCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CServerStatusCommand.cpp.o
-.PHONY : src/protocol/commands/CServerStatusCommand.cpp.o
-
-src/protocol/commands/CServerStatusCommand.i: src/protocol/commands/CServerStatusCommand.cpp.i
-.PHONY : src/protocol/commands/CServerStatusCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CServerStatusCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CServerStatusCommand.cpp.i
-.PHONY : src/protocol/commands/CServerStatusCommand.cpp.i
-
-src/protocol/commands/CServerStatusCommand.s: src/protocol/commands/CServerStatusCommand.cpp.s
-.PHONY : src/protocol/commands/CServerStatusCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CServerStatusCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CServerStatusCommand.cpp.s
-.PHONY : src/protocol/commands/CServerStatusCommand.cpp.s
-
-src/protocol/commands/CWhatsMyUriCommand.o: src/protocol/commands/CWhatsMyUriCommand.cpp.o
-.PHONY : src/protocol/commands/CWhatsMyUriCommand.o
-
-# target to build an object file
-src/protocol/commands/CWhatsMyUriCommand.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CWhatsMyUriCommand.cpp.o
-.PHONY : src/protocol/commands/CWhatsMyUriCommand.cpp.o
-
-src/protocol/commands/CWhatsMyUriCommand.i: src/protocol/commands/CWhatsMyUriCommand.cpp.i
-.PHONY : src/protocol/commands/CWhatsMyUriCommand.i
-
-# target to preprocess a source file
-src/protocol/commands/CWhatsMyUriCommand.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CWhatsMyUriCommand.cpp.i
-.PHONY : src/protocol/commands/CWhatsMyUriCommand.cpp.i
-
-src/protocol/commands/CWhatsMyUriCommand.s: src/protocol/commands/CWhatsMyUriCommand.cpp.s
-.PHONY : src/protocol/commands/CWhatsMyUriCommand.s
-
-# target to generate assembly for a file
-src/protocol/commands/CWhatsMyUriCommand.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/protocol/commands/CWhatsMyUriCommand.cpp.s
-.PHONY : src/protocol/commands/CWhatsMyUriCommand.cpp.s
+src/wire_protocol_handler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/fauxdb.dir/build.make CMakeFiles/fauxdb.dir/src/wire_protocol_handler.cpp.s
+.PHONY : src/wire_protocol_handler.cpp.s
 
 # Help Target
 help:
@@ -1558,177 +331,24 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... fauxdb"
-	@echo "... src/CConfig.o"
-	@echo "... src/CConfig.i"
-	@echo "... src/CConfig.s"
-	@echo "... src/CConfiguration.o"
-	@echo "... src/CConfiguration.i"
-	@echo "... src/CConfiguration.s"
-	@echo "... src/CLogger.o"
-	@echo "... src/CLogger.i"
-	@echo "... src/CLogger.s"
-	@echo "... src/CServer.o"
-	@echo "... src/CServer.i"
-	@echo "... src/CServer.s"
-	@echo "... src/CServerConfig.o"
-	@echo "... src/CServerConfig.i"
-	@echo "... src/CServerConfig.s"
-	@echo "... src/CSignal.o"
-	@echo "... src/CSignal.i"
-	@echo "... src/CSignal.s"
-	@echo "... src/auth/CAuthRegistry.o"
-	@echo "... src/auth/CAuthRegistry.i"
-	@echo "... src/auth/CAuthRegistry.s"
-	@echo "... src/auth/CBasicAuth.o"
-	@echo "... src/auth/CBasicAuth.i"
-	@echo "... src/auth/CBasicAuth.s"
-	@echo "... src/auth/CScramAuth.o"
-	@echo "... src/auth/CScramAuth.i"
-	@echo "... src/auth/CScramAuth.s"
-	@echo "... src/auth/CScramMongoAuth.o"
-	@echo "... src/auth/CScramMongoAuth.i"
-	@echo "... src/auth/CScramMongoAuth.s"
-	@echo "... src/database/CConnectionPooler.o"
-	@echo "... src/database/CConnectionPooler.i"
-	@echo "... src/database/CConnectionPooler.s"
-	@echo "... src/database/CDatabase.o"
-	@echo "... src/database/CDatabase.i"
-	@echo "... src/database/CDatabase.s"
-	@echo "... src/database/CLibpq.o"
-	@echo "... src/database/CLibpq.i"
-	@echo "... src/database/CLibpq.s"
-	@echo "... src/database/CPGConnectionPooler.o"
-	@echo "... src/database/CPGConnectionPooler.i"
-	@echo "... src/database/CPGConnectionPooler.s"
-	@echo "... src/database/CPostgresDatabase.o"
-	@echo "... src/database/CPostgresDatabase.i"
-	@echo "... src/database/CPostgresDatabase.s"
+	@echo "... src/bson.o"
+	@echo "... src/bson.i"
+	@echo "... src/bson.s"
+	@echo "... src/logger.o"
+	@echo "... src/logger.i"
+	@echo "... src/logger.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/network/CNetwork.o"
-	@echo "... src/network/CNetwork.i"
-	@echo "... src/network/CNetwork.s"
-	@echo "... src/network/CTcp.o"
-	@echo "... src/network/CTcp.i"
-	@echo "... src/network/CTcp.s"
-	@echo "... src/network/CThread.o"
-	@echo "... src/network/CThread.i"
-	@echo "... src/network/CThread.s"
-	@echo "... src/parsing/CMessageParser.o"
-	@echo "... src/parsing/CMessageParser.i"
-	@echo "... src/parsing/CMessageParser.s"
-	@echo "... src/parsing/CParser.o"
-	@echo "... src/parsing/CParser.i"
-	@echo "... src/parsing/CParser.s"
-	@echo "... src/protocol/BaseCommand.o"
-	@echo "... src/protocol/BaseCommand.i"
-	@echo "... src/protocol/BaseCommand.s"
-	@echo "... src/protocol/CBsonType.o"
-	@echo "... src/protocol/CBsonType.i"
-	@echo "... src/protocol/CBsonType.s"
-	@echo "... src/protocol/CCommandHandler.o"
-	@echo "... src/protocol/CCommandHandler.i"
-	@echo "... src/protocol/CCommandHandler.s"
-	@echo "... src/protocol/CDocumentCommandHandler.o"
-	@echo "... src/protocol/CDocumentCommandHandler.i"
-	@echo "... src/protocol/CDocumentCommandHandler.s"
-	@echo "... src/protocol/CDocumentProtocolHandler.o"
-	@echo "... src/protocol/CDocumentProtocolHandler.i"
-	@echo "... src/protocol/CDocumentProtocolHandler.s"
-	@echo "... src/protocol/CDocumentWireProtocol.o"
-	@echo "... src/protocol/CDocumentWireProtocol.i"
-	@echo "... src/protocol/CDocumentWireProtocol.s"
-	@echo "... src/protocol/COpMsgHandler.o"
-	@echo "... src/protocol/COpMsgHandler.i"
-	@echo "... src/protocol/COpMsgHandler.s"
-	@echo "... src/protocol/COpReplyHandler.o"
-	@echo "... src/protocol/COpReplyHandler.i"
-	@echo "... src/protocol/COpReplyHandler.s"
-	@echo "... src/protocol/CResponseBuilder.o"
-	@echo "... src/protocol/CResponseBuilder.i"
-	@echo "... src/protocol/CResponseBuilder.s"
-	@echo "... src/protocol/CollectionNameParser.o"
-	@echo "... src/protocol/CollectionNameParser.i"
-	@echo "... src/protocol/CollectionNameParser.s"
-	@echo "... src/protocol/CommandRegistry.o"
-	@echo "... src/protocol/CommandRegistry.i"
-	@echo "... src/protocol/CommandRegistry.s"
-	@echo "... src/protocol/CountCommand.o"
-	@echo "... src/protocol/CountCommand.i"
-	@echo "... src/protocol/CountCommand.s"
-	@echo "... src/protocol/FindCommand.o"
-	@echo "... src/protocol/FindCommand.i"
-	@echo "... src/protocol/FindCommand.s"
-	@echo "... src/protocol/FindOneCommand.o"
-	@echo "... src/protocol/FindOneCommand.i"
-	@echo "... src/protocol/FindOneCommand.s"
-	@echo "... src/protocol/commands/CAggregateCommand.o"
-	@echo "... src/protocol/commands/CAggregateCommand.i"
-	@echo "... src/protocol/commands/CAggregateCommand.s"
-	@echo "... src/protocol/commands/CBaseCommand.o"
-	@echo "... src/protocol/commands/CBaseCommand.i"
-	@echo "... src/protocol/commands/CBaseCommand.s"
-	@echo "... src/protocol/commands/CBuildInfoCommand.o"
-	@echo "... src/protocol/commands/CBuildInfoCommand.i"
-	@echo "... src/protocol/commands/CBuildInfoCommand.s"
-	@echo "... src/protocol/commands/CCollStatsCommand.o"
-	@echo "... src/protocol/commands/CCollStatsCommand.i"
-	@echo "... src/protocol/commands/CCollStatsCommand.s"
-	@echo "... src/protocol/commands/CCommandRegistry.o"
-	@echo "... src/protocol/commands/CCommandRegistry.i"
-	@echo "... src/protocol/commands/CCommandRegistry.s"
-	@echo "... src/protocol/commands/CCountCommand.o"
-	@echo "... src/protocol/commands/CCountCommand.i"
-	@echo "... src/protocol/commands/CCountCommand.s"
-	@echo "... src/protocol/commands/CCreateCommand.o"
-	@echo "... src/protocol/commands/CCreateCommand.i"
-	@echo "... src/protocol/commands/CCreateCommand.s"
-	@echo "... src/protocol/commands/CCreateIndexesCommand.o"
-	@echo "... src/protocol/commands/CCreateIndexesCommand.i"
-	@echo "... src/protocol/commands/CCreateIndexesCommand.s"
-	@echo "... src/protocol/commands/CDbStatsCommand.o"
-	@echo "... src/protocol/commands/CDbStatsCommand.i"
-	@echo "... src/protocol/commands/CDbStatsCommand.s"
-	@echo "... src/protocol/commands/CDistinctCommand.o"
-	@echo "... src/protocol/commands/CDistinctCommand.i"
-	@echo "... src/protocol/commands/CDistinctCommand.s"
-	@echo "... src/protocol/commands/CDropCommand.o"
-	@echo "... src/protocol/commands/CDropCommand.i"
-	@echo "... src/protocol/commands/CDropCommand.s"
-	@echo "... src/protocol/commands/CDropIndexesCommand.o"
-	@echo "... src/protocol/commands/CDropIndexesCommand.i"
-	@echo "... src/protocol/commands/CDropIndexesCommand.s"
-	@echo "... src/protocol/commands/CExplainCommand.o"
-	@echo "... src/protocol/commands/CExplainCommand.i"
-	@echo "... src/protocol/commands/CExplainCommand.s"
-	@echo "... src/protocol/commands/CFindAndModifyCommand.o"
-	@echo "... src/protocol/commands/CFindAndModifyCommand.i"
-	@echo "... src/protocol/commands/CFindAndModifyCommand.s"
-	@echo "... src/protocol/commands/CHelloCommand.o"
-	@echo "... src/protocol/commands/CHelloCommand.i"
-	@echo "... src/protocol/commands/CHelloCommand.s"
-	@echo "... src/protocol/commands/CIsMasterCommand.o"
-	@echo "... src/protocol/commands/CIsMasterCommand.i"
-	@echo "... src/protocol/commands/CIsMasterCommand.s"
-	@echo "... src/protocol/commands/CListCollectionsCommand.o"
-	@echo "... src/protocol/commands/CListCollectionsCommand.i"
-	@echo "... src/protocol/commands/CListCollectionsCommand.s"
-	@echo "... src/protocol/commands/CListDatabasesCommand.o"
-	@echo "... src/protocol/commands/CListDatabasesCommand.i"
-	@echo "... src/protocol/commands/CListDatabasesCommand.s"
-	@echo "... src/protocol/commands/CListIndexesCommand.o"
-	@echo "... src/protocol/commands/CListIndexesCommand.i"
-	@echo "... src/protocol/commands/CListIndexesCommand.s"
-	@echo "... src/protocol/commands/CPingCommand.o"
-	@echo "... src/protocol/commands/CPingCommand.i"
-	@echo "... src/protocol/commands/CPingCommand.s"
-	@echo "... src/protocol/commands/CServerStatusCommand.o"
-	@echo "... src/protocol/commands/CServerStatusCommand.i"
-	@echo "... src/protocol/commands/CServerStatusCommand.s"
-	@echo "... src/protocol/commands/CWhatsMyUriCommand.o"
-	@echo "... src/protocol/commands/CWhatsMyUriCommand.i"
-	@echo "... src/protocol/commands/CWhatsMyUriCommand.s"
+	@echo "... src/mongodb.o"
+	@echo "... src/mongodb.i"
+	@echo "... src/mongodb.s"
+	@echo "... src/protocol.o"
+	@echo "... src/protocol.i"
+	@echo "... src/protocol.s"
+	@echo "... src/wire_protocol_handler.o"
+	@echo "... src/wire_protocol_handler.i"
+	@echo "... src/wire_protocol_handler.s"
 .PHONY : help
 
 

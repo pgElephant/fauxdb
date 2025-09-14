@@ -1,4 +1,0 @@
-comment = 'bson extension for MongoDB BSON type support'
-default_version = '1.0'
-module_pathname = '$libdir/bson'
-relocatable = true

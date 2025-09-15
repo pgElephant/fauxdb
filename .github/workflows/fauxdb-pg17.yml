@@ -1,0 +1,116 @@
+name: FauxDB-PG17 Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: fauxdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+
+    - name: Cache Rust dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-
+
+    - name: Install PostgreSQL development packages
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-server-dev-17 postgresql-contrib-17
+
+    - name: Install mongosh for testing
+      run: |
+        curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+        echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+        sudo apt-get update
+        sudo apt-get install -y mongodb-mongosh
+
+    - name: Setup PostgreSQL for FauxDB
+      run: |
+        # Create FauxDB database and user
+        sudo -u postgres psql -c "CREATE DATABASE fauxdb;" || true
+        sudo -u postgres psql -c "CREATE USER fauxdb WITH PASSWORD 'fauxdb';" || true
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE fauxdb TO fauxdb;" || true
+        sudo -u postgres psql -c "ALTER USER fauxdb CREATEDB;" || true
+        
+        # Enable required extensions (using native PostgreSQL JSONB instead of DocumentDB)
+        sudo -u postgres psql -d fauxdb -c "CREATE EXTENSION IF NOT EXISTS btree_gin;" || true
+
+    - name: Build FauxDB
+      run: |
+        cargo build --release --verbose
+
+    - name: Run tests
+      run: |
+        # Start FauxDB in background
+        nohup ./target/release/fauxdb > fauxdb.log 2>&1 &
+        FAUXDB_PID=$!
+        
+        # Wait for server to start
+        sleep 10
+        
+        # Check if server is running
+        if ! kill -0 $FAUXDB_PID 2>/dev/null; then
+          echo "FauxDB failed to start"
+          cat fauxdb.log
+          exit 1
+        fi
+        
+        # Wait for server to be ready
+        for i in {1..30}; do
+          if mongosh --host localhost --port 27018 --eval "db.runCommand({ping: 1})" >/dev/null 2>&1; then
+            echo "FauxDB is ready"
+            break
+          fi
+          echo "Waiting for FauxDB to be ready... ($i/30)"
+          sleep 2
+        done
+        
+        # Run the comprehensive test suite
+        cargo test --test fauxdb_tests test_comprehensive_suite -- --nocapture
+        
+        # Clean up
+        kill $FAUXDB_PID 2>/dev/null || true
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: |
+          test_results.json
+          fauxdb.log
+        retention-days: 7

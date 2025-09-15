@@ -1,0 +1,346 @@
+[
+  {
+    "test_name": "ping",
+    "category": "core",
+    "status": "Passed",
+    "duration_ms": 377,
+    "output": "{ ok: 1 }",
+    "error": null
+  },
+  {
+    "test_name": "hello",
+    "category": "core",
+    "status": "Passed",
+    "duration_ms": 364,
+    "output": "{\n  ismaster: true,\n  maxBsonObjectSize: 16777216,\n  maxMessageSizeBytes: 48000000,\n  maxWriteBatchSize: 100000,\n  localTime: '2025-09-15T09:37:57.673299+00:00',\n  logicalSessionTimeoutMinutes: 30,\n  connectionId: 1,\n  minWireVersion: 0,\n  maxWireVersion: 17,\n  readOnly: false,\n  ok: 1\n}",
+    "error": null
+  },
+  {
+    "test_name": "buildInfo",
+    "category": "core",
+    "status": "Passed",
+    "duration_ms": 381,
+    "output": "{\n  version: '5.0.0',\n  gitVersion: 'fauxdb-5.0.0-production',\n  versionArray: [ 5, 0, 0, 0 ],\n  modules: [],\n  allocator: 'tcmalloc',\n  javascriptEngine: 'none',\n  sysInfo: 'deprecated',\n  versionExtraInfo: 'fauxdb-production',\n  openssl: {},\n  bits: 64,\n  debug: false,\n  maxBsonObjectSize: 16777216,\n  buildEnvironment: {},\n  ok: 1\n}",
+    "error": null
+  },
+  {
+    "test_name": "isMaster",
+    "category": "core",
+    "status": "Passed",
+    "duration_ms": 379,
+    "output": "{\n  ismaster: true,\n  maxBsonObjectSize: 16777216,\n  maxMessageSizeBytes: 48000000,\n  maxWriteBatchSize: 100000,\n  localTime: '2025-09-15T09:37:58.435908+00:00',\n  logicalSessionTimeoutMinutes: 30,\n  connectionId: 1,\n  minWireVersion: 0,\n  maxWireVersion: 17,\n  readOnly: false,\n  ok: 1\n}",
+    "error": null
+  },
+  {
+    "test_name": "listDatabases",
+    "category": "core",
+    "status": "Passed",
+    "duration_ms": 389,
+    "output": "{\n  databases: [\n    { name: 'test', sizeOnDisk: Long('1024'), empty: false },\n    { name: 'admin', sizeOnDisk: Long('512'), empty: false }\n  ],\n  totalSize: 1536,\n  ok: 1\n}",
+    "error": null
+  },
+  {
+    "test_name": "insertOne",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "{\n  acknowledged: true,\n  insertedId: ObjectId('68c7de770280808ea8ca7418')\n}",
+    "error": null
+  },
+  {
+    "test_name": "insertMany",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "{\n  acknowledged: true,\n  insertedIds: {\n    '0': ObjectId('68c7de7713fc978f9283fdb6'),\n    '1': ObjectId('68c7de7713fc978f9283fdb7')\n  }\n}",
+    "error": null
+  },
+  {
+    "test_name": "find",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 378,
+    "output": "[\n  {\n    _id: ObjectId('68c7de7745e46847d8493a47'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:37:59.948722+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7745e46847d8493a48'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:37:59.948724+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7745e46847d8493a49'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:37:59.948724+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7745e46847d8493a4a'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:37:59.948725+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7745e46847d8493a4b'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:37:59.948725+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "findOne",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "{\n  _id: ObjectId('68c7de7845e46847d8493a4c'),\n  id: 1,\n  name: 'User 1',\n  email: 'user1@example.com',\n  department_id: 2,\n  created_at: '2025-09-15T09:38:00.325797+00:00'\n}",
+    "error": null
+  },
+  {
+    "test_name": "findWithFilter",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 377,
+    "output": "[\n  {\n    _id: ObjectId('68c7de7845e46847d8493a4d'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:00.700529+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7845e46847d8493a4e'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:00.700530+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7845e46847d8493a4f'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:00.700531+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7845e46847d8493a50'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:00.700532+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7845e46847d8493a51'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:00.700532+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "findWithLimit",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "[\n  {\n    _id: ObjectId('68c7de7945e46847d8493a52'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:01.076434+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a53'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:01.076435+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "findWithSkip",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "[\n  {\n    _id: ObjectId('68c7de7945e46847d8493a54'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:01.450453+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a55'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:01.450454+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a56'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:01.450455+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a57'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:01.450456+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a58'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:01.450456+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "findWithSort",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 377,
+    "output": "[\n  {\n    _id: ObjectId('68c7de7945e46847d8493a59'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:01.829090+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a5a'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:01.829091+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a5b'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:01.829092+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a5c'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:01.829092+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7945e46847d8493a5d'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:01.829093+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "findWithProjection",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 376,
+    "output": "[\n  {\n    _id: ObjectId('68c7de7a45e46847d8493a5e'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:02.203364+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7a45e46847d8493a5f'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:02.203366+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7a45e46847d8493a60'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:02.203366+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7a45e46847d8493a61'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:02.203367+00:00'\n  },\n  {\n    _id: ObjectId('68c7de7a45e46847d8493a62'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:02.203368+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "countDocuments",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 376,
+    "output": "0",
+    "error": null
+  },
+  {
+    "test_name": "updateOne",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 378,
+    "output": "{\n  acknowledged: true,\n  insertedId: null,\n  matchedCount: undefined,\n  modifiedCount: undefined,\n  upsertedCount: 0\n}",
+    "error": null
+  },
+  {
+    "test_name": "updateMany",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "{\n  acknowledged: true,\n  insertedId: null,\n  matchedCount: undefined,\n  modifiedCount: undefined,\n  upsertedCount: 0\n}",
+    "error": null
+  },
+  {
+    "test_name": "replaceOne",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 379,
+    "output": "{\n  acknowledged: true,\n  insertedId: null,\n  matchedCount: undefined,\n  modifiedCount: undefined,\n  upsertedCount: 0\n}",
+    "error": null
+  },
+  {
+    "test_name": "deleteOne",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "{ acknowledged: true, deletedCount: undefined }",
+    "error": null
+  },
+  {
+    "test_name": "deleteMany",
+    "category": "crud",
+    "status": "Passed",
+    "duration_ms": 369,
+    "output": "{ acknowledged: true, deletedCount: undefined }",
+    "error": null
+  },
+  {
+    "test_name": "aggregate",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "aggregateMatch",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 371,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "aggregateGroup",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 370,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "aggregateSort",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "aggregateLimit",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 370,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "aggregateSkip",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 373,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "aggregateProject",
+    "category": "aggregation",
+    "status": "Passed",
+    "duration_ms": 377,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "createIndex",
+    "category": "indexing",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "name_1",
+    "error": null
+  },
+  {
+    "test_name": "createCompoundIndex",
+    "category": "indexing",
+    "status": "Passed",
+    "duration_ms": 377,
+    "output": "name_1_age_-1",
+    "error": null
+  },
+  {
+    "test_name": "createUniqueIndex",
+    "category": "indexing",
+    "status": "Passed",
+    "duration_ms": 372,
+    "output": "email_1",
+    "error": null
+  },
+  {
+    "test_name": "listIndexes",
+    "category": "indexing",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "[]",
+    "error": null
+  },
+  {
+    "test_name": "dropIndex",
+    "category": "indexing",
+    "status": "Passed",
+    "duration_ms": 378,
+    "output": "{ ok: 1 }",
+    "error": null
+  },
+  {
+    "test_name": "createCollection",
+    "category": "collections",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "{ ok: 1 }",
+    "error": null
+  },
+  {
+    "test_name": "listCollections",
+    "category": "collections",
+    "status": "Passed",
+    "duration_ms": 373,
+    "output": "[]",
+    "error": null
+  },
+  {
+    "test_name": "collectionStats",
+    "category": "collections",
+    "status": "Passed",
+    "duration_ms": 373,
+    "output": "{\n  ns: 'test.users',\n  size: 0,\n  count: 0,\n  avgObjSize: 0,\n  storageSize: 0,\n  capped: false,\n  nindexes: 1,\n  totalIndexSize: 0,\n  indexSizes: { _id_: 0 },\n  ok: 1\n}",
+    "error": null
+  },
+  {
+    "test_name": "dropCollection",
+    "category": "collections",
+    "status": "Passed",
+    "duration_ms": 376,
+    "output": "true",
+    "error": null
+  },
+  {
+    "test_name": "distinct",
+    "category": "advanced",
+    "status": "Passed",
+    "duration_ms": 374,
+    "output": "",
+    "error": null
+  },
+  {
+    "test_name": "explain",
+    "category": "advanced",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "{\n  queryPlanner: {\n    plannerVersion: 1,\n    namespace: 'test.users',\n    indexFilterSet: false,\n    parsedQuery: {},\n    winningPlan: { stage: 'COLLSCAN', direction: 'forward' },\n    rejectedPlans: []\n  },\n  ok: 1\n}",
+    "error": null
+  },
+  {
+    "test_name": "hint",
+    "category": "advanced",
+    "status": "Passed",
+    "duration_ms": 375,
+    "output": "[\n  {\n    _id: ObjectId('68c7de8345e46847d8493a63'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:11.575245+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a64'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:11.575246+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a65'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:11.575246+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a66'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:11.575247+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a67'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:11.575248+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "maxTimeMS",
+    "category": "advanced",
+    "status": "Passed",
+    "duration_ms": 387,
+    "output": "[\n  {\n    _id: ObjectId('68c7de8345e46847d8493a68'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:11.964812+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a69'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:11.964813+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a6a'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:11.964814+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a6b'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:11.964814+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8345e46847d8493a6c'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:11.964815+00:00'\n  }\n]",
+    "error": null
+  },
+  {
+    "test_name": "invalidCommand",
+    "category": "errors",
+    "status": "Passed",
+    "duration_ms": 377,
+    "output": "",
+    "error": "mongosh command failed: MongoServerError: Unknown command: invalidCommand\n"
+  },
+  {
+    "test_name": "syntaxError",
+    "category": "errors",
+    "status": "Passed",
+    "duration_ms": 349,
+    "output": "",
+    "error": "mongosh command failed: SyntaxError: Unexpected token, expected \",\" (1:23)\n\n> 1 | db.users.find({invalid syntax})\n    |                        ^\n"
+  },
+  {
+    "test_name": "typeError",
+    "category": "errors",
+    "status": "Passed",
+    "duration_ms": 376,
+    "output": "[\n  {\n    _id: ObjectId('68c7de8545e46847d8493a6d'),\n    id: 1,\n    name: 'User 1',\n    email: 'user1@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:13.066760+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8545e46847d8493a6e'),\n    id: 2,\n    name: 'User 2',\n    email: 'user2@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:13.066762+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8545e46847d8493a6f'),\n    id: 3,\n    name: 'User 3',\n    email: 'user3@example.com',\n    department_id: 1,\n    created_at: '2025-09-15T09:38:13.066762+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8545e46847d8493a70'),\n    id: 4,\n    name: 'User 4',\n    email: 'user4@example.com',\n    department_id: 2,\n    created_at: '2025-09-15T09:38:13.066763+00:00'\n  },\n  {\n    _id: ObjectId('68c7de8545e46847d8493a71'),\n    id: 5,\n    name: 'User 5',\n    email: 'user5@example.com',\n    department_id: 3,\n    created_at: '2025-09-15T09:38:13.066764+00:00'\n  }\n]",
+    "error": null
+  }
+]

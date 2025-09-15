@@ -49,6 +49,9 @@ pub enum PipelineStage {
     // Count stage
     Count(String),
     
+    // CollStats stage
+    CollStats(Document),
+    
     // Facet stage
     Facet(Document),
     
@@ -339,6 +342,13 @@ impl AggregationPipeline {
                     Ok(PipelineStage::Count(count_field))
                 } else {
                     Err(anyhow!("$count stage must be a string"))
+                }
+            }
+            "$collStats" => {
+                if let Bson::Document(coll_stats_doc) = stage_value {
+                    Ok(PipelineStage::CollStats(coll_stats_doc))
+                } else {
+                    Err(anyhow!("$collStats stage must be a document"))
                 }
             }
             "$facet" => {

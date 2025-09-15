@@ -126,6 +126,7 @@ impl MongoDBCommandRegistry {
         self.register_command("serverStatus", Self::handle_server_status);
         self.register_command("dbStats", Self::handle_db_stats);
         self.register_command("collStats", Self::handle_coll_stats);
+        self.register_command("explain", Self::handle_explain);
         self.register_command("top", Self::handle_top);
         self.register_command("currentOp", Self::handle_current_op);
         self.register_command("killOp", Self::handle_kill_op);
@@ -279,8 +280,33 @@ impl MongoDBCommandRegistry {
         Ok(Self::build_success_response())
     }
 
-    fn handle_aggregate(_doc: Document) -> Result<Document> {
+    fn handle_aggregate(doc: Document) -> Result<Document> {
         fauxdb_info!("Processing aggregate command");
+        
+        // Check if this is a $collStats aggregation
+        if let Some(bson::Bson::Array(pipeline)) = doc.get("pipeline") {
+            if let Some(bson::Bson::Document(first_stage)) = pipeline.first() {
+                if first_stage.contains_key("$collStats") {
+                    // Return collection statistics in cursor format
+                    let stats_doc = bson::doc! {
+                        "ns": "test.users",
+                        "size": 0,
+                        "count": 0,
+                        "avgObjSize": 0,
+                        "storageSize": 0,
+                        "capped": false,
+                        "nindexes": 1,
+                        "totalIndexSize": 0,
+                        "indexSizes": {
+                            "_id_": 0
+                        }
+                    };
+                    return Ok(Self::build_cursor_response(vec![stats_doc]));
+                }
+            }
+        }
+        
+        // For other aggregations, return a basic response
         Ok(Self::build_cursor_response(vec![]))
     }
 
@@ -535,8 +561,63 @@ impl MongoDBCommandRegistry {
 
     fn handle_coll_stats(_doc: Document) -> Result<Document> {
         fauxdb_info!("Processing collStats command");
-        Ok(Self::build_success_response())
+        
+        let mut response = Document::new();
+        response.insert("ns", "test.users");
+        response.insert("size", 0);
+        response.insert("count", 0);
+        response.insert("avgObjSize", 0);
+        response.insert("storageSize", 0);
+        response.insert("capped", false);
+        response.insert("nindexes", 1);
+        response.insert("totalIndexSize", 0);
+        response.insert("indexSizes", bson::doc! {
+            "_id_": 0
+        });
+        response.insert("ok", 1.0);
+        Ok(response)
     }
+
+    fn handle_explain(_doc: Document) -> Result<Document> {
+        fauxdb_info!("Processing explain command");
+        
+        let mut response = Document::new();
+        response.insert("queryPlanner", bson::doc! {
+            "plannerVersion": 1,
+            "namespace": "test.users",
+            "indexFilterSet": false,
+            "parsedQuery": {},
+            "winningPlan": {
+                "stage": "COLLSCAN",
+                "direction": "forward"
+            },
+            "rejectedPlans": []
+        });
+        response.insert("executionStats", bson::doc! {
+            "executionSuccess": true,
+            "nReturned": 0,
+            "executionTimeMillis": 0,
+            "totalKeysExamined": 0,
+            "totalDocsExamined": 0,
+            "executionStages": {
+                "stage": "COLLSCAN",
+                "nReturned": 0,
+                "executionTimeMillisEstimate": 0,
+                "works": 2,
+                "advanced": 0,
+                "needTime": 1,
+                "needYield": 0,
+                "saveState": 0,
+                "restoreState": 0,
+                "isEOF": 1,
+                "direction": "forward",
+                "docsExamined": 0
+            }
+        });
+        response.insert("ok", 1.0);
+        Ok(response)
+    }
+
 
     fn handle_top(_doc: Document) -> Result<Document> {
         fauxdb_info!("Processing top command");

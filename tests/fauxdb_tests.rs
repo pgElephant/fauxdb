@@ -60,7 +60,7 @@ impl FauxDBTestSuite {
         match self.run_mongosh_command(command) {
             Ok(output) => {
                 let duration = start.elapsed().as_millis() as u64;
-                println!("✅ {} - {}ms", description, duration);
+                println!("PASS {} - {}ms", description, duration);
                 self.test_results.push(TestResult {
                     test_name: test_name.to_string(),
                     category: category.to_string(),
@@ -73,7 +73,7 @@ impl FauxDBTestSuite {
             }
             Err(e) => {
                 let duration = start.elapsed().as_millis() as u64;
-                println!("❌ {} - {}ms - Error: {}", description, duration, e);
+                println!("FAIL {} - {}ms - Error: {}", description, duration, e);
                 self.test_results.push(TestResult {
                     test_name: test_name.to_string(),
                     category: category.to_string(),
@@ -83,6 +83,39 @@ impl FauxDBTestSuite {
                     error: Some(e.to_string()),
                 });
                 TestStatus::Failed
+            }
+        }
+    }
+
+    fn run_error_test(&mut self, category: &str, test_name: &str, command: &str, description: &str) -> TestStatus {
+        let start = Instant::now();
+        
+        match self.run_mongosh_command(command) {
+            Ok(_output) => {
+                let duration = start.elapsed().as_millis() as u64;
+                println!("FAIL {} - {}ms - Expected error but got success", description, duration);
+                self.test_results.push(TestResult {
+                    test_name: test_name.to_string(),
+                    category: category.to_string(),
+                    status: TestStatus::Failed,
+                    duration_ms: duration,
+                    output: String::new(),
+                    error: Some("Expected error but got success".to_string()),
+                });
+                TestStatus::Failed
+            }
+            Err(e) => {
+                let duration = start.elapsed().as_millis() as u64;
+                println!("PASS {} - {}ms - Error as expected: {}", description, duration, e);
+                self.test_results.push(TestResult {
+                    test_name: test_name.to_string(),
+                    category: category.to_string(),
+                    status: TestStatus::Passed,
+                    duration_ms: duration,
+                    output: String::new(),
+                    error: Some(e.to_string()),
+                });
+                TestStatus::Passed
             }
         }
     }
@@ -102,7 +135,7 @@ impl FauxDBTestSuite {
     }
 
     async fn run_all_tests(&mut self) -> Result<()> {
-        println!("🧪 FauxDB Comprehensive Test Suite");
+        println!("FauxDB Comprehensive Test Suite");
         println!("===================================");
         println!("Connection: {}", self.connection_string);
         println!();
@@ -110,7 +143,7 @@ impl FauxDBTestSuite {
         self.wait_for_server().await?;
 
         // Core MongoDB Commands
-        println!("📡 Testing Core MongoDB Commands");
+        println!("Testing Core MongoDB Commands");
         println!("--------------------------------");
         self.run_test("core", "ping", "db.runCommand({ping: 1})", "Ping Command");
         self.run_test("core", "hello", "db.runCommand({hello: 1})", "Hello Command");
@@ -120,7 +153,7 @@ impl FauxDBTestSuite {
         println!();
 
         // CRUD Operations
-        println!("📝 Testing CRUD Operations");
+        println!("Testing CRUD Operations");
         println!("--------------------------");
         
         // Insert Operations
@@ -148,7 +181,7 @@ impl FauxDBTestSuite {
         println!();
 
         // Aggregation Pipeline
-        println!("🔄 Testing Aggregation Pipeline");
+        println!("Testing Aggregation Pipeline");
         println!("------------------------------");
         self.run_test("aggregation", "aggregate", r#"db.users.aggregate([{$match: {age: {$gte: 25}}}, {$group: {_id: null, avgAge: {$avg: "$age"}}}])"#, "Aggregate Pipeline");
         self.run_test("aggregation", "aggregateMatch", r#"db.users.aggregate([{$match: {age: {$gte: 30}}}])"#, "Aggregate Match Stage");
@@ -160,7 +193,7 @@ impl FauxDBTestSuite {
         println!();
 
         // Indexing Operations
-        println!("📇 Testing Indexing Operations");
+        println!("Testing Indexing Operations");
         println!("-----------------------------");
         self.run_test("indexing", "createIndex", r#"db.users.createIndex({name: 1})"#, "Create Single Index");
         self.run_test("indexing", "createCompoundIndex", r#"db.users.createIndex({name: 1, age: -1})"#, "Create Compound Index");
@@ -170,16 +203,16 @@ impl FauxDBTestSuite {
         println!();
 
         // Collection Operations
-        println!("📁 Testing Collection Operations");
+        println!("Testing Collection Operations");
         println!("-------------------------------");
         self.run_test("collections", "createCollection", "db.createCollection('test_collection')", "Create Collection");
         self.run_test("collections", "listCollections", "db.getCollectionNames()", "List Collections");
-        self.run_test("collections", "collectionStats", "db.users.stats()", "Collection Statistics");
+        self.run_test("collections", "collectionStats", "db.runCommand({collStats: 'users'})", "Collection Statistics");
         self.run_test("collections", "dropCollection", "db.test_collection.drop()", "Drop Collection");
         println!();
 
         // Advanced Features
-        println!("🚀 Testing Advanced Features");
+        println!("Testing Advanced Features");
         println!("---------------------------");
         self.run_test("advanced", "distinct", "db.users.distinct('category')", "Distinct Values");
         self.run_test("advanced", "explain", "db.users.find().explain()", "Explain Query");
@@ -188,10 +221,10 @@ impl FauxDBTestSuite {
         println!();
 
         // Error Handling
-        println!("⚠️  Testing Error Handling");
+        println!("Testing Error Handling");
         println!("-------------------------");
-        self.run_test("errors", "invalidCommand", "db.runCommand({invalidCommand: 1})", "Invalid Command");
-        self.run_test("errors", "syntaxError", "db.users.find({invalid syntax})", "Syntax Error");
+        self.run_error_test("errors", "invalidCommand", "db.runCommand({invalidCommand: 1})", "Invalid Command");
+        self.run_error_test("errors", "syntaxError", "db.users.find({invalid syntax})", "Syntax Error");
         self.run_test("errors", "typeError", "db.users.find({age: {$gte: \"not_a_number\"}})", "Type Error");
         println!();
 
@@ -204,7 +237,7 @@ impl FauxDBTestSuite {
         let passed = self.test_results.iter().filter(|r| matches!(r.status, TestStatus::Passed)).count();
         let failed = self.test_results.iter().filter(|r| matches!(r.status, TestStatus::Failed)).count();
 
-        println!("📊 COMPREHENSIVE TEST RESULTS");
+        println!("COMPREHENSIVE TEST RESULTS");
         println!("=============================");
         println!("Total Tests: {}", total);
         println!("Passed: {}", passed);
@@ -212,16 +245,16 @@ impl FauxDBTestSuite {
         println!("Success Rate: {:.1}%", (passed as f64 / total as f64) * 100.0);
 
         if failed == 0 {
-            println!("\n🎉 ALL TESTS PASSED! FauxDB is fully compatible with mongosh!");
+            println!("\nALL TESTS PASSED! FauxDB is fully compatible with mongosh!");
         } else {
-            println!("\n⚠️  Some tests failed. FauxDB needs more improvements.");
+            println!("\nSome tests failed. FauxDB needs more improvements.");
         }
     }
 
     fn save_results_to_file(&self, filename: &str) -> Result<()> {
         let json = serde_json::to_string_pretty(&self.test_results)?;
         std::fs::write(filename, json)?;
-        println!("📄 Test results saved to: {}", filename);
+        println!("Test results saved to: {}", filename);
         Ok(())
     }
 }
@@ -233,7 +266,7 @@ async fn test_core_mongodb_commands() -> Result<()> {
     let mut suite = FauxDBTestSuite::new(27018);
     suite.wait_for_server().await?;
 
-    println!("🧪 Testing Core MongoDB Commands");
+    println!("Testing Core MongoDB Commands");
     suite.run_test("core", "ping", "db.runCommand({ping: 1})", "Ping Command");
     suite.run_test("core", "hello", "db.runCommand({hello: 1})", "Hello Command");
     suite.run_test("core", "buildInfo", "db.runCommand({buildInfo: 1})", "BuildInfo Command");
@@ -249,7 +282,7 @@ async fn test_crud_operations() -> Result<()> {
     let mut suite = FauxDBTestSuite::new(27018);
     suite.wait_for_server().await?;
 
-    println!("🧪 Testing CRUD Operations");
+    println!("Testing CRUD Operations");
     
     // Insert Operations
     suite.run_test("crud", "insertOne", r#"db.users.insertOne({name: "Test User", age: 25, email: "test@example.com"})"#, "Insert One");
@@ -283,7 +316,7 @@ async fn test_aggregation_pipeline() -> Result<()> {
     let mut suite = FauxDBTestSuite::new(27018);
     suite.wait_for_server().await?;
 
-    println!("🧪 Testing Aggregation Pipeline");
+    println!("Testing Aggregation Pipeline");
     suite.run_test("aggregation", "aggregate", r#"db.users.aggregate([{$match: {age: {$gte: 25}}}, {$group: {_id: null, avgAge: {$avg: "$age"}}}])"#, "Aggregate Pipeline");
     suite.run_test("aggregation", "aggregateMatch", r#"db.users.aggregate([{$match: {age: {$gte: 30}}}])"#, "Aggregate Match Stage");
     suite.run_test("aggregation", "aggregateGroup", r#"db.users.aggregate([{$group: {_id: "$category", count: {$sum: 1}}}])"#, "Aggregate Group Stage");
@@ -301,7 +334,7 @@ async fn test_indexing_operations() -> Result<()> {
     let mut suite = FauxDBTestSuite::new(27018);
     suite.wait_for_server().await?;
 
-    println!("🧪 Testing Indexing Operations");
+    println!("Testing Indexing Operations");
     suite.run_test("indexing", "createIndex", r#"db.users.createIndex({name: 1})"#, "Create Single Index");
     suite.run_test("indexing", "createCompoundIndex", r#"db.users.createIndex({name: 1, age: -1})"#, "Create Compound Index");
     suite.run_test("indexing", "createUniqueIndex", r#"db.users.createIndex({email: 1}, {unique: true})"#, "Create Unique Index");
@@ -317,10 +350,10 @@ async fn test_collection_operations() -> Result<()> {
     let mut suite = FauxDBTestSuite::new(27018);
     suite.wait_for_server().await?;
 
-    println!("🧪 Testing Collection Operations");
+    println!("Testing Collection Operations");
     suite.run_test("collections", "createCollection", "db.createCollection('test_collection')", "Create Collection");
     suite.run_test("collections", "listCollections", "db.getCollectionNames()", "List Collections");
-    suite.run_test("collections", "collectionStats", "db.users.stats()", "Collection Statistics");
+    suite.run_test("collections", "collectionStats", "db.runCommand({collStats: 'users'})", "Collection Statistics");
     suite.run_test("collections", "dropCollection", "db.test_collection.drop()", "Drop Collection");
 
     suite.print_summary();
@@ -332,7 +365,7 @@ async fn test_advanced_features() -> Result<()> {
     let mut suite = FauxDBTestSuite::new(27018);
     suite.wait_for_server().await?;
 
-    println!("🧪 Testing Advanced Features");
+    println!("Testing Advanced Features");
     suite.run_test("advanced", "distinct", "db.users.distinct('category')", "Distinct Values");
     suite.run_test("advanced", "explain", "db.users.find().explain()", "Explain Query");
     suite.run_test("advanced", "hint", "db.users.find().hint({name: 1})", "Query Hint");

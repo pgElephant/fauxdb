@@ -91,7 +91,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
         
     - name: Setup Rust toolchain
       uses: dtolnay/rust-toolchain@stable
@@ -123,9 +122,15 @@ jobs:
       run: |
         # Install mdbook and related tools
         cargo install mdbook mdbook-mermaid mdbook-graphviz mdbook-toc
+        
         # Install Node.js dependencies for interactive docs
         if [ -f "docs/package.json" ]; then
-          cd docs && npm ci
+          cd docs
+          # Generate package-lock.json if it doesn't exist
+          if [ ! -f "package-lock.json" ]; then
+            npm install --package-lock-only
+          fi
+          npm ci
         fi
         
     - name: Build Rust documentation

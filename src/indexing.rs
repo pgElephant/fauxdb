@@ -290,10 +290,9 @@ impl IndexManager {
         }
 
         // Validate unique index
-        if spec.options.unique.unwrap_or(false) {
-            if spec.options.sparse.unwrap_or(false) {
+        if spec.options.unique.unwrap_or(false)
+            && spec.options.sparse.unwrap_or(false) {
                     fauxdb_warn!("Unique sparse indexes may allow duplicate null values");
-            }
         }
 
         Ok(())

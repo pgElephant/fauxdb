@@ -6,7 +6,7 @@ connection_timeout_ms = 5000
 idle_timeout_ms = 60000
 
 [database]
-uri = "postgresql://localhost:5432/fauxdb"
+uri = "postgresql://postgres@localhost:5432/fauxdb"
 max_connections = 10
 connection_timeout_ms = 5000
 idle_timeout_ms = 60000

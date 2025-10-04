@@ -5,7 +5,7 @@
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ProductionConfig {
     pub server: ServerConfig,
     pub database: DatabaseConfig,
@@ -100,19 +100,6 @@ pub struct ClusteringConfig {
     pub replication_factor: u32,
 }
 
-impl Default for ProductionConfig {
-    fn default() -> Self {
-        Self {
-            server: ServerConfig::default(),
-            database: DatabaseConfig::default(),
-            security: SecurityConfig::default(),
-            performance: PerformanceConfig::default(),
-            monitoring: MonitoringConfig::default(),
-            logging: LoggingConfig::default(),
-            clustering: ClusteringConfig::default(),
-        }
-    }
-}
 
 impl Default for ServerConfig {
     fn default() -> Self {
@@ -259,10 +246,9 @@ impl ProductionConfig {
         if self.database.pool_size == 0 {
             return Err(anyhow::anyhow!("database pool_size must be greater than 0"));
         }
-        if self.security.ssl_enabled {
-            if self.security.ssl_cert_path.is_none() || self.security.ssl_key_path.is_none() {
-                return Err(anyhow::anyhow!("SSL certificate and key paths required when SSL is enabled"));
-            }
+        if self.security.ssl_enabled
+            && (self.security.ssl_cert_path.is_none() || self.security.ssl_key_path.is_none()) {
+            return Err(anyhow::anyhow!("SSL certificate and key paths required when SSL is enabled"));
         }
         Ok(())
     }

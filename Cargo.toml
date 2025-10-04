@@ -49,7 +49,7 @@ base64 = "0.21"  # Base64 encoding/decoding
 rand = "0.8"  # Random number generation for salts and nonces
 
 # Production-ready dependencies
-dashmap = "5.5"  # High-performance concurrent HashMap
+# dashmap = "4.0"  # High-performance concurrent HashMap - temporarily disabled due to compilation issues
 arc-swap = "1.6"  # Atomic reference counting
 metrics = "0.22"  # Metrics collection
 metrics-exporter-prometheus = "0.13"  # Prometheus metrics

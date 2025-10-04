@@ -109,7 +109,7 @@ impl PostgreSQLManager {
             schema_name, table_name
         );
 
-        let row = client.query_one(&insert_query, &[&json_str, &bson_bytes]).await
+        let row = client.query_one(&insert_query, &[&json_str, &bson_bytes.as_slice()]).await
             .map_err(|e| FauxDBError::Database(format!("Failed to insert document: {}", e)))?;
 
         let id: i32 = row.get("id");
@@ -168,7 +168,7 @@ impl PostgreSQLManager {
                 .map_err(FauxDBError::Serialization)?;
             
             let document = bson::to_bson(&json_value)
-                .map_err(|e| FauxDBError::BsonSerialization(e))?
+                .map_err(FauxDBError::BsonSerialization)?
                 .as_document()
                 .ok_or_else(|| FauxDBError::Database("Failed to convert to document".to_string()))?
                 .clone();

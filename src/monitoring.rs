@@ -372,7 +372,7 @@ impl MonitoringManager {
                 .duration_since(UNIX_EPOCH)
                 .ok()
                 .and_then(|d| DateTime::from_timestamp(d.as_secs() as i64, 0))
-                .unwrap_or_else(|| Utc::now()),
+                .unwrap_or_else(Utc::now),
             threads: num_cpus::get() as u32,
             file_descriptors: 0, // Would need to implement FD counting
         })

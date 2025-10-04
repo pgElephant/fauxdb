@@ -464,7 +464,7 @@ impl ReplicationManager {
                                 term: 1, // Would track actual term
                             };
                             
-                            if let Err(_) = sender.send(heartbeat) {
+                            if sender.send(heartbeat).is_err() {
                                 fauxdb_warn!("Failed to send heartbeat to member {}", member_id);
                             }
                         }

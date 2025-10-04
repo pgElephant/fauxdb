@@ -530,7 +530,15 @@ impl ScramAuthenticator {
             iterations: 4096,
         }
     }
+}
 
+impl Default for ScramAuthenticator {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ScramAuthenticator {
     pub fn generate_challenge(&self, mechanism: AuthMechanism) -> AuthChallenge {
         AuthChallenge {
             nonce: self.nonce.clone(),

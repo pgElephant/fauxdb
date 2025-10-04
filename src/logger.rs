@@ -235,7 +235,7 @@ where
         event.record(&mut visitor);
         
         let message = visitor.message.unwrap_or_else(|| {
-            format!("{}", metadata.name())
+            metadata.name().to_string()
         });
 
         if let Some(logger) = get_logger() {

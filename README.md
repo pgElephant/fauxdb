@@ -1,8 +1,8 @@
 # FauxDB - Production-Ready MongoDB Alternative
 
-[![Build Status](https://github.com/fauxdb/fauxdb/workflows/CI/badge.svg)](https://github.com/fauxdb/fauxdb/actions)
-[![CircleCI](https://circleci.com/gh/fauxdb/fauxdb.svg?style=svg)](https://circleci.com/gh/fauxdb/fauxdb)
-[![Code Coverage](https://codecov.io/gh/fauxdb/fauxdb/branch/main/graph/badge.svg)](https://codecov.io/gh/fauxdb/fauxdb)
+[![Build Status](https://github.com/pgelephant/fauxdb/workflows/CI/badge.svg)](https://github.com/pgelephant/fauxdb/actions)
+[![CircleCI](https://circleci.com/gh/pgelephant/fauxdb.svg?style=svg)](https://circleci.com/gh/pgelephant/fauxdb)
+[![Code Coverage](https://codecov.io/gh/pgelephant/fauxdb/branch/main/graph/badge.svg)](https://codecov.io/gh/pgelephant/fauxdb)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org)
 [![MongoDB Compatible](https://img.shields.io/badge/MongoDB-5.0%2B-green.svg)](https://www.mongodb.com)
@@ -12,11 +12,11 @@
 
 ## Key Features
 
-- ✓ **100% MongoDB Compatibility** - Full wire protocol support with `mongosh` compatibility
-- ✓ **High Performance** - Built in Rust for superior speed and memory efficiency
-- ✓ **Production Ready** - Enterprise-grade monitoring, logging, and configuration
-- ✓ **Advanced Features** - Transactions, geospatial, aggregation pipelines
-- ✓ **Pure PostgreSQL Backend** - Native JSONB support, no external dependencies
+- **100% MongoDB Compatibility** - Full wire protocol support with `mongosh` compatibility
+- **High Performance** - Built in Rust for superior speed and memory efficiency
+- **Production Ready** - Enterprise-grade monitoring, logging, and configuration
+- **Advanced Features** - Transactions, geospatial, aggregation pipelines
+- **Pure PostgreSQL Backend** - Native JSONB support, no external dependencies
 
 ## Architecture
 
@@ -42,14 +42,31 @@
 
 ### Prerequisites
 - Rust 1.70+
-- PostgreSQL 17+
+- PostgreSQL 13+
 - 2GB+ RAM recommended
 
-### Installation
+### One-Command Build & Setup
 
 ```bash
 # Clone the repository
-git clone https://github.com/fauxdb/fauxdb.git
+git clone https://github.com/pgelephant/fauxdb.git
+cd fauxdb
+
+# Build everything with one command
+./build.sh
+
+# Start FauxDB server
+./run.sh
+
+# Test MongoDB compatibility
+./test.sh
+```
+
+### Manual Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/pgelephant/fauxdb.git
 cd fauxdb
 
 # Build with optimizations
@@ -63,7 +80,7 @@ cargo build --release
 
 ```bash
 # Clone and setup
-git clone https://github.com/fauxdb/fauxdb.git
+git clone https://github.com/pgelephant/fauxdb.git
 cd fauxdb
 
 # Quick start with Docker
@@ -208,7 +225,9 @@ cargo tarpaulin --out Html
 open tarpaulin-report.html
 ```
 
-## MongoDB Compatibility
+## MongoDB & DocumentDB Compatibility
+
+FauxDB provides full MongoDB wire protocol compatibility, similar to Amazon DocumentDB. See [DocumentDB Compatibility Guide](DOCUMENTDB_COMPATIBILITY.md) for detailed information.
 
 ### ✓ **Supported Operations**
 
@@ -229,6 +248,22 @@ open tarpaulin-report.html
 - **Authorization**: Role-based access control
 - **Auditing**: Comprehensive audit logging
 - **Monitoring**: Prometheus metrics, health checks
+
+### Architecture: MongoDB → PostgreSQL Translation
+
+```
+MongoDB Client (mongosh, drivers) 
+    ↓ (MongoDB Wire Protocol)
+FauxDB Server (Port 27018)
+    ↓ (Query Translation)
+PostgreSQL with JSONB (Port 5432)
+```
+
+**Key Benefits:**
+- **Zero Code Changes**: Use existing MongoDB drivers and applications
+- **ACID Compliance**: Full PostgreSQL ACID transactions
+- **SQL Access**: Query data directly with SQL when needed
+- **Performance**: Leverages PostgreSQL's optimized JSONB with GIN indexes
 
 ## Configuration
 
@@ -421,7 +456,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ```bash
 # Clone and setup
-git clone https://github.com/fauxdb/fauxdb.git
+git clone https://github.com/pgelephant/fauxdb.git
 cd fauxdb
 
 # Install dependencies

@@ -8,11 +8,10 @@
  * @brief Production FauxDB server main entry point - Full MongoDB 5.0+ compatibility
  */
 
-use fauxdb::production_config::ProductionConfig;
-use fauxdb::production_server::ProductionFauxDBServer;
-use fauxdb::process_manager::ProcessManager;
-use fauxdb::logger::{LogLevel, init_logger};
-use fauxdb::fauxdb_info;
+use fauxdb::{
+    ProductionConfig, ProductionServer, ProcessManager,
+    logger::{LogLevel, init_logger}, fauxdb_info
+};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -57,8 +56,11 @@ async fn run_server_mode() -> anyhow::Result<()> {
         log_level: "info".to_string(),
     });
     
-    // Start the server with process manager
-    let server = ProductionFauxDBServer::new_with_process_manager(config, process_manager).await?;
+    // Initialize and start the production server with all infrastructure
+    let mut server = ProductionServer::new(config);
+    
+    // Initialize all components (shutdown, circuit breakers, rate limiting, health checks)
+    server.initialize().await?;
     
     fauxdb_info!("Production FauxDB Server initialized successfully");
     fauxdb_info!("Ready for production workloads!");
@@ -72,10 +74,13 @@ async fn run_server_mode() -> anyhow::Result<()> {
     fauxdb_info!("  - Production-grade monitoring and metrics");
     fauxdb_info!("  - Enterprise security features");
     fauxdb_info!("  - High-performance PostgreSQL backend");
+    fauxdb_info!("  - Health checks and observability");
+    fauxdb_info!("  - Rate limiting and circuit breakers");
+    fauxdb_info!("  - Graceful shutdown handling");
     fauxdb_info!("==========================================");
     
-    // Run with graceful shutdown handling
-    server.run_with_shutdown_signal().await?;
+    // Start the server (this will block until shutdown)
+    server.start().await?;
     
     Ok(())
 }
@@ -141,7 +146,7 @@ async fn run_worker_mode() -> anyhow::Result<()> {
     let mut config = config;
     config.database.connection_string = database_url;
     
-    let _server = ProductionFauxDBServer::new(config).await?;
+    let _server = ProductionServer::new(config);
     
     // Handle the connection in this worker process
     // This would typically involve reading from stdin and writing to stdout

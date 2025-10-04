@@ -427,7 +427,7 @@ impl PostgreSQLServer {
         // Create proper cursor response
         let response_doc = bson::doc! {
             "cursor": {
-                "firstBatch": bson::Bson::Array(documents.into_iter().map(|d| bson::Bson::Document(d)).collect()),
+                "firstBatch": bson::Bson::Array(documents.into_iter().map(bson::Bson::Document).collect()),
                 "ns": format!("fauxdb.{}", collection),
                 "id": 0i64
             },
@@ -522,10 +522,7 @@ impl PostgreSQLServer {
         let count = match query_result {
             Ok(rows) => {
                 if let Some(row) = rows.first() {
-                    match row.try_get::<_, i64>(0) {
-                        Ok(c) => c,
-                        Err(_) => 0,
-                    }
+                    row.try_get::<_, i64>(0).unwrap_or_default()
                 } else {
                     0
                 }

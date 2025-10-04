@@ -98,7 +98,7 @@ pub enum PipelineStage {
     CustomSql(String),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PipelineOptions {
     pub allow_disk_use: bool,
     pub cursor: Option<Document>,
@@ -184,20 +184,6 @@ pub struct FillOptions {
     pub sort_by: Option<Document>,
 }
 
-impl Default for PipelineOptions {
-    fn default() -> Self {
-        Self {
-            allow_disk_use: false,
-            cursor: None,
-            max_time_ms: None,
-            bypass_document_validation: false,
-            read_concern: None,
-            collation: None,
-            hint: None,
-            comment: None,
-        }
-    }
-}
 
 impl AggregationPipeline {
     pub fn new() -> Self {
@@ -514,9 +500,7 @@ impl AggregationPipeline {
             let boundaries = doc.get("boundaries")
                 .and_then(|v| v.as_array())
                 .ok_or_else(|| anyhow!("$bucket boundaries is required"))?
-                .iter()
-                .cloned()
-                .collect();
+                .to_vec();
 
             let default = doc.get("default").cloned();
             let output = doc.get("output").and_then(|v| v.as_document()).cloned();
@@ -845,7 +829,7 @@ impl AggregationPipeline {
             Bson::Double(f) => Ok(f.to_string()),
             Bson::Boolean(b) => Ok(b.to_string()),
             Bson::Null => Ok("NULL".to_string()),
-            Bson::ObjectId(_) => Ok(format!("'{}'", value.to_string())),
+            Bson::ObjectId(_) => Ok(format!("'{}'", value)),
             _ => Err(anyhow!("Unsupported BSON type for SQL conversion"))
         }
     }

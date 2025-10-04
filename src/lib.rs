@@ -28,8 +28,15 @@ pub mod monitoring;
 pub mod replication;
 pub mod wire_protocol;
 
+// Production-grade infrastructure
+pub mod health;
+pub mod rate_limiter;
+pub mod circuit_breaker;
+pub mod shutdown;
+pub mod production_main;
+
 // Re-export main types for external use
-pub use error::{FauxDBError, Result};
+pub use error::{FauxDBError, Result, ErrorSeverity};
 pub use config::Config;
 pub use postgresql_manager::PostgreSQLManager;
 pub use postgresql_server::PostgreSQLServer;
@@ -45,3 +52,10 @@ pub use process_manager::{ProcessManager, ProcessConfig};
 pub use security::{SecurityManager, User, Role, Privilege, AuthSession, AuthMechanism};
 pub use monitoring::{MonitoringManager, MetricsSnapshot, HealthReport, Alert, MetricsConfig};
 pub use replication::{ReplicationManager, ClusterManager, ReplicaSetConfig, ReplicaSetMember, ReplicationConfig};
+
+// Re-export production infrastructure
+pub use health::{HealthChecker, HealthStatus, HealthState, SystemMetrics};
+pub use rate_limiter::{RateLimiter, RateLimitConfig, RateLimitRule, RateLimitScope, RateLimitResult};
+pub use circuit_breaker::{CircuitBreaker, CircuitBreakerConfig, CircuitState, CircuitBreakerManager};
+pub use shutdown::{ShutdownManager, ShutdownConfig, ShutdownReason, ShutdownGuard};
+pub use production_main::{ProductionServer, ServerInfo};

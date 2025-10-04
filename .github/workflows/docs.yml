@@ -91,6 +91,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: 'docs/package-lock.json'
         
     - name: Setup Rust toolchain
       uses: dtolnay/rust-toolchain@stable
@@ -126,7 +128,7 @@ jobs:
         # Install Node.js dependencies for interactive docs (optional)
         if [ -f "docs/package.json" ]; then
           cd docs
-          npm install
+          npm ci
         fi
         
     - name: Build Rust documentation

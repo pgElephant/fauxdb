@@ -8,17 +8,7 @@
     "serve": "mdbook serve",
     "watch": "mdbook watch",
     "test": "mdbook test",
-    "clean": "rm -rf _site",
-    "lint": "markdownlint src/**/*.md",
-    "spellcheck": "cspell 'src/**/*.md'",
-    "preview": "npm run build && npm run serve"
-  },
-  "devDependencies": {
-    "markdownlint-cli": "^0.37.0",
-    "cspell": "^7.3.7",
-    "imagemin": "^8.0.1",
-    "imagemin-pngquant": "^9.0.2",
-    "imagemin-mozjpeg": "^10.0.0"
+    "clean": "rm -rf _site"
   },
   "engines": {
     "node": ">=18.0.0",

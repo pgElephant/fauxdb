@@ -1,143 +1,26 @@
-# FauxDB Documentation Site Configuration
-# GitHub Pages Jekyll Configuration
+# GitHub Pages Configuration for FauxDB Documentation
 
 title: FauxDB Documentation
-description: Production-ready MongoDB-compatible database server built in Rust
+description: MongoDB-compatible server built on PostgreSQL with production-ready features
+author: pgElephant Team
+email: contact@pgelephant.org
+
+# GitHub Pages settings
 baseurl: "/fauxdb"
 url: "https://pgelephant.github.io"
 
-# GitHub Pages settings
-remote_theme: just-the-docs/just-the-docs
+# Build settings
+markdown: kramdown
+highlighter: rouge
+theme: minima
+
+# Plugins
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
 
-# Site settings
-logo: /assets/images/logo.svg
-favicon_ico: /assets/images/favicon.ico
-search_enabled: true
-search:
-  provider: lunr
-
-# Navigation
-aux_links:
-  "FauxDB on GitHub":
-    - "//github.com/pgelephant/fauxdb"
-
-# Color scheme
-color_scheme: light
-color_schemes:
-  light:
-    primary:
-      background: "#ffffff"
-      text: "#000000"
-    accent:
-      background: "#0066cc"
-      text: "#ffffff"
-    sidebar:
-      background: "#f8f9fa"
-      text: "#333333"
-      accent: "#0066cc"
-      hover:
-        background: "#e9ecef"
-        text: "#333333"
-  dark:
-    primary:
-      background: "#1a1a1a"
-      text: "#ffffff"
-    accent:
-      background: "#0066cc"
-      text: "#ffffff"
-    sidebar:
-      background: "#2d2d2d"
-      text: "#ffffff"
-      accent: "#0066cc"
-      hover:
-        background: "#404040"
-        text: "#ffffff"
-
-# Footer content
-footer_content: "Copyright &copy; 2024 FauxDB Contributors. Distributed under the MIT License."
-
-# Print settings
-print:
-  print_title: true
-  print_content: true
-  print_sidebar: true
-  print_footer: true
-
-# Header and footer
-header_links:
-  - title: "GitHub"
-    url: "https://github.com/fauxdb/fauxdb"
-    icon: "fab fa-github"
-
-# Table of contents
-toc:
-  - name: Getting Started
-    url: /guides/installation/
-    children:
-      - name: Installation
-        url: /guides/installation/
-      - name: Quick Start
-        url: /tutorials/quick-start/
-      - name: Configuration
-        url: /guides/configuration/
-  - name: API Reference
-    url: /api/operations/
-    children:
-      - name: CRUD Operations
-        url: /api/operations/crud/
-      - name: Query Operators
-        url: /api/operations/queries/
-      - name: Aggregation
-        url: /api/operations/aggregation/
-      - name: Indexes
-        url: /api/operations/indexes/
-  - name: Guides
-    url: /guides/compatibility/
-    children:
-      - name: MongoDB Compatibility
-        url: /guides/compatibility/
-      - name: Performance Tuning
-        url: /guides/performance/
-      - name: Monitoring
-        url: /guides/monitoring/
-      - name: Security
-        url: /guides/security/
-  - name: Deployment
-    url: /deployment/production/
-    children:
-      - name: Production
-        url: /deployment/production/
-      - name: Docker
-        url: /deployment/docker/
-      - name: Kubernetes
-        url: /deployment/kubernetes/
-  - name: Examples
-    url: /examples/queries/
-    children:
-      - name: Query Examples
-        url: /examples/queries/
-      - name: Application Examples
-        url: /examples/applications/
-      - name: Migration Examples
-        url: /examples/migration/
-
-# Markdown settings
-markdown: kramdown
-kramdown:
-  input: GFM
-  syntax_highlighter: rouge
-  syntax_highlighter_opts:
-    css_class: 'highlight'
-    span:
-      line_numbers: false
-    block:
-      line_numbers: false
-
-# Exclude files
+# Exclude files from processing
 exclude:
   - README.md
   - Gemfile
@@ -147,15 +30,88 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
+  - _site/
   - .sass-cache/
   - .jekyll-cache/
   - .jekyll-metadata
-  - _site/
+  - .bundle/
   - .git/
   - .gitignore
-  - Dockerfile
-  - docker-compose.yml
-  - Makefile
-  - build.sh
-  - run.sh
-  - test.sh
+  - .ruby-version
+  - .ruby-gemset
+  - .rvmrc
+  - .DS_Store
+  - Thumbs.db
+
+# Include files
+include:
+  - _redirects
+
+# Collections
+collections:
+  api:
+    output: true
+    permalink: /:collection/:name/
+  examples:
+    output: true
+    permalink: /:collection/:name/
+
+# Default settings
+defaults:
+  - scope:
+      path: ""
+      type: "pages"
+    values:
+      layout: "default"
+  - scope:
+      path: ""
+      type: "api"
+    values:
+      layout: "api"
+  - scope:
+      path: ""
+      type: "examples"
+    values:
+      layout: "example"
+
+# SEO settings
+twitter:
+  username: pgelephant
+
+github:
+  username: pgelephant
+  repository: fauxdb
+
+# Navigation
+navigation:
+  - title: Home
+    url: /
+  - title: Quick Start
+    url: /quick-start/
+  - title: Installation
+    url: /installation/
+  - title: API Reference
+    url: /api/
+  - title: Examples
+    url: /examples/
+  - title: GitHub
+    url: https://github.com/pgelephant/fauxdb
+    external: true
+
+# Social links
+social:
+  - name: GitHub
+    url: https://github.com/pgelephant/fauxdb
+  - name: Twitter
+    url: https://twitter.com/pgelephant
+
+# Analytics (optional)
+# google_analytics: UA-XXXXXXXXX-X
+
+# Search
+search: true
+search_full_content: true
+
+# Comments (optional)
+# disqus:
+#   shortname: fauxdb-docs

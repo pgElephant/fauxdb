@@ -1,0 +1,42 @@
+{
+  "name": "fauxdb-docs",
+  "version": "1.0.0",
+  "description": "FauxDB Documentation Site",
+  "private": true,
+  "scripts": {
+    "build": "mdbook build",
+    "serve": "mdbook serve",
+    "watch": "mdbook watch",
+    "test": "mdbook test",
+    "clean": "rm -rf _site",
+    "lint": "markdownlint src/**/*.md",
+    "spellcheck": "cspell 'src/**/*.md'",
+    "preview": "npm run build && npm run serve"
+  },
+  "devDependencies": {
+    "markdownlint-cli": "^0.37.0",
+    "cspell": "^7.3.7",
+    "imagemin": "^8.0.1",
+    "imagemin-pngquant": "^9.0.2",
+    "imagemin-mozjpeg": "^10.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pgelephant/fauxdb.git",
+    "directory": "docs"
+  },
+  "keywords": [
+    "fauxdb",
+    "mongodb",
+    "postgresql",
+    "documentation",
+    "database",
+    "nosql"
+  ],
+  "author": "pgElephant Team",
+  "license": "MIT"
+}

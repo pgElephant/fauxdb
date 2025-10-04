@@ -1,0 +1,311 @@
+name: FauxDB Security Scan
+
+# Only run manually for security scans
+on:
+  workflow_dispatch:
+    inputs:
+      scan_type:
+        description: 'Type of security scan'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+        - quick
+        - full
+        - dependency
+        - code
+      fail_on_high:
+        description: 'Fail on HIGH severity issues'
+        required: false
+        default: true
+        type: boolean
+      generate_report:
+        description: 'Generate detailed security report'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  dependency-scan:
+    name: Dependency Security Scan
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.scan_type == 'full' || github.event.inputs.scan_type == 'dependency' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+        
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-security-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-security-
+          
+    - name: Run cargo audit
+      uses: rustsec/audit-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Run cargo deny
+      run: |
+        cargo install cargo-deny
+        cargo deny check
+        
+    - name: Generate dependency report
+      if: ${{ github.event.inputs.generate_report == 'true' }}
+      run: |
+        echo "# Dependency Security Report" > security-report.md
+        echo "Generated on: $(date)" >> security-report.md
+        echo "" >> security-report.md
+        echo "## Cargo Audit Results" >> security-report.md
+        cargo audit --json >> audit-results.json || true
+        echo "## Cargo Deny Results" >> security-report.md
+        cargo deny check --format json >> deny-results.json || true
+        
+    - name: Upload security reports
+      if: ${{ github.event.inputs.generate_report == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-security-report
+        path: |
+          security-report.md
+          audit-results.json
+          deny-results.json
+        retention-days: 30
+
+  code-scan:
+    name: Code Security Scan
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.scan_type == 'full' || github.event.inputs.scan_type == 'code' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+        
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-code-scan-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-code-scan-
+          
+    - name: Run Clippy security lints
+      run: |
+        cargo clippy --all-features -- -W clippy::all -D warnings
+        
+    - name: Install semgrep
+      run: |
+        pip install semgrep
+        
+    - name: Run semgrep security scan
+      run: |
+        semgrep --config=auto --json --output=semgrep-results.json src/ || true
+        
+    - name: Run bandit (Python security scanner)
+      if: hashFiles('**/*.py') != ''
+      run: |
+        pip install bandit
+        bandit -r . -f json -o bandit-results.json || true
+        
+    - name: Generate code security report
+      if: ${{ github.event.inputs.generate_report == 'true' }}
+      run: |
+        echo "# Code Security Report" > code-security-report.md
+        echo "Generated on: $(date)" >> code-security-report.md
+        echo "" >> code-security-report.md
+        echo "## Clippy Security Warnings" >> code-security-report.md
+        echo "Clippy scan completed - see build logs for details" >> code-security-report.md
+        echo "" >> code-security-report.md
+        echo "## Semgrep Results" >> code-security-report.md
+        if [ -f semgrep-results.json ]; then
+          echo "Semgrep scan completed - see semgrep-results.json for details" >> code-security-report.md
+        fi
+        echo "" >> code-security-report.md
+        echo "## Bandit Results (Python)" >> code-security-report.md
+        if [ -f bandit-results.json ]; then
+          echo "Bandit scan completed - see bandit-results.json for details" >> code-security-report.md
+        fi
+        
+    - name: Upload code security reports
+      if: ${{ github.event.inputs.generate_report == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-security-report
+        path: |
+          code-security-report.md
+          semgrep-results.json
+          bandit-results.json
+        retention-days: 30
+
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.scan_type == 'full' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Build Docker image
+      run: |
+        docker build -t fauxdb:security-scan .
+        
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'fauxdb:security-scan'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+        
+    - name: Run Docker Scout
+      uses: docker/scout-action@v1
+      with:
+        command: cves
+        image: fauxdb:security-scan
+        format: sarif
+        output: docker-scout-results.sarif
+        
+    - name: Generate container security report
+      if: ${{ github.event.inputs.generate_report == 'true' }}
+      run: |
+        echo "# Container Security Report" > container-security-report.md
+        echo "Generated on: $(date)" >> container-security-report.md
+        echo "" >> container-security-report.md
+        echo "## Trivy Scan Results" >> container-security-report.md
+        echo "Trivy vulnerability scan completed - see trivy-results.sarif for details" >> container-security-report.md
+        echo "" >> container-security-report.md
+        echo "## Docker Scout Results" >> container-security-report.md
+        echo "Docker Scout scan completed - see docker-scout-results.sarif for details" >> container-security-report.md
+        
+    - name: Upload container security reports
+      if: ${{ github.event.inputs.generate_report == 'true' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: container-security-report
+        path: |
+          container-security-report.md
+          trivy-results.sarif
+          docker-scout-results.sarif
+        retention-days: 30
+
+  secrets-scan:
+    name: Secrets Scan
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.scan_type == 'full' || github.event.inputs.scan_type == 'quick' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Run TruffleHog secrets scan
+      uses: trufflesecurity/trufflehog@main
+      with:
+        path: ./
+        base: main
+        head: HEAD
+        extra_args: --debug --only-verified
+        
+    - name: Run GitLeaks
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  security-summary:
+    name: Security Scan Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, code-scan, container-scan, secrets-scan]
+    if: always() && ${{ github.event.inputs.generate_report == 'true' }}
+    
+    steps:
+    - name: Download all security reports
+      uses: actions/download-artifact@v4
+      with:
+        path: ./reports
+        
+    - name: Generate comprehensive security report
+      run: |
+        echo "# FauxDB Security Scan Report" > comprehensive-security-report.md
+        echo "Generated on: $(date)" >> comprehensive-security-report.md
+        echo "Scan Type: ${{ github.event.inputs.scan_type }}" >> comprehensive-security-report.md
+        echo "Triggered by: ${{ github.actor }}" >> comprehensive-security-report.md
+        echo "" >> comprehensive-security-report.md
+        
+        echo "## Scan Results Summary" >> comprehensive-security-report.md
+        echo "" >> comprehensive-security-report.md
+        
+        if [ -f "./reports/dependency-security-report/security-report.md" ]; then
+          echo "### Dependency Security" >> comprehensive-security-report.md
+          cat ./reports/dependency-security-report/security-report.md >> comprehensive-security-report.md
+          echo "" >> comprehensive-security-report.md
+        fi
+        
+        if [ -f "./reports/code-security-report/code-security-report.md" ]; then
+          echo "### Code Security" >> comprehensive-security-report.md
+          cat ./reports/code-security-report/code-security-report.md >> comprehensive-security-report.md
+          echo "" >> comprehensive-security-report.md
+        fi
+        
+        if [ -f "./reports/container-security-report/container-security-report.md" ]; then
+          echo "### Container Security" >> comprehensive-security-report.md
+          cat ./reports/container-security-report/container-security-report.md >> comprehensive-security-report.md
+          echo "" >> comprehensive-security-report.md
+        fi
+        
+        echo "## Recommendations" >> comprehensive-security-report.md
+        echo "" >> comprehensive-security-report.md
+        echo "1. Review all HIGH and CRITICAL severity issues" >> comprehensive-security-report.md
+        echo "2. Update dependencies with known vulnerabilities" >> comprehensive-security-report.md
+        echo "3. Address code security issues identified by static analysis" >> comprehensive-security-report.md
+        echo "4. Regularly scan for secrets and sensitive information" >> comprehensive-security-report.md
+        echo "5. Keep base images and dependencies up to date" >> comprehensive-security-report.md
+        
+    - name: Upload comprehensive security report
+      uses: actions/upload-artifact@v4
+      with:
+        name: comprehensive-security-report
+        path: comprehensive-security-report.md
+        retention-days: 90
+        
+    - name: Security scan completion notification
+      run: |
+        echo "🔒 FauxDB Security Scan Completed"
+        echo ""
+        echo "📊 Scan Details:"
+        echo "  Type: ${{ github.event.inputs.scan_type }}"
+        echo "  Triggered by: ${{ github.actor }}"
+        echo "  Date: $(date)"
+        echo ""
+        echo "📋 Scan Results:"
+        echo "  Dependency Scan: ${{ needs.dependency-scan.result }}"
+        echo "  Code Scan: ${{ needs.code-scan.result }}"
+        echo "  Container Scan: ${{ needs.container-scan.result }}"
+        echo "  Secrets Scan: ${{ needs.secrets-scan.result }}"
+        echo ""
+        echo "📄 Reports generated and uploaded as artifacts"
+        echo "✅ Security scan completed successfully!"

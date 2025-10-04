@@ -1,0 +1,373 @@
+name: FauxDB Documentation
+
+# Only run manually for documentation builds
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Type of documentation build'
+        required: true
+        default: 'full'
+        type: choice
+        options:
+        - full
+        - quick
+        - api-only
+      deploy:
+        description: 'Deploy to GitHub Pages'
+        required: false
+        default: true
+        type: boolean
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - preview
+      version:
+        description: 'Documentation version (leave empty for latest)'
+        required: false
+        type: string
+
+# Allow GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20'
+  CARGO_TERM_COLOR: always
+
+jobs:
+  setup:
+    name: Setup Documentation Environment
+    runs-on: ubuntu-latest
+    outputs:
+      docs-version: ${{ steps.version.outputs.version }}
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set documentation version
+      id: version
+      run: |
+        if [ -n "${{ github.event.inputs.version }}" ]; then
+          echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          # Get version from Cargo.toml or git tag
+          if [ -f "Cargo.toml" ]; then
+            VERSION=$(grep '^version = ' Cargo.toml | cut -d'"' -f2)
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "version=latest" >> $GITHUB_OUTPUT
+          fi
+        fi
+        echo "📚 Documentation version: ${{ steps.version.outputs.version }}"
+
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    needs: setup
+    if: ${{ github.event.inputs.build_type == 'full' || github.event.inputs.build_type == 'quick' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Setup Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy, rust-docs
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          postgresql postgresql-contrib \
+          postgresql-server-dev-all \
+          libssl-dev \
+          pkg-config \
+          build-essential
+        
+    - name: Cache Rust dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-docs-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-docs-
+          
+    - name: Install documentation dependencies
+      run: |
+        # Install mdbook and related tools
+        cargo install mdbook mdbook-mermaid mdbook-graphviz mdbook-toc
+        # Install Node.js dependencies for interactive docs
+        if [ -f "docs/package.json" ]; then
+          cd docs && npm ci
+        fi
+        
+    - name: Build Rust documentation
+      run: |
+        # Build library documentation
+        cargo doc --no-deps --document-private-items
+        
+        # Build API documentation with examples
+        cargo doc --package fauxdb --no-deps --document-private-items --features full
+        
+    - name: Build Markdown documentation
+      run: |
+        # Build main documentation with mdbook
+        if [ -f "docs/book.toml" ]; then
+          cd docs
+          mdbook build
+          # Copy API docs to book output
+          cp -r ../target/doc book/html/api
+        fi
+        
+    - name: Generate API reference
+      run: |
+        # Generate comprehensive API reference
+        mkdir -p docs/_site/api
+        
+        # Copy rustdoc output
+        cp -r target/doc/* docs/_site/api/ 2>/dev/null || true
+        
+        # Generate additional API documentation
+        echo "# FauxDB API Reference" > docs/_site/api/README.md
+        echo "" >> docs/_site/api/README.md
+        echo "This directory contains the complete API reference for FauxDB." >> docs/_site/api/README.md
+        echo "" >> docs/_site/api/README.md
+        echo "## Quick Links" >> docs/_site/api/README.md
+        echo "- [Main Library](fauxdb/index.html)" >> docs/_site/api/README.md
+        echo "- [Error Types](fauxdb/error/index.html)" >> docs/_site/api/README.md
+        echo "- [Configuration](fauxdb/config/index.html)" >> docs/_site/api/README.md
+        echo "- [Server](fauxdb/production_server/index.html)" >> docs/_site/api/README.md
+        
+    - name: Build interactive examples
+      if: ${{ github.event.inputs.build_type == 'full' }}
+      run: |
+        # Build interactive documentation examples
+        if [ -f "docs/examples/package.json" ]; then
+          cd docs/examples
+          npm ci
+          npm run build
+          cp -r dist/* ../_site/examples/
+        fi
+        
+    - name: Generate search index
+      run: |
+        # Generate search index for documentation
+        if [ -f "docs/search-index.js" ]; then
+          node docs/search-index.js docs/_site
+        fi
+        
+    - name: Optimize assets
+      run: |
+        # Optimize images and assets
+        if command -v imagemin &> /dev/null; then
+          find docs/_site -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" | \
+          xargs imagemin --out-dir=docs/_site/optimized
+        fi
+        
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: documentation-build
+        path: |
+          docs/_site
+          target/doc
+        retention-days: 30
+
+  build-api-docs:
+    name: Build API Documentation Only
+    runs-on: ubuntu-latest
+    needs: setup
+    if: ${{ github.event.inputs.build_type == 'api-only' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rust-docs
+        
+    - name: Cache Rust dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-api-docs-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-api-docs-
+          
+    - name: Build API documentation
+      run: |
+        # Build comprehensive API documentation
+        cargo doc --no-deps --document-private-items --features full
+        
+        # Generate API overview
+        mkdir -p api-docs
+        echo "# FauxDB API Documentation" > api-docs/README.md
+        echo "" >> api-docs/README.md
+        echo "Version: ${{ needs.setup.outputs.docs-version }}" >> api-docs/README.md
+        echo "Generated: $(date)" >> api-docs/README.md
+        echo "" >> api-docs/README.md
+        echo "## Quick Start" >> api-docs/README.md
+        echo "" >> api-docs/README.md
+        echo "\`\`\`rust" >> api-docs/README.md
+        echo "use fauxdb::{ProductionFauxDBServer, ProductionConfig};" >> api-docs/README.md
+        echo "" >> api-docs/README.md
+        echo "let config = ProductionConfig::load_from_env()?;" >> api-docs/README.md
+        echo "let server = ProductionFauxDBServer::new(config).await?;" >> api-docs/README.md
+        echo "\`\`\`" >> api-docs/README.md
+        
+    - name: Upload API documentation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: |
+          target/doc
+          api-docs
+        retention-days: 30
+
+  deploy-preview:
+    name: Deploy Preview
+    runs-on: ubuntu-latest
+    needs: [setup, build-docs]
+    if: ${{ github.event.inputs.deploy == 'true' && github.event.inputs.environment == 'preview' }}
+    
+    steps:
+    - name: Download documentation artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: documentation-build
+        path: ./docs-site
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./docs-site
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: Preview deployment notification
+      run: |
+        echo "🚀 Documentation preview deployed!"
+        echo ""
+        echo "📋 Deployment Details:"
+        echo "  Environment: Preview"
+        echo "  Version: ${{ needs.setup.outputs.docs-version }}"
+        echo "  Build Type: ${{ github.event.inputs.build_type }}"
+        echo "  Deployed by: ${{ github.actor }}"
+        echo "  Deployment URL: ${{ steps.deployment.outputs.page_url }}"
+        echo ""
+        echo "🔗 Access your preview at: ${{ steps.deployment.outputs.page_url }}"
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [setup, build-docs]
+    if: ${{ github.event.inputs.deploy == 'true' && github.event.inputs.environment == 'production' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+    - name: Download documentation artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: documentation-build
+        path: ./docs-site
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to Pages
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./docs-site
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: Production deployment notification
+      run: |
+        echo "🎉 Documentation deployed to production!"
+        echo ""
+        echo "📋 Deployment Details:"
+        echo "  Environment: Production"
+        echo "  Version: ${{ needs.setup.outputs.docs-version }}"
+        echo "  Build Type: ${{ github.event.inputs.build_type }}"
+        echo "  Deployed by: ${{ github.actor }}"
+        echo "  Production URL: https://pgelephant.github.io/fauxdb/"
+        echo ""
+        echo "✅ Documentation is now live at: https://pgelephant.github.io/fauxdb/"
+
+  docs-summary:
+    name: Documentation Build Summary
+    runs-on: ubuntu-latest
+    needs: [setup, build-docs, deploy-preview, deploy-production]
+    if: always()
+    
+    steps:
+    - name: Build summary
+      run: |
+        echo "📚 FauxDB Documentation Build Summary"
+        echo "======================================"
+        echo ""
+        echo "📋 Build Details:"
+        echo "  Version: ${{ needs.setup.outputs.docs-version }}"
+        echo "  Build Type: ${{ github.event.inputs.build_type }}"
+        echo "  Environment: ${{ github.event.inputs.environment }}"
+        echo "  Deploy: ${{ github.event.inputs.deploy }}"
+        echo "  Triggered by: ${{ github.actor }}"
+        echo ""
+        echo "📊 Job Results:"
+        echo "  Setup: ${{ needs.setup.result }}"
+        echo "  Build Docs: ${{ needs.build-docs.result }}"
+        echo "  Deploy Preview: ${{ needs.deploy-preview.result }}"
+        echo "  Deploy Production: ${{ needs.deploy-production.result }}"
+        echo ""
+        if [ "${{ github.event.inputs.deploy }}" == "true" ]; then
+          if [ "${{ github.event.inputs.environment }}" == "production" ]; then
+            echo "🌐 Production URL: https://pgelephant.github.io/fauxdb/"
+          else
+            echo "🔍 Preview URL: Check deployment step output"
+          fi
+        else
+          echo "📦 Documentation artifacts uploaded (no deployment)"
+        fi
+        echo ""
+        echo "✅ Documentation build completed!"

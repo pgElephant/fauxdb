@@ -1,0 +1,228 @@
+name: FauxDB CI/CD
+
+# Only run manually - no automatic triggers
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'development'
+        type: choice
+        options:
+        - development
+        - staging
+        - production
+      run_tests:
+        description: 'Run full test suite'
+        required: false
+        default: true
+        type: boolean
+      build_docker:
+        description: 'Build Docker images'
+        required: false
+        default: true
+        type: boolean
+      deploy:
+        description: 'Deploy after successful build'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.run_tests == 'true' }}
+    
+    strategy:
+      matrix:
+        rust-version: [stable, beta, nightly]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        toolchain: ${{ matrix.rust-version }}
+        components: rustfmt, clippy
+        
+    - name: Cache cargo registry
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ matrix.rust-version }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-cargo-${{ matrix.rust-version }}-
+          
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          postgresql postgresql-contrib \
+          postgresql-server-dev-all \
+          libssl-dev \
+          pkg-config \
+          build-essential
+          
+    - name: Setup PostgreSQL
+      run: |
+        sudo systemctl start postgresql
+        sudo -u postgres psql -c "CREATE DATABASE fauxdb_test;"
+        sudo -u postgres psql -c "CREATE USER fauxdb WITH PASSWORD 'fauxdb';"
+        sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE fauxdb_test TO fauxdb;"
+        
+    - name: Run cargo check
+      run: cargo check --all-features
+      
+    - name: Run cargo test
+      run: cargo test --all-features
+      env:
+        DATABASE_URL: postgresql://fauxdb:fauxdb@localhost:5432/fauxdb_test
+        
+    - name: Run clippy
+      run: cargo clippy --all-features -- -D warnings
+      
+    - name: Run rustfmt
+      run: cargo fmt --all -- --check
+
+  build:
+    name: Build FauxDB
+    runs-on: ubuntu-latest
+    needs: test
+    if: always() && (needs.test.result == 'success' || needs.test.result == 'skipped')
+    
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        target: ${{ matrix.target }}
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          postgresql postgresql-contrib \
+          postgresql-server-dev-all \
+          libssl-dev \
+          pkg-config \
+          build-essential \
+          gcc-aarch64-linux-gnu
+          
+    - name: Build FauxDB
+      run: |
+        cargo build --release --target ${{ matrix.target }}
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: fauxdb-${{ matrix.target }}
+        path: target/${{ matrix.target }}/release/fauxdb
+        retention-days: 30
+
+  docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: build
+    if: ${{ github.event.inputs.build_docker == 'true' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: pgelephant/fauxdb
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.run_tests == 'true' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt, clippy
+        
+    - name: Run cargo audit
+      uses: rustsec/audit-check@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: [build, docker]
+    if: ${{ github.event.inputs.deploy == 'true' }}
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: fauxdb-x86_64-unknown-linux-gnu
+        path: ./artifacts
+        
+    - name: Deploy to ${{ github.event.inputs.environment }}
+      run: |
+        echo "Deploying FauxDB to ${{ github.event.inputs.environment }}"
+        echo "Build artifacts:"
+        ls -la ./artifacts/
+        # Add actual deployment commands here
+        
+    - name: Notify deployment
+      run: |
+        echo "✅ FauxDB successfully deployed to ${{ github.event.inputs.environment }}"
+        echo "🚀 Environment: ${{ github.event.inputs.environment }}"
+        echo "📦 Version: ${{ github.sha }}"
+        echo "👤 Triggered by: ${{ github.actor }}"

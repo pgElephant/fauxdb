@@ -1,0 +1,271 @@
+/* FauxDB Documentation Custom Styles */
+
+:root {
+  --fauxdb-primary: #2563eb;
+  --fauxdb-secondary: #7c3aed;
+  --fauxdb-accent: #059669;
+  --fauxdb-warning: #d97706;
+  --fauxdb-danger: #dc2626;
+}
+
+/* Header and Navigation */
+.book-header {
+  background: linear-gradient(135deg, var(--fauxdb-primary), var(--fauxdb-secondary));
+  border-bottom: 3px solid var(--fauxdb-accent);
+}
+
+.book-header h1 {
+  color: white;
+  font-weight: 600;
+}
+
+/* Sidebar */
+.book-sidebar {
+  border-right: 2px solid #e5e7eb;
+}
+
+.book-sidebar .chapter-item {
+  border-radius: 6px;
+  margin: 2px 0;
+  transition: all 0.2s ease;
+}
+
+.book-sidebar .chapter-item:hover {
+  background-color: #f3f4f6;
+}
+
+.book-sidebar .chapter-item.active {
+  background-color: var(--fauxdb-primary);
+  color: white;
+}
+
+/* Code Blocks */
+.markdown pre {
+  background-color: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.markdown code {
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+}
+
+.markdown pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+/* Syntax Highlighting */
+.hljs-keyword {
+  color: #7c3aed;
+}
+
+.hljs-string {
+  color: #059669;
+}
+
+.hljs-comment {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.hljs-number {
+  color: #d97706;
+}
+
+/* Callouts and Alerts */
+.callout {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid;
+  border-radius: 6px;
+  background-color: #f9fafb;
+}
+
+.callout.info {
+  border-left-color: var(--fauxdb-primary);
+  background-color: #eff6ff;
+}
+
+.callout.success {
+  border-left-color: var(--fauxdb-accent);
+  background-color: #ecfdf5;
+}
+
+.callout.warning {
+  border-left-color: var(--fauxdb-warning);
+  background-color: #fffbeb;
+}
+
+.callout.danger {
+  border-left-color: var(--fauxdb-danger);
+  background-color: #fef2f2;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--fauxdb-primary);
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--fauxdb-secondary);
+}
+
+.btn-secondary:hover {
+  background-color: #6d28d9;
+}
+
+/* Tables */
+.markdown table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.markdown th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  color: #374151;
+}
+
+.markdown tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* Mermaid Diagrams */
+.mermaid {
+  text-align: center;
+  margin: 2rem 0;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* Search */
+.search-input {
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 0.5rem;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--fauxdb-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Footer */
+.book-footer {
+  border-top: 2px solid #e5e7eb;
+  padding: 2rem 0;
+  margin-top: 3rem;
+  background-color: #f9fafb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .book-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .book-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .markdown pre {
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .book-sidebar,
+  .book-header,
+  .book-footer {
+    display: none;
+  }
+  
+  .markdown {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .markdown pre {
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fauxdb-primary: #3b82f6;
+    --fauxdb-secondary: #8b5cf6;
+    --fauxdb-accent: #10b981;
+    --fauxdb-warning: #f59e0b;
+    --fauxdb-danger: #ef4444;
+  }
+  
+  .markdown {
+    color: #e5e7eb;
+  }
+  
+  .markdown code {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+  
+  .markdown pre {
+    background-color: #111827;
+    border-color: #374151;
+  }
+  
+  .callout {
+    background-color: #1f2937;
+    color: #e5e7eb;
+  }
+  
+  .markdown table {
+    background-color: #1f2937;
+  }
+  
+  .markdown th {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+  
+  .markdown tr:nth-child(even) {
+    background-color: #111827;
+  }
+}

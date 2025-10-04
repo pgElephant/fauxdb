@@ -1,0 +1,48 @@
+[book]
+title = "FauxDB Documentation"
+description = "MongoDB-compatible server built on PostgreSQL with production-ready features"
+authors = ["pgElephant Team"]
+language = "en"
+multilingual = false
+src = "src"
+
+[build]
+build-dir = "_site"
+create-missing = true
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/pgelephant/fauxdb"
+git-repository-icon = "fa-github"
+edit-url-template = "https://github.com/pgelephant/fauxdb/edit/main/docs/src/{path}"
+additional-css = ["custom.css"]
+
+[output.html.search]
+enable = true
+limit-results = 30
+teaser-word-count = 30
+use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 1
+boost-paragraph = 1
+expand = true
+heading-split-level = 3
+copyable = false
+
+[output.html.print]
+enable = true
+
+[output.html.fold]
+enable = true
+level = 0
+
+[preprocessor.links]
+
+[preprocessor.index]
+
+[preprocessor.mermaid]
+command = "mmdc"
+
+[preprocessor.toc]
+command = "mdbook-toc"

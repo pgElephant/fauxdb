@@ -1,0 +1,309 @@
+name: FauxDB Release
+
+# Only run manually for releases
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'minor'
+        type: choice
+        options:
+        - patch
+        - minor
+        - major
+        - prerelease
+      create_tag:
+        description: 'Create Git tag'
+        required: true
+        default: true
+        type: boolean
+      publish_crates:
+        description: 'Publish to crates.io'
+        required: false
+        default: false
+        type: boolean
+      publish_docker:
+        description: 'Publish Docker images'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  CARGO_TERM_COLOR: always
+  REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+jobs:
+  validate-release:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Validate version format
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        if [[ ! $VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9\-\.]+)?$ ]]; then
+          echo "❌ Invalid version format: $VERSION"
+          echo "Expected format: v1.0.0 or v1.0.0-beta.1"
+          exit 1
+        fi
+        echo "✅ Version format is valid: $VERSION"
+        
+    - name: Check if tag already exists
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        if git tag -l | grep -q "^$VERSION$"; then
+          echo "❌ Tag $VERSION already exists"
+          exit 1
+        fi
+        echo "✅ Tag $VERSION does not exist"
+        
+    - name: Validate Cargo.toml version
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        CARGO_VERSION=$(grep '^version = ' Cargo.toml | cut -d'"' -f2)
+        EXPECTED_VERSION=${VERSION#v}
+        
+        if [[ "$CARGO_VERSION" != "$EXPECTED_VERSION" ]]; then
+          echo "❌ Version mismatch:"
+          echo "  Cargo.toml: $CARGO_VERSION"
+          echo "  Release tag: $EXPECTED_VERSION"
+          exit 1
+        fi
+        echo "✅ Cargo.toml version matches: $CARGO_VERSION"
+
+  build-release:
+    name: Build Release
+    runs-on: ubuntu-latest
+    needs: validate-release
+    
+    strategy:
+      matrix:
+        target: [x86_64-unknown-linux-gnu, aarch64-unknown-linux-gnu]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        target: ${{ matrix.target }}
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          postgresql postgresql-contrib \
+          postgresql-server-dev-all \
+          libssl-dev \
+          pkg-config \
+          build-essential \
+          gcc-aarch64-linux-gnu
+          
+    - name: Build release
+      run: |
+        cargo build --release --target ${{ matrix.target }}
+        
+    - name: Create release archive
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        TARGET="${{ matrix.target }}"
+        
+        mkdir -p release
+        cp target/$TARGET/release/fauxdb release/fauxdb-$VERSION-$TARGET
+        tar -czf fauxdb-$VERSION-$TARGET.tar.gz -C release fauxdb-$VERSION-$TARGET
+        
+    - name: Upload release artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: fauxdb-${{ github.event.inputs.version }}-${{ matrix.target }}
+        path: fauxdb-${{ github.event.inputs.version }}-${{ matrix.target }}.tar.gz
+        retention-days: 90
+
+  create-tag:
+    name: Create Git Tag
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-release]
+    if: ${{ github.event.inputs.create_tag == 'true' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+        
+    - name: Create and push tag
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git tag -a "$VERSION" -m "Release $VERSION"
+        git push origin "$VERSION"
+        echo "✅ Created and pushed tag: $VERSION"
+
+  publish-crates:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-release]
+    if: ${{ github.event.inputs.publish_crates == 'true' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Publish to crates.io
+      run: |
+        if [ -z "$REGISTRY_TOKEN" ]; then
+          echo "❌ CARGO_REGISTRY_TOKEN not set"
+          exit 1
+        fi
+        
+        cargo login "$REGISTRY_TOKEN"
+        cargo publish
+        echo "✅ Published to crates.io"
+
+  publish-docker:
+    name: Publish Docker Images
+    runs-on: ubuntu-latest
+    needs: [validate-release, build-release]
+    if: ${{ github.event.inputs.publish_docker == 'true' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: pgelephant/fauxdb
+        tags: |
+          type=raw,value=${{ github.event.inputs.version }}
+          type=raw,value=latest,enable={{is_default_branch}}
+          
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        
+    - name: Docker Hub Description
+      uses: peter-evans/dockerhub-description@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: pgelephant/fauxdb
+        short-description: "FauxDB - MongoDB-compatible server built on PostgreSQL"
+
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [create-tag, publish-crates, publish-docker]
+    if: always()
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./artifacts
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.event.inputs.version }}
+        name: FauxDB ${{ github.event.inputs.version }}
+        body: |
+          ## FauxDB ${{ github.event.inputs.version }}
+          
+          **Release Type:** ${{ github.event.inputs.release_type }}
+          
+          ### What's New
+          - MongoDB 5.0+ compatibility
+          - Production-ready PostgreSQL backend
+          - Advanced aggregation pipelines
+          - Comprehensive indexing support
+          - ACID transaction support
+          
+          ### Installation
+          
+          **Docker:**
+          ```bash
+          docker pull pgelephant/fauxdb:${{ github.event.inputs.version }}
+          ```
+          
+          **Binary:**
+          Download the appropriate binary for your platform from the assets below.
+          
+          ### Documentation
+          - [Installation Guide](https://pgelephant.github.io/fauxdb/)
+          - [Quick Start](https://pgelephant.github.io/fauxdb/quick-start/)
+          - [API Reference](https://pgelephant.github.io/fauxdb/api/)
+          
+          ---
+          
+          **Triggered by:** @${{ github.actor }}
+          **Release Type:** ${{ github.event.inputs.release_type }}
+        files: ./artifacts/*
+        draft: false
+        prerelease: ${{ github.event.inputs.release_type == 'prerelease' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify-completion:
+    name: Notify Release Completion
+    runs-on: ubuntu-latest
+    needs: [create-github-release]
+    if: always()
+    
+    steps:
+    - name: Release Summary
+      run: |
+        VERSION="${{ github.event.inputs.version }}"
+        echo "🎉 FauxDB Release $VERSION completed!"
+        echo ""
+        echo "📋 Release Summary:"
+        echo "  Version: $VERSION"
+        echo "  Type: ${{ github.event.inputs.release_type }}"
+        echo "  Tag Created: ${{ github.event.inputs.create_tag }}"
+        echo "  Crates Published: ${{ github.event.inputs.publish_crates }}"
+        echo "  Docker Published: ${{ github.event.inputs.publish_docker }}"
+        echo ""
+        echo "🔗 Links:"
+        echo "  GitHub Release: https://github.com/pgelephant/fauxdb/releases/tag/$VERSION"
+        echo "  Docker Hub: https://hub.docker.com/r/pgelephant/fauxdb"
+        echo ""
+        echo "✅ All release tasks completed successfully!"

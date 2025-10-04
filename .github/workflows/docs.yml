@@ -123,14 +123,10 @@ jobs:
         # Install mdbook and related tools
         cargo install mdbook mdbook-mermaid mdbook-graphviz mdbook-toc
         
-        # Install Node.js dependencies for interactive docs
+        # Install Node.js dependencies for interactive docs (optional)
         if [ -f "docs/package.json" ]; then
           cd docs
-          # Generate package-lock.json if it doesn't exist
-          if [ ! -f "package-lock.json" ]; then
-            npm install --package-lock-only
-          fi
-          npm ci
+          npm install
         fi
         
     - name: Build Rust documentation

@@ -32,6 +32,12 @@ pub enum FauxDBError {
 
     #[error("Connection pool error: {0}")]
     ConnectionPool(String),
+
+    #[error("Authentication error: {0}")]
+    Authentication(String),
+
+    #[error("Configuration error: {0}")]
+    Config(String),
 }
 
 pub type Result<T> = std::result::Result<T, FauxDBError>;

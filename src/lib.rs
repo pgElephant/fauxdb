@@ -18,15 +18,20 @@ pub mod production_config;
 pub mod connection_pool;
 pub mod mongodb_commands;
 pub mod aggregation_pipeline;
+pub mod aggregation;
 pub mod indexing;
 pub mod transactions;
 pub mod production_server;
 pub mod logger;
 pub mod process_manager;
 pub mod security;
+pub mod authentication;
 pub mod monitoring;
 pub mod replication;
 pub mod wire_protocol;
+pub mod geospatial;
+pub mod database;
+pub mod ssl;
 
 // Re-export main types for external use
 pub use error::{FauxDBError, Result};

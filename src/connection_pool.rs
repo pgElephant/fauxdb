@@ -8,6 +8,7 @@ use std::time::Duration;
 use std::sync::Arc;
 use parking_lot::RwLock;
 use metrics::{counter, histogram, gauge};
+use crate::FauxDBError;
 use anyhow::Result;
 use crate::fauxdb_info;
 
@@ -120,8 +121,27 @@ impl ProductionConnectionPool {
     }
 
     pub async fn health_check(&self) -> Result<()> {
-        let mut client = self.get_connection().await?;
-        client.execute("SELECT 1", &[]).await?;
+        use std::time::Instant;
+        
+        let start_time = Instant::now();
+        
+        // Get a connection from the pool
+        let mut client = self.get_connection().await
+            .map_err(|e| FauxDBError::ConnectionPool(format!("Failed to get connection for health check: {}", e)))?;
+        
+        // Execute a simple query to verify the connection is alive
+        client.execute("SELECT 1 as health_check", &[])
+            .await
+            .map_err(|e| FauxDBError::ConnectionPool(format!("Health check query failed: {}", e)))?;
+        
+        let duration = start_time.elapsed();
+        
+        // Log health check results
+        println!("💚 Connection pool health check passed in {:?}", duration);
+        
+        // Update health check statistics
+        *self.stats.query_count.write() += 1;
+        
         Ok(())
     }
 }

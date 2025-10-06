@@ -86,9 +86,23 @@ impl DatabaseManager {
     }
 
     pub async fn insert_document(&self, collection: &str, document: &Document) -> Result<()> {
-        let doc_json = serde_json::to_string(document)?;
+        // Validate collection name
+        if collection.is_empty() || !collection.chars().all(|c| c.is_alphanumeric() || c == '_') {
+            return Err(FauxDBError::Database("Invalid collection name".to_string()));
+        }
+        
+        // Validate document is not empty
+        if document.is_empty() {
+            return Err(FauxDBError::Database("Document cannot be empty".to_string()));
+        }
+        
+        let doc_json = serde_json::to_string(document)
+            .map_err(|e| FauxDBError::Database(format!("Failed to serialize document: {}", e)))?;
+            
         let query = format!("INSERT INTO {} (data) VALUES ($1)", collection);
         self.execute_command(&query, &[&doc_json]).await?;
+        
+        println!("✅ Document inserted into collection: {}", collection);
         Ok(())
     }
 
